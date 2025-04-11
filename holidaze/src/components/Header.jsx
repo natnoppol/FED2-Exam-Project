@@ -23,8 +23,6 @@ const Header = () => {
     navigate('/login'); // Redirect to login page (or home)
   };
 
-  console.log("user", user)
-
   return (
     <header className="bg-white shadow-md p-4 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
