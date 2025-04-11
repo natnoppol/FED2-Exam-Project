@@ -23,6 +23,8 @@ const Header = () => {
     navigate('/login'); // Redirect to login page (or home)
   };
 
+  console.log("user", user)
+
   return (
     <header className="bg-white shadow-md p-4 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
@@ -50,7 +52,7 @@ const Header = () => {
                 className="flex items-center space-x-2 text-gray-700 hover:text-blue-500"
               >
                 <User className="w-5 h-5" />
-                <span>{user.name}</span>
+                <span>{user?.name}</span>
               </button>
               {accountOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-2 z-10">

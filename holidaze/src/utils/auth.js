@@ -1,8 +1,15 @@
 // src/utils/auth.js
 
-export const saveAuth = ({ accessToken, name, email, avatar }) => {
-    localStorage.setItem('token', accessToken);
-    localStorage.setItem('user', JSON.stringify({ name, email, avatar }));
+export const saveAuth = ({ accessToken, name, email, avatar, banner }) => {
+    if (accessToken) {
+        localStorage.setItem('token', accessToken);
+      }
+      if (name && email) {
+        localStorage.setItem(
+          'user',
+          JSON.stringify({ name, email, avatar, banner })
+        );
+      }
   };
   
   export const getToken = () => localStorage.getItem('token');

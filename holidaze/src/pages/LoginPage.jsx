@@ -27,8 +27,8 @@ const LoginPage = () => {
         setError(data.errors?.[0]?.message || 'Login failed');
         return;
       }
-
-      saveAuth(data);
+      console.log('Login data:', data);
+      saveAuth(data.data);
       navigate('/'); 
     } catch (err) {
       setError('Network error');
