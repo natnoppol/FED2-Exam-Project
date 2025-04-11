@@ -5,7 +5,7 @@ import { Menu, X } from "lucide-react";
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const navLinkClass = ({ isActive }) =>
+  const getNavLinkClass = ({ isActive }) =>
     isActive
       ? "text-blue-500 font-semibold"
       : "text-gray-700 hover:text-blue-500 transition";
@@ -21,13 +21,13 @@ const Header = () => {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex space-x-6">
-          <NavLink to="/" className={navLinkClass}>
+          <NavLink to="/" className={getNavLinkClass}>
             Home
           </NavLink>
-          <NavLink to="/login" className={navLinkClass}>
+          <NavLink to="/login" className={getNavLinkClass}>
             Login
           </NavLink>
-          <NavLink to="/admin" className={navLinkClass}>
+          <NavLink to="/admin" className={getNavLinkClass}>
             Admin
           </NavLink>
         </nav>
@@ -49,21 +49,21 @@ const Header = () => {
         <nav id="mobile-nav" className="md:hidden bg-white border-t px-4 pb-4 space-y-3">
           <NavLink
             to="/"
-            className={navLinkClass}
+            className={getNavLinkClass}
             onClick={() => setMenuOpen(false)}
           >
             Home
           </NavLink>
           <NavLink
             to="/login"
-            className={navLinkClass}
+            className={getNavLinkClass}
             onClick={() => setMenuOpen(false)}
           >
             Login
           </NavLink>
           <NavLink
             to="/admin"
-            className={navLinkClass}
+            className={getNavLinkClass}
             onClick={() => setMenuOpen(false)}
           >
             Admin
