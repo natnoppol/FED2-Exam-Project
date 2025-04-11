@@ -1,43 +1,66 @@
-// src/pages/LoginPage.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { saveAuth } from '../utils/auth';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Add login logic (e.g., API request or simple validation)
-    console.log('Logged in with', email, password);
+    setError('');
+
+    try {
+      const response = await fetch('https://v2.api.noroff.dev/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.errors?.[0]?.message || 'Login failed');
+        return;
+      }
+      console.log('Login data:', data);
+      saveAuth(data.data);
+      navigate('/'); 
+    } catch (err) {
+      setError('Network error');
+    }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-5 border rounded-md shadow-md">
-      <h2 className="text-xl font-bold mb-4">Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+    <div className="max-w-md mx-auto p-6 mt-10 bg-white shadow rounded">
+      <h2 className="text-xl font-semibold mb-4">Login</h2>
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div>
+          <label>Email</label>
           <input
             type="email"
-            id="email"
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+            className="w-full p-2 border rounded"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+        <div>
+          <label>Password</label>
           <input
             type="password"
-            id="password"
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+            className="w-full p-2 border rounded"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-        <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded-md">
+        {error && <p className="text-red-500">{error}</p>}
+        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
           Log In
         </button>
       </form>
