@@ -1,4 +1,4 @@
-// src/App.jsx
+import Header from './components/Header';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import VenueDetails from './pages/VenueDetails';
@@ -9,6 +9,7 @@ import AdminVenueManagement from './pages/admin/AdminVenueManagement';
 function App() {
   return (
     <Router>
+      <Header />
       <Routes>
         {/* Customer Routes */}
         <Route path="/" element={<HomePage />} />
