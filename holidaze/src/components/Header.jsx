@@ -1,7 +1,6 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Menu, X, User } from "lucide-react";
-
 import { getUser, logout } from "../utils/auth";
 
 const Header = () => {
@@ -15,8 +14,14 @@ const Header = () => {
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleAccount = () => setAccountOpen(!accountOpen);
-  
+
+  const navigate = useNavigate();
   const user = getUser();
+
+  const handleLogout = () => {
+    logout();  // Clear user data
+    navigate('/login'); // Redirect to login page (or home)
+  };
 
   return (
     <header className="bg-white shadow-md p-4 sticky top-0 z-50">
@@ -63,10 +68,7 @@ const Header = () => {
                   </Link>
                   <button
                     className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                    onClick={() => {
-                      logout();
-                      window.location.reload(); // Log out and refresh page
-                    }}
+                    onClick={handleLogout} // Use consistent logout method
                   >
                     Logout
                   </button>
@@ -134,15 +136,7 @@ const Header = () => {
               >
                 Manage Venues
               </Link>
-              <button
-                onClick={() => {
-                  logout();
-                  setMenuOpen(false);
-                }}
-                className="block text-gray-700 hover:text-blue-500 mt-1"
-              >
-                Logout
-              </button>
+              <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="block text-gray-700 hover:text-blue-500 mt-1">Logout</button>
             </div>
           )}
         </nav>
