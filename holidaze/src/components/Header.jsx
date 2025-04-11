@@ -37,6 +37,8 @@ const Header = () => {
           className="md:hidden"
           onClick={toggleMenu}
           aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+          aria-controls="mobile-nav"
         >
           {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -44,7 +46,7 @@ const Header = () => {
 
       {/* Mobile Nav Menu */}
       {menuOpen && (
-        <nav className="md:hidden bg-white border-t px-4 pb-4 space-y-3">
+        <nav id="mobile-nav" className="md:hidden bg-white border-t px-4 pb-4 space-y-3">
           <NavLink
             to="/"
             className={navLinkClass}
