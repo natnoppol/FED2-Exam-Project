@@ -33,7 +33,7 @@ const LoginPage = () => {
       saveAuth(data.data);
       navigate(from, { replace: true });
     } catch (err) {
-      setError("Network error", err.message);
+      setError(`Network error: ${err.message}`);
     }
   };
 
