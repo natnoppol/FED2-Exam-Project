@@ -12,11 +12,12 @@ const ProtectedRoute = ({ children }) => {
     
         if (token) {
           setIsAuthenticated(true);
+          setIsLoading(false); // no delay if token exists
         }
+        else {
+            setIsLoading(false); // no delay if no token
+          }
     
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 300); // small delay for UX
       }, []);
 
       if (isLoading) {
