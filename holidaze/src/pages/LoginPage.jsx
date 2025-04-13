@@ -30,7 +30,6 @@ const LoginPage = () => {
         setError(data.errors?.[0]?.message || 'Login failed');
         return;
       }
-      console.log('Login data:', data);
       saveAuth(data.data);
       navigate(from, { replace: true });
     } catch (err) {
