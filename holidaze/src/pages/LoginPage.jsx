@@ -33,7 +33,8 @@ const LoginPage = () => {
       saveAuth(data.data);
       navigate(from, { replace: true });
     } catch (err) {
-      setError(`Network error: ${err.message}`);
+      console.error("Login error:", err); 
+      setError("An unexpected error occurred. Please try again later."); 
     }
   };
 
