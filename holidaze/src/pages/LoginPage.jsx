@@ -33,7 +33,7 @@ const LoginPage = () => {
       saveAuth(data.data);
       navigate(from, { replace: true });
     } catch (err) {
-      setError('Network error');
+      setError('Network error',err);
     }
   };
 
@@ -42,7 +42,7 @@ const LoginPage = () => {
       <h2 className="text-xl font-semibold mb-4">Login</h2>
       <form onSubmit={handleLogin} className="space-y-4">
         <div>
-          <label>Email</label>
+          <label htmlFor={'email'}>Email</label>
           <input
             type="email"
             className="w-full p-2 border rounded"
@@ -52,7 +52,7 @@ const LoginPage = () => {
           />
         </div>
         <div>
-          <label>Password</label>
+          <label htmlFor={'password'}>Password</label>
           <input
             type="password"
             className="w-full p-2 border rounded"
