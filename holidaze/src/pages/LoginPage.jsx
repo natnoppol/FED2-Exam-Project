@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { saveAuth } from '../utils/auth';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,7 +32,7 @@ const LoginPage = () => {
       }
       console.log('Login data:', data);
       saveAuth(data.data);
-      navigate('/'); 
+      navigate(from, { replace: true });
     } catch (err) {
       setError('Network error');
     }
