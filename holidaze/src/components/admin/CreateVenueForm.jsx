@@ -1,4 +1,4 @@
-import { API_BASE_URL, apiKey } from "./config";
+import { API_BASE_URL, apiKey } from "../../config";
 
 
 import { useState } from "react";
