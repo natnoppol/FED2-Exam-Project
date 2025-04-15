@@ -43,9 +43,8 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = mode === "edit" && venueId 
-        ? `${API_BASE_URL}/holidaze/venues/${venueId}` 
-        : `${API_BASE_URL}/holidaze/venues`;
+      const url = mode === "edit" && venueId ? `${API_BASE_URL}/holidaze/venues/${venueId}` : `${API_BASE_URL}/holidaze/venues`;
+
       const method = mode === "edit" ? "PUT" : "POST";
       const res = await fetch(url, {
         method,
