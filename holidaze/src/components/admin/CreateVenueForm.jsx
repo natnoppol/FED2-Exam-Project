@@ -29,7 +29,7 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
     maxGuests: Number(formData.maxGuests),
     media: formData.media ? [formData.media] : [], // Convert to array if needed
   };
-  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -28,6 +28,28 @@ const AdminVenueManagement = () => {
 
   if (loading) return <p>Loading venues...</p>;
 
+  const handleDelete = async (id) => {
+    const confirmDelete = confirm("Are you sure you want to delete this venue?");
+    if (!confirmDelete) return;
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`https://v2.api.noroff.dev/holidaze/venues/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (response.ok) {
+        setVenues((prev) => prev.filter((v) => v.id !== id));
+      } else {
+        console.error("Failed to delete venue");
+      }
+    } catch (error) {
+      console.error("Error deleting venue:", error);
+    }
+  };
+
   return (
     
     <div>
