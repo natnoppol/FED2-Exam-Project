@@ -1,5 +1,4 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const LOGGING_ENABLED = import.meta.env.VITE_LOGGING_ENABLED === "true";
 
 import { useState } from "react";
 
@@ -7,8 +6,22 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    media: [""],
+    price: "0", // Initialized as a string so it's easy to bind to input fields
+    maxGuests: "1", // Default minimum 1 guest
+    media: [],
+    location: {
+      address: "",
+      city: "",
+      country: "",
+    },
+    meta: {
+      wifi: false,
+      parking: false,
+      breakfast: false,
+      pets: false,
+    },
   });
+  
 
   const preparedData = {
     ...formData,
@@ -40,6 +53,7 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
       if (!res.ok) throw new Error("Failed to create venue");
 
       const newVenue = await res.json();
+
 
       onSuccess(newVenue);
       onCancel(); // Close form

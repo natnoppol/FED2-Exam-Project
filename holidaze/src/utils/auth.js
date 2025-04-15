@@ -1,4 +1,3 @@
-// src/utils/auth.js
 
 // Save user data and token to localStorage
 export function saveAuth(userData) {

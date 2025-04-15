@@ -1,5 +1,5 @@
 import { API_BASE_URL, LOGGING_ENABLED } from "./config";
-import { saveAuth } from "../src/utils/auth";
+import { saveAuth } from "./utils/auth";
 
 
 export async function loginUser(credentials) {

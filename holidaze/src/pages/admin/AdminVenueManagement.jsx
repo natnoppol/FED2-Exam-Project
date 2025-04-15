@@ -1,6 +1,3 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const LOGGING_ENABLED = import.meta.env.VITE_LOGGING_ENABLED === "true";
-
 import { useEffect, useState } from "react";
 import { getMyVenues } from "../../api";
 import { getToken, getUser } from "../../utils/auth"; // Adjust the import path as necessary
@@ -10,6 +7,7 @@ const AdminVenueManagement = () => {
   const [loading, setLoading] = useState(true);
   const token = getToken();
   const user = getUser();
+  
 
   useEffect(() => {
     const fetchVenues = async () => {
