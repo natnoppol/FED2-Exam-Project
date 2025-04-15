@@ -1,12 +1,15 @@
-import { API_BASE_URL, LOGGING_ENABLED } from "./config";
+import { API_BASE_URL, LOGGING_ENABLED, apiKey } from "./config";
 import { saveAuth } from "./utils/auth";
+
 
 
 export async function loginUser(credentials) {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json",
+        "X-Noroff-API-Key": apiKey
+      },
       body: JSON.stringify(credentials),
     });
 
@@ -33,6 +36,7 @@ export async function getMyVenues(name, token) {
     const response = await fetch(`${API_BASE_URL}/holidaze/profiles/${name}/venues?_bookings=true`, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "X-Noroff-API-Key": apiKey
       },
     });
 

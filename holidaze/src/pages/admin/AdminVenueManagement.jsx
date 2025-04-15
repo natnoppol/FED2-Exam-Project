@@ -1,3 +1,4 @@
+import { API_BASE_URL, apiKey } from "./config";
 import { useEffect, useState } from "react";
 import { getMyVenues } from "../../api";
 import { getToken, getUser } from "../../utils/auth";
@@ -43,11 +44,13 @@ const AdminVenueManagement = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://v2.api.noroff.dev/holidaze/venues/${id}`,
+        `${API_BASE_URL}/holidaze/venues/${id}`,
         {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
+            "X-Noroff-API-Key": apiKey,
+
           },
         }
       );

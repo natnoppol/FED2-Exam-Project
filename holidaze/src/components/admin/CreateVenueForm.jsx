@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE_URL, apiKey } from "./config";
+
 
 import { useState } from "react";
 
@@ -48,6 +49,7 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+           "X-Noroff-API-Key": apiKey
         },
         body: JSON.stringify(preparedData),
       });
