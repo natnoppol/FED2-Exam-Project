@@ -42,34 +42,31 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try { 
-      const res = await fetch(`${API_BASE_URL}/holidaze/venues`, {
-
-        method: "POST",
+    try {
+      const url = mode === "edit" && venueId 
+        ? `${API_BASE_URL}/holidaze/venues/${venueId}` 
+        : `${API_BASE_URL}/holidaze/venues`;
+      const method = mode === "edit" ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-           "X-Noroff-API-Key": apiKey
+          "X-Noroff-API-Key": apiKey
         },
         body: JSON.stringify(preparedData),
       });
-
-      if (!res.ok) throw new Error("Failed to create venue");
-
-      const newVenue = await res.json();
-
-
-      onSuccess(newVenue);
+      if (!res.ok) throw new Error(`Failed to ${mode === "edit" ? "update" : "create"} venue`);
+      const venue = await res.json();
+      onSuccess(venue);
       onCancel(); // Close form
-
     } catch (err) {
-      console.error("Error creating venue:", err);
+      console.error(`Error ${mode === "edit" ? "updating" : "creating"} venue:`, err);
     }
   };
-
   return (
     <form onSubmit={handleSubmit} className="bg-white p-4 shadow-md rounded-md mb-6">
-      <h2 className="text-xl font-bold mb-4">Create New Venue</h2>
+      <h2 className="text-xl font-bold mb-4">{mode === "edit" ? "Edit Venue" : "Create New Venue"}</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input name="name" value={formData.name} onChange={handleChange} required placeholder="Venue Name" className="border p-2 rounded" />
