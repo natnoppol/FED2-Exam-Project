@@ -8,7 +8,7 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
     description: "",
     price: "0", // Initialized as a string so it's easy to bind to input fields
     maxGuests: "1", // Default minimum 1 guest
-    media: [],
+    media: "",
     location: {
       address: "",
       city: "",
@@ -27,6 +27,8 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
     ...formData,
     price: Number(formData.price),
     maxGuests: Number(formData.maxGuests),
+    media: formData.media ? [formData.media] : [], // Convert to array if needed
+  };
   };
 
   const handleChange = (e) => {
@@ -71,7 +73,7 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
         <input name="name" value={formData.name} onChange={handleChange} required placeholder="Venue Name" className="border p-2 rounded" />
         <input name="price" type="number" value={formData.price} onChange={handleChange} required placeholder="Price per night" className="border p-2 rounded" />
         <input name="maxGuests" type="number" value={formData.maxGuests} onChange={handleChange} required placeholder="Max guests" className="border p-2 rounded" />
-        <input name="media" value={formData.media[0]} onChange={handleChange} required placeholder="Image URL" className="border p-2 rounded" />
+        <input name="media" value={formData.media} onChange={handleChange} required placeholder="Image URL" className="border p-2 rounded" />
       </div>
 
       <textarea name="description" value={formData.description} onChange={handleChange} required placeholder="Description" className="border p-2 rounded w-full mt-4" rows={4} />

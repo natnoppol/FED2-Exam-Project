@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { getMyVenues } from "../../api";
-import { getToken, getUser } from "../../utils/auth"; // Adjust the import path as necessary
+import { getToken, getUser } from "../../utils/auth"; 
+import VenueCard from "../../components/admin/VenueCard";
 
 const AdminVenueManagement = () => {
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
   const token = getToken();
   const user = getUser();
+  
   
 
   useEffect(() => {
@@ -27,16 +29,21 @@ const AdminVenueManagement = () => {
   if (loading) return <p>Loading venues...</p>;
 
   return (
+    
     <div>
     <h1>My Venues</h1>
     {/* Render your venue list */}
     {venues.map((venue) => (
-      <div key={venue.id}>
-        <h2>{venue.name}</h2>
-        {/* ...other details */}
-      </div>
+       <VenueCard
+       key={venue.id}
+       venue={venue}
+       onEdit={handleEdit}
+       onDelete={handleDelete}
+     />
     ))}
   </div>
+
+  
 );
 };
 
