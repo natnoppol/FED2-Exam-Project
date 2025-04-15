@@ -17,24 +17,7 @@ const AdminVenueManagement = () => {
     window.scrollTo({ top: 0, behavior: "smooth" }); // Optional: scroll to form
   };
 
-  const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this venue?")) {
-      try {
-        const token = localStorage.getItem("token");
-        await fetch(`https://v2.api.noroff.dev/holidaze/venues/${id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        // Refresh the venue list
-        setVenues((prev) => prev.filter((v) => v.id !== id));
-      } catch (err) {
-        console.error("Failed to delete venue:", err);
-      }
-    }
-  };
-
+ 
   useEffect(() => {
     const fetchVenues = async () => {
       try {
@@ -103,14 +86,13 @@ const AdminVenueManagement = () => {
         />
       )}
 
-      {showForm && (
+      {showEditForm &&  (
         <CreateVenueForm
           mode="edit"
           venueData={editingVenue}
           onSuccess={() => {
-            setShowForm(false);
+            showEditForm(false);
             setEditingVenue(null);
-            fetchVenues(); // or update your list locally
           }}
         />
       )}
