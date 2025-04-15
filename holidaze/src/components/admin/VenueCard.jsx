@@ -1,27 +1,5 @@
 import React from "react";
 
-const handleEdit = (venue, setFormData) => {
-  setFormData(venue); // Populate formData to update the form fields
-  setShowCreateForm(true); // Or toggle into edit mode
-};
-
-const handleDelete = async (id) => {
-  if (confirm("Are you sure you want to delete this venue?")) {
-    try {
-      const token = localStorage.getItem("token");
-      await fetch(`https://v2.api.noroff.dev/holidaze/venues/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      // Refresh the venue list
-      setVenues((prev) => prev.filter((v) => v.id !== id));
-    } catch (err) {
-      console.error("Failed to delete venue:", err);
-    }
-  }
-};
 
 export default function VenueCard({ venue, onEdit, onDelete }) {
   return (
@@ -48,6 +26,7 @@ export default function VenueCard({ venue, onEdit, onDelete }) {
         >
           Edit
         </button>
+
         <button
           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           onClick={() => onDelete(venue.id)}
