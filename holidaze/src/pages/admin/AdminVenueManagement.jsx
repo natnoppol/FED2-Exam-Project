@@ -1,8 +1,9 @@
-import { API_BASE_URL, apiKey } from "./config";
+import { API_BASE_URL, apiKey } from "../../config";
 import { useEffect, useState } from "react";
 import { getMyVenues } from "../../api";
 import { getToken, getUser } from "../../utils/auth";
 import VenueCard from "../../components/admin/VenueCard";
+import CreateVenueForm from "../../components/admin/CreateVenueForm";
 
 const AdminVenueManagement = () => {
   const [venues, setVenues] = useState([]);
@@ -42,7 +43,6 @@ const AdminVenueManagement = () => {
     );
     if (!confirmDelete) return;
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(
         `${API_BASE_URL}/holidaze/venues/${id}`,
         {
