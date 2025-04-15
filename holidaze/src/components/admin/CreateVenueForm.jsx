@@ -35,7 +35,7 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "media" ? [value] : value,
+      [name]: value,
     }));
   };
 

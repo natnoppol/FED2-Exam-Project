@@ -86,16 +86,6 @@ const AdminVenueManagement = () => {
         />
       )}
 
-      {showEditForm &&  (
-        <CreateVenueForm
-          mode="edit"
-          venueData={editingVenue}
-          onSuccess={() => {
-            showEditForm(false);
-            setEditingVenue(null);
-          }}
-        />
-      )}
     </div>
   );
 };
