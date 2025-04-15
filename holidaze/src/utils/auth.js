@@ -1,26 +1,24 @@
-export const saveAuth = ({ accessToken, name, email, avatar, banner }) => {
-    if (accessToken) {
-        localStorage.setItem('token', accessToken);
-      }
-      if (name && email) {
-        localStorage.setItem(
-          'user',
-          JSON.stringify({ name, email, avatar, banner })
-        );
-      }
-  };
-  
-export const getToken = () => {
+// src/utils/auth.js
+
+// Save user data and token to localStorage
+export function saveAuth(userData) {
+  localStorage.setItem("token", userData.accessToken);
+  localStorage.setItem("user", JSON.stringify(userData));
+}
+
+// Get the saved token
+export function getToken() {
   return localStorage.getItem("token");
-};
-  
-  export const getUser = () => {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
-  };
-  
-  export const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  };
-  
+}
+
+// Get the saved user object
+export function getUser() {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+}
+
+// Clear login data (on logout)
+export function clearAuth() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+}

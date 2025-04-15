@@ -1,6 +1,9 @@
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const LOGGING_ENABLED = import.meta.env.VITE_LOGGING_ENABLED === "true";
+
 import { useEffect, useState } from "react";
-import { getToken, getUser } from "../../utils/auth";
-import CreateVenueForm from "../../components/admin/CreateVenueForm";
+import { getMyVenues } from "../../api";
+import { getToken, getUser } from "../../utils/auth"; // Adjust the import path as necessary
 
 const AdminVenueManagement = () => {
   const [venues, setVenues] = useState([]);
@@ -8,43 +11,13 @@ const AdminVenueManagement = () => {
   const token = getToken();
   const user = getUser();
 
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    maxGuests: "",
-    media: [""],
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "media" ? [value] : value,
-    }));
-  };
-
   useEffect(() => {
     const fetchVenues = async () => {
       try {
-        const res = await fetch(
-          `https://v2.api.noroff.dev/holidaze/profiles/${user.name}/venues?_bookings=true`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!res.ok) throw new Error("Failed to fetch venues");
-
-        const data = await res.json();
-        console.log("data of venues", data);
-
-        setVenues(data);
+        const data = await getMyVenues(user.name, token);
+        setVenues(data.data);
       } catch (err) {
-        console.error("Error:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -53,24 +26,20 @@ const AdminVenueManagement = () => {
     fetchVenues();
   }, [token, user.name]);
 
-  if (loading) return <p className="text-center">Loading venues...</p>;
+  if (loading) return <p>Loading venues...</p>;
 
   return (
-    <button
-  onClick={() => setShowCreateForm(!showCreateForm)}
-  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
->
-  {showCreateForm ? "Cancel" : "+ Create Venue"}
-</button>
-
-{showCreateForm && (
-  <CreateVenueForm
-    token={token}
-    onSuccess={(newVenue) => setVenues((prev) => [...prev, newVenue])}
-    onCancel={() => setShowCreateForm(false)}
-  />
-)}
-  );
+    <div>
+    <h1>My Venues</h1>
+    {/* Render your venue list */}
+    {venues.map((venue) => (
+      <div key={venue.id}>
+        <h2>{venue.name}</h2>
+        {/* ...other details */}
+      </div>
+    ))}
+  </div>
+);
 };
 
 export default AdminVenueManagement;

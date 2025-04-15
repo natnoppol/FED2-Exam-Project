@@ -1,13 +1,20 @@
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const LOGGING_ENABLED = import.meta.env.VITE_LOGGING_ENABLED === "true";
+
 import { useState } from "react";
 
 const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    price: "",
-    maxGuests: "",
     media: [""],
   });
+
+  const preparedData = {
+    ...formData,
+    price: Number(formData.price),
+    maxGuests: Number(formData.maxGuests),
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,23 +27,20 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try { 
-      const res = await fetch("https://v2.api.noroff.dev/holidaze/venues", {
+      const res = await fetch(`${API_BASE_URL}/holidaze/venues`, {
 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          ...formData,
-        }),
+        body: JSON.stringify(preparedData),
       });
 
       if (!res.ok) throw new Error("Failed to create venue");
 
       const newVenue = await res.json();
-      console.log("New venue created:", newVenue);
-      
+
       onSuccess(newVenue);
       onCancel(); // Close form
 
