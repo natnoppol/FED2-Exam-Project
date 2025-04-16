@@ -58,7 +58,6 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
         );
       const venue = await res.json();
       onSuccess(venue);
-      onCancel(); // Close form
     } catch (err) {
       setErrorMessage(`Failed to ${mode === "edit" ? "update" : "create"} venue. Please try again.`);
       console.error(err);
