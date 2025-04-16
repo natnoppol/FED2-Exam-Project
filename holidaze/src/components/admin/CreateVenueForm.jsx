@@ -22,7 +22,7 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
     ...formData,
     price: Number(formData.price),
     maxGuests: Number(formData.maxGuests),
-    media: formData.media ? [formData.media] : [], // Convert to array if needed
+    media: Array.isArray(formData.media) ? formData.media : formData.media ? [formData.media] : [], // Ensure media is a flat array
   };
 
   const handleChange = (e) => {
