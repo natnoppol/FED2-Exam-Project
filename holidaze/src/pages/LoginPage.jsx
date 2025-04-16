@@ -28,6 +28,11 @@ const LoginPage = () => {
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-semibold mb-4">Login</h2>
       <form onSubmit={handleSubmit}>
+        {error && (
+          <div className="text-red-500 bg-red-100 p-2 rounded mb-4">
+            {error}
+          </div>
+        )}
         <div className="mb-4">
           <label
             htmlFor="email"
@@ -60,7 +65,7 @@ const LoginPage = () => {
             name="password"
             required
             value={password}
-            onChange={(e) =>setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             className="mt-1 w-full border p-2 rounded"
             placeholder="Enter your password"
           />
