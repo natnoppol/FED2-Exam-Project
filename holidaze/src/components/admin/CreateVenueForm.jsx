@@ -43,7 +43,6 @@ const CreateVenueForm = ({
         }))
       : [],
   };
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,10 +72,16 @@ const CreateVenueForm = ({
       });
       if (!res.ok)
         throw new Error(
-          `Failed to ${mode === "edit" ? UPDATE_ERROR_MESSAGE: CREATE_ERROR_MESSAGE}`
+          `Failed to ${
+            mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE
+          }`
         );
       const venue = await res.json();
-      toast.success(`Venue ${mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE}`);
+      toast.success(
+        `${
+          mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE
+        }`
+      );
       onSuccess(venue);
     } catch (err) {
       setErrorMessage(
@@ -86,7 +91,9 @@ const CreateVenueForm = ({
       );
       console.error(err);
       toast.error(
-        `Failed to ${mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE}`
+        `Failed to ${
+          mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE
+        }`
       );
     }
   };
