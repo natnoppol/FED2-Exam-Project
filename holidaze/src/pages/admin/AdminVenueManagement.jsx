@@ -79,7 +79,19 @@ const AdminVenueManagement = () => {
       ))}
 
       {showEditForm && editingVenue && (
-        <CreateVenueForm mode="edit" venueData={editingVenue} onSuccess={() => { setShowEditForm(false); setEditingVenue(null); }} />
+       <CreateVenueForm
+       mode={isEditing ? "edit" : "create"}
+       venueData={editingVenue}
+       onSuccess={() => {
+         fetchVenues(); // or refresh local state
+         setShowForm(false);
+         setEditingVenue(null);
+       }}
+       onCancel={() => {
+         setShowForm(false);
+         setEditingVenue(null);
+       }}
+     />
       )}
 
     </div>
