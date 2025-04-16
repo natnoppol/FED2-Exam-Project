@@ -76,7 +76,7 @@ const CreateVenueForm = ({
           `Failed to ${mode === "edit" ? UPDATE_ERROR_MESSAGE: CREATE_ERROR_MESSAGE}`
         );
       const venue = await res.json();
-      toast.success(`Venue ${mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE} successfully!`);
+      toast.success(`Venue ${mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE}`);
       onSuccess(venue);
     } catch (err) {
       setErrorMessage(
