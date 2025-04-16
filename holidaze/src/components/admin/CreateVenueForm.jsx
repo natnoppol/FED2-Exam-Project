@@ -14,7 +14,8 @@ const CreateVenueForm = ({
     description: venueData.description || "",
     price: venueData.price || "",
     maxGuests: venueData.maxGuests || "",
-    media:venueData.media && Array.isArray(venueData.media) ? venueData.media : [],
+    media:
+      venueData.media && Array.isArray(venueData.media) ? venueData.media : [],
     location: venueData.location || {
       address: "",
       city: "",
