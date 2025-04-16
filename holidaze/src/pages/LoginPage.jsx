@@ -26,7 +26,7 @@ const LoginPage = () => {
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-semibold mb-4">Login</h2>
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label
             htmlFor="email"
@@ -39,8 +39,8 @@ const LoginPage = () => {
             id="email"
             name="email"
             required
-            value={formData.email}
-            onChange={handleChange}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="mt-1 w-full border p-2 rounded"
             placeholder="Enter your email"
           />
@@ -58,8 +58,8 @@ const LoginPage = () => {
             id="password"
             name="password"
             required
-            value={formData.password}
-            onChange={handleChange}
+            value={password}
+            onChange={(e) =>setPassword(e.target.value)}
             className="mt-1 w-full border p-2 rounded"
             placeholder="Enter your password"
           />

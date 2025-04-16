@@ -3,6 +3,7 @@ import { useState } from "react";
 import { getToken } from "../../utils/auth";
 
 const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel,}) => {
+  const [errorMessage, setErrorMessage] = useState(""); // Initialize error state
   const [formData, setFormData] = useState({
     name: venueData.name || "",
     description: venueData.description || "",
@@ -59,9 +60,8 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
       onSuccess(venue);
       onCancel(); // Close form
     } catch (err) {
-      setErrorMessage(
-        `Failed to ${mode === "edit" ? "update" : "create"} venue. Please try again.`
-      );
+      setErrorMessage(`Failed to ${mode === "edit" ? "update" : "create"} venue. Please try again.`);
+      console.error(err);
     }
   };
   return (
@@ -137,7 +137,14 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
           Cancel
         </button>
       </div>
+      {errorMessage && (
+  <div className="text-red-500 text-sm mt-2">
+    {errorMessage}
+  </div>
+)}
+
     </form>
+    
   );
 };
 
