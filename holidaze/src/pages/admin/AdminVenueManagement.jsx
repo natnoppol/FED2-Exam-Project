@@ -65,7 +65,7 @@ const AdminVenueManagement = () => {
         const errorData = await res.json();
         console.error("Delete failed:", errorData);
         setDeleteError("Failed to delete venue. Please try again.");
-        toast.error("Failed to delete venue.");
+        toast.error("Failed to delete venue. Please try again.");
       } else {
         setVenues((prev) => prev.filter((v) => v.id !== id));
         setDeleteError(""); // Clear error if delete was successful
@@ -73,7 +73,7 @@ const AdminVenueManagement = () => {
       }
     } catch (error) {
       console.error("Delete error:", error);
-      setDeleteError("Something went wrong while deleting. Please try again.");
+      setDeleteError("Failed to delete venue. Please try again.");
       toast.error("Something went wrong while deleting. Please try again.");
     }
   };
