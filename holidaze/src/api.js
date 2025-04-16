@@ -1,4 +1,4 @@
-import { API_BASE_URL, LOGGING_ENABLED, apiKey } from "./config";
+import { API_BASE_URL, LOGGING_ENABLED, API_KEY} from "./config";
 import { saveAuth } from "./utils/auth";
 
 
@@ -8,7 +8,7 @@ export async function loginUser(credentials) {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json",
-        "X-Noroff-API-Key": apiKey
+        "X-Noroff-API-Key": API_KEY
       },
       body: JSON.stringify(credentials),
     });
@@ -31,24 +31,18 @@ export async function loginUser(credentials) {
 }
 
 // Function to get venues (requires the user's name and token)
-export async function getMyVenues(name, token) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/holidaze/profiles/${name}/venues?_bookings=true`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "X-Noroff-API-Key": apiKey
-      },
-    });
+export async function getMyVenues(profileName, token) {
+  const res = await fetch(`${API_BASE_URL}/holidaze/profiles/${profileName}/venues?_bookings=true`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "X-Noroff-API-Key": API_KEY,
+    },
+  });
 
-    const data = await response.json();
-
-    if (LOGGING_ENABLED) {
-      console.log("My venues:", data);
-    }
-
-    return data; // Return the venue data
-  } catch (err) {
-    console.error("Error fetching venues:", err);
-    throw err;
+  if (!res.ok) {
+    throw new Error("Failed to fetch venues");
   }
+
+  const json = await res.json();
+  return json.data; // So your component gets just the array
 }

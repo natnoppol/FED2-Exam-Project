@@ -1,4 +1,4 @@
-import { API_BASE_URL, apiKey } from "../../config";
+import { API_BASE_URL, API_KEY } from "../../config";
 import { useEffect, useState } from "react";
 import { getMyVenues } from "../../api";
 import { getToken, getUser } from "../../utils/auth";
@@ -21,18 +21,11 @@ const AdminVenueManagement = () => {
 
   const fetchVenues = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/holidaze/profiles/${user.name}/venues?_bookings=true`, {
-        headers: {
-             Authorization: `Bearer ${token}`,
-             "X-Noroff-API-Key": apiKey,
-        },
-      });
-      const data = await res.json();
-      setVenues(data.data);
+      const data = await getMyVenues(user.name, token);
+      setVenues(data); // Assuming your API helper returns the .data array
     } catch (error) {
       console.error("Failed to fetch venues:", error);
-    } finally {
-      setLoading(false);
+    }
   };
  
   useEffect(() => {
@@ -53,8 +46,7 @@ const AdminVenueManagement = () => {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
-            "X-Noroff-API-Key": apiKey,
-
+            "X-Noroff-API-Key": API_KEY,
           },
         }
       );

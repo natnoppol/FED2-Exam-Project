@@ -8,7 +8,7 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-   // If redirected from a protected route, the location.state.from holds the path
+  // If redirected from a protected route, the location.state.from holds the path
   const from = location.state?.from?.pathname || "/";
 
   const handleSubmit = async (e) => {
@@ -22,32 +22,31 @@ const LoginPage = () => {
       setError(err.message);
     }
   };
- 
 
   return (
-    <div>
-    <h2>Login</h2>
-    <form onSubmit={handleSubmit}>
-      {/* Input fields for email and password */}
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-        required
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        required
-      />
-      {error && <p className="text-red-600">{error}</p>}
-      <button type="submit">Log In</button>
-    </form>
-  </div>
-);
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-semibold mb-4">Login</h2>
+      <form onSubmit={handleSubmit}>
+        {/* Input fields for email and password */}
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          required
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          required
+        />
+        {error && <p className="text-red-600">{error}</p>}
+        <button type="submit">Log In</button>
+      </form>
+    </div>
+  );
 };
 
 export default LoginPage;

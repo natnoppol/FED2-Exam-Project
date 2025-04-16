@@ -1,4 +1,4 @@
-import { API_BASE_URL, apiKey } from "../../config";
+import { API_BASE_URL, API_KEY } from "../../config";
 import { useState } from "react";
 import { getToken } from "../../utils/auth";
 
@@ -47,7 +47,7 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
-          "X-Noroff-API-Key": `${apiKey}`,
+          "X-Noroff-API-Key": API_KEY,
         },
         body: JSON.stringify(preparedData),
       });
@@ -107,7 +107,7 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
           onChange={(e) =>
             setFormData({
               ...formData,
-              media: e.target.value.split(","),
+              media: e.target.value.split(",").map(item => item.trim()),
             })
           }
         />
