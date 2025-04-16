@@ -4,6 +4,7 @@ import { getMyVenues } from "../../api";
 import { getToken, getUser } from "../../utils/auth";
 import VenueCard from "../../components/admin/VenueCard";
 import CreateVenueForm from "../../components/admin/CreateVenueForm";
+import ErrorBoundary from "../../components/ErrorBoundary";
 
 const AdminVenueManagement = () => {
   const [deleteError, setDeleteError] = useState("");
@@ -99,20 +100,21 @@ const AdminVenueManagement = () => {
       ))}
 
       {showEditForm && (
-        <CreateVenueForm
-        mode={editingVenue ? "edit" : "create"}
-        venueData={editingVenue}
-        onSuccess={() => {
-          fetchVenues(); // loading new venues after edit/create
-          setShowEditForm(false);
-          setEditingVenue(null);
-        }}
-        onCancel={() => {
-          setShowEditForm(false);
-          setEditingVenue(null);
-        }}
-      />
-      
+        <ErrorBoundary>
+          <CreateVenueForm
+            mode={editingVenue ? "edit" : "create"}
+            venueData={editingVenue}
+            onSuccess={() => {
+              fetchVenues(); // loading new venues after edit/create
+              setShowEditForm(false);
+              setEditingVenue(null);
+            }}
+            onCancel={() => {
+              setShowEditForm(false);
+              setEditingVenue(null);
+            }}
+          />
+        </ErrorBoundary>
       )}
     </div>
   );
