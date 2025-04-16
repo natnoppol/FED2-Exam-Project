@@ -74,6 +74,7 @@ const AdminVenueManagement = () => {
     } catch (error) {
       console.error("Delete error:", error);
       setDeleteError("Something went wrong while deleting. Please try again.");
+      toast.error("Something went wrong while deleting. Please try again.");
     }
   };
 
