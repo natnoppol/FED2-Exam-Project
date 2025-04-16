@@ -26,24 +26,51 @@ const LoginPage = () => {
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-semibold mb-4">Login</h2>
-      <form onSubmit={handleSubmit}>
-        {/* Input fields for email and password */}
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        {error && <p className="text-red-600">{error}</p>}
-        <button type="submit">Log In</button>
+      <form onSubmit={handleLogin}>
+        <div className="mb-4">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            value={formData.email}
+            onChange={handleChange}
+            className="mt-1 w-full border p-2 rounded"
+            placeholder="Enter your email"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Password
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            value={formData.password}
+            onChange={handleChange}
+            className="mt-1 w-full border p-2 rounded"
+            placeholder="Enter your password"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+        >
+          Log In
+        </button>
       </form>
     </div>
   );

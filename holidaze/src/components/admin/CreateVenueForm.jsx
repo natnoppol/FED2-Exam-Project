@@ -59,9 +59,8 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
       onSuccess(venue);
       onCancel(); // Close form
     } catch (err) {
-      console.error(
-        `Error ${mode === "edit" ? "updating" : "creating"} venue:`,
-        err
+      setErrorMessage(
+        `Failed to ${mode === "edit" ? "update" : "create"} venue. Please try again.`
       );
     }
   };
