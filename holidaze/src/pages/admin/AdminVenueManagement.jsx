@@ -84,7 +84,7 @@ const AdminVenueManagement = () => {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       >
-        + Create New Venue
+        Create New Venue
       </button>
 
       {deleteError && <p className="text-red-600 mb-4">{deleteError}</p>}

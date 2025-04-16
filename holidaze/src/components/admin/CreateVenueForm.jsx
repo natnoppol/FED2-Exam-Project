@@ -2,14 +2,19 @@ import { API_BASE_URL, API_KEY } from "../../config";
 import { useState } from "react";
 import { getToken } from "../../utils/auth";
 
-const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel,}) => {
+const CreateVenueForm = ({
+  mode = "create",
+  venueData = {},
+  onSuccess,
+  onCancel,
+}) => {
   const [errorMessage, setErrorMessage] = useState(""); // Initialize error state
   const [formData, setFormData] = useState({
     name: venueData.name || "",
     description: venueData.description || "",
     price: venueData.price || "",
     maxGuests: venueData.maxGuests || "",
-    media: venueData.media || [""],
+    media:venueData.media && Array.isArray(venueData.media) ? venueData.media : [],
     location: venueData.location || {
       address: "",
       city: "",
@@ -23,7 +28,11 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
     ...formData,
     price: Number(formData.price),
     maxGuests: Number(formData.maxGuests),
-    media: Array.isArray(formData.media) ? formData.media : formData.media ? [formData.media] : [], // Ensure media is a flat array
+    media: Array.isArray(formData.media)
+      ? formData.media
+      : formData.media
+      ? [formData.media]
+      : [], // Ensure media is a flat array
   };
 
   const handleChange = (e) => {
@@ -59,7 +68,11 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
       const venue = await res.json();
       onSuccess(venue);
     } catch (err) {
-      setErrorMessage(`Failed to ${mode === "edit" ? "update" : "create"} venue. Please try again.`);
+      setErrorMessage(
+        `Failed to ${
+          mode === "edit" ? "update" : "create"
+        } venue. Please try again.`
+      );
       console.error(err);
     }
   };
@@ -102,10 +115,15 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
         <input
           name="media"
           value={formData.media.join(",")}
-          onChange={(e) => setFormData({
-            ...formData,
-            media: e.target.value.split(",").map(item => item.trim()).filter(item => item !== "")
-          })}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              media: e.target.value
+                .split(",")
+                .map((item) => item.trim())
+                .filter((item) => item !== ""),
+            })
+          }
           placeholder="Enter media URLs, separated by commas"
         />
       </div>
@@ -136,13 +154,9 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
         </button>
       </div>
       {errorMessage && (
-  <div className="text-red-500 text-sm mt-2">
-    {errorMessage}
-  </div>
-)}
-
+        <div className="text-red-500 text-sm mt-2">{errorMessage}</div>
+      )}
     </form>
-    
   );
 };
 
