@@ -79,7 +79,9 @@ const CreateVenueForm = ({
         } venue. Please try again.`
       );
       console.error(err);
-      toast.error("Failed to delete venue.");
+      toast.error(
+        `Failed to ${mode === "edit" ? "update" : "create"} venue. Please try again.`
+      );
     }
   };
   return (
