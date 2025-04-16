@@ -11,13 +11,13 @@ const CreateVenueForm = ({
 }) => {
   const [errorMessage, setErrorMessage] = useState(""); // Initialize error state
   const [formData, setFormData] = useState({
-    name: venueData.name || "",
-    description: venueData.description || "",
-    price: venueData.price || "",
-    maxGuests: venueData.maxGuests || "",
+    name: venueData?.name || "",
+    description: venueData?.description || "",
+    price: venueData?.price || "",
+    maxGuests: venueData?.maxGuests || "",
     media:
-      venueData.media && Array.isArray(venueData.media) ? venueData.media : [],
-    location: venueData.location || {
+      venueData?.media && Array.isArray(venueData.media) ? venueData.media : [],
+    location: venueData?.location || {
       address: "",
       city: "",
       country: "",
@@ -31,11 +31,13 @@ const CreateVenueForm = ({
     price: Number(formData.price),
     maxGuests: Number(formData.maxGuests),
     media: Array.isArray(formData.media)
-      ? formData.media
-      : formData.media
-      ? [formData.media]
-      : [], // Ensure media is a flat array
+      ? formData.media.map((url) => ({
+          url,
+          alt: `${formData.name} image`, // or any custom alt text
+        }))
+      : [],
   };
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
