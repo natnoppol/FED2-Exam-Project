@@ -1,7 +1,13 @@
 import { API_BASE_URL, API_KEY } from "../../config";
 import { useState } from "react";
 import { getToken } from "../../utils/auth";
-
+import { toast } from "react-toastify";
+import {
+  CREATE_SUCCESS_MESSAGE,
+  CREATE_ERROR_MESSAGE,
+  UPDATE_SUCCESS_MESSAGE,
+  UPDATE_ERROR_MESSAGE,
+} from "../../constants";
 
 const CreateVenueForm = ({
   mode = "create",
@@ -37,7 +43,6 @@ const CreateVenueForm = ({
         }))
       : [],
   };
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -67,17 +72,29 @@ const CreateVenueForm = ({
       });
       if (!res.ok)
         throw new Error(
-          `Failed to ${mode === "edit" ? "update" : "create"} venue`
+          `Failed to ${
+            mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE
+          }`
         );
       const venue = await res.json();
+      toast.success(
+        `${
+          mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE
+        }`
+      );
       onSuccess(venue);
     } catch (err) {
       setErrorMessage(
         `Failed to ${
-          mode === "edit" ? "update" : "create"
-        } venue. Please try again.`
+          mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE
+        }`
       );
       console.error(err);
+      toast.error(
+        `Failed to ${
+          mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE
+        }`
+      );
     }
   };
   return (

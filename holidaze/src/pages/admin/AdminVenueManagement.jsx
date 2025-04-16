@@ -5,6 +5,12 @@ import { getToken, getUser } from "../../utils/auth";
 import VenueCard from "../../components/admin/VenueCard";
 import CreateVenueForm from "../../components/admin/CreateVenueForm";
 import ErrorBoundary from "../../components/ErrorBoundary";
+import { toast } from "react-toastify";
+import {
+  DELETE_ERROR_MESSAGE,
+  DELETE_SUCCESS_MESSAGE,
+} from "../../constants";
+
 
 const AdminVenueManagement = () => {
   const [deleteError, setDeleteError] = useState("");
@@ -62,15 +68,18 @@ const AdminVenueManagement = () => {
 
       if (!res.ok) {
         const errorData = await res.json();
-        console.error("Delete failed:", errorData);
-        setDeleteError("Failed to delete venue. Please try again.");
+        console.error(DELETE_ERROR_MESSAGE, errorData);
+        setDeleteError(DELETE_ERROR_MESSAGE);
+        toast.error(DELETE_ERROR_MESSAGE);
       } else {
         setVenues((prev) => prev.filter((v) => v.id !== id));
         setDeleteError(""); // Clear error if delete was successful
+        toast.success(DELETE_SUCCESS_MESSAGE);
       }
     } catch (error) {
       console.error("Delete error:", error);
-      setDeleteError("Something went wrong while deleting. Please try again.");
+      setDeleteError(DELETE_ERROR_MESSAGE);
+      toast.error(DELETE_ERROR_MESSAGE);
     }
   };
 
