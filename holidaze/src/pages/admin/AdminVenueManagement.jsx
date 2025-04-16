@@ -25,6 +25,8 @@ const AdminVenueManagement = () => {
       setVenues(data); // Assuming your API helper returns the .data array
     } catch (error) {
       console.error("Failed to fetch venues:", error);
+    }finally {
+      setLoading(false); 
     }
   };
  
