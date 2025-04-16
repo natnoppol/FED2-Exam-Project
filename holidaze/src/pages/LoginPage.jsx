@@ -19,7 +19,8 @@ const LoginPage = () => {
       await loginUser({ email, password });
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.message);
+      console.error("Login failed:", err);
+      setError("Invalid email or password. Please try again.");
     }
   };
 
