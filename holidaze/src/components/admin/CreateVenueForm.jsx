@@ -1,7 +1,7 @@
 import { API_BASE_URL, API_KEY } from "../../config";
 import { useState } from "react";
 import { getToken } from "../../utils/auth";
-
+import { toast } from "react-toastify";
 
 const CreateVenueForm = ({
   mode = "create",
@@ -70,6 +70,7 @@ const CreateVenueForm = ({
           `Failed to ${mode === "edit" ? "update" : "create"} venue`
         );
       const venue = await res.json();
+      toast.success(`Venue ${mode === "edit" ? "updated" : "created"} successfully!`);
       onSuccess(venue);
     } catch (err) {
       setErrorMessage(
@@ -78,6 +79,7 @@ const CreateVenueForm = ({
         } venue. Please try again.`
       );
       console.error(err);
+      toast.error("Failed to delete venue.");
     }
   };
   return (
