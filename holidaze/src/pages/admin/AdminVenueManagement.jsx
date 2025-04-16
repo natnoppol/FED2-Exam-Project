@@ -24,7 +24,9 @@ const AdminVenueManagement = () => {
   const fetchVenues = async () => {
     try {
       if (!user?.name) {
-        console.error("User is null or does not have a name. Cannot fetch venues.");
+        console.error(
+          "User is null or does not have a name. Cannot fetch venues."
+        );
         setLoading(false);
         return;
       }
@@ -36,7 +38,7 @@ const AdminVenueManagement = () => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchVenues();
   }, [user?.name, token]); // Fetch venues when user name or token changes
@@ -74,8 +76,18 @@ const AdminVenueManagement = () => {
   return (
     <div>
       <h1>My Venues</h1>
-      {deleteError && <p className="text-red-600 mb-4">{deleteError}</p>}
+      <button
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mb-4"
+        onClick={() => {
+          setShowEditForm(true);
+          setEditingVenue(null); // break loading old venue
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      >
+        + Create New Venue
+      </button>
 
+      {deleteError && <p className="text-red-600 mb-4">{deleteError}</p>}
       {/* Render your venue list */}
       {venues.map((venue) => (
         <VenueCard
@@ -88,18 +100,19 @@ const AdminVenueManagement = () => {
 
       {showEditForm && (
         <CreateVenueForm
-          mode={editingVenue ? "edit" : "create"}
-          venueData={editingVenue}
-          onSuccess={() => {
-            fetchVenues();
-            setShowEditForm(false);
-            setEditingVenue(null);
-          }}
-          onCancel={() => {
-            setShowEditForm(false);
-            setEditingVenue(null);
-          }}
-        />
+        mode={editingVenue ? "edit" : "create"}
+        venueData={editingVenue}
+        onSuccess={() => {
+          fetchVenues(); // loading new venues after edit/create
+          setShowEditForm(false);
+          setEditingVenue(null);
+        }}
+        onCancel={() => {
+          setShowEditForm(false);
+          setEditingVenue(null);
+        }}
+      />
+      
       )}
     </div>
   );
