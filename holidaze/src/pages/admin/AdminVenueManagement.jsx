@@ -6,6 +6,8 @@ import VenueCard from "../../components/admin/VenueCard";
 import CreateVenueForm from "../../components/admin/CreateVenueForm";
 
 const AdminVenueManagement = () => {
+  const [deleteError, setDeleteError] = useState("");
+
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
   const token = getToken();
@@ -59,14 +61,20 @@ const AdminVenueManagement = () => {
       } else {
         console.error("Failed to delete venue");
       }
-    } catch (error) {
-      console.error("Error deleting venue:", error);
+    } catch (err) {
+      console.error("Delete failed:", err);
+     setDeleteError("Failed to delete the venue. Please try again.");
     }
   };
 
   return (
     <div>
       <h1>My Venues</h1>
+      {deleteError && (
+  <div className="text-red-600 bg-red-100 p-2 rounded mb-4">
+    {deleteError}
+  </div>
+)}
       {/* Render your venue list */}
       {venues.map((venue) => (
         <VenueCard
