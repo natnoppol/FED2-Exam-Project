@@ -103,12 +103,14 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
         <input
           name="media"
           value={formData.media.join(",")}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              media: e.target.value.split(",").map(item => item.trim()),
-            })
-          }
+          onChange={(e) => setFormData({
+            ...formData,
+            media: e.target.value
+              .split(",")               // Split by comma
+              .map(item => item.trim())  // Trim leading/trailing spaces
+              .filter(item => item !== "")  // Remove empty strings
+          })}
+          placeholder="Enter media URLs, separated by commas"
         />
       </div>
 

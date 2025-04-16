@@ -31,8 +31,9 @@ const AdminVenueManagement = () => {
   };
  
   useEffect(() => {
-    fetchVenues();
-  }, []);
+    fetchVenues(); // Fetch venues whenever user.name or token changes
+  }, [user.name, token]); // Add user.name and token as dependencies
+  
 
   if (loading) return <p>Loading venues...</p>;
 
