@@ -11,8 +11,8 @@ const AdminVenueManagement = () => {
   const token = getToken();
   const user = getUser();
 
-  const [editingVenue, setEditingVenue] = useState(null); // holds the venue to edit
   const [showEditForm, setShowEditForm] = useState(false);
+  const [editingVenue, setEditingVenue] = useState(null);
   const handleEdit = (venue) => {
     setEditingVenue(venue);
     setShowEditForm(true);
@@ -78,21 +78,22 @@ const AdminVenueManagement = () => {
         />
       ))}
 
-      {showEditForm && editingVenue && (
-       <CreateVenueForm
-       mode={isEditing ? "edit" : "create"}
-       venueData={editingVenue}
-       onSuccess={() => {
-         fetchVenues(); // or refresh local state
-         setShowForm(false);
-         setEditingVenue(null);
-       }}
-       onCancel={() => {
-         setShowForm(false);
-         setEditingVenue(null);
-       }}
-     />
-      )}
+{showEditForm && (
+  <CreateVenueForm
+    mode={editingVenue ? "edit" : "create"}
+    venueData={editingVenue}
+    onSuccess={() => {
+      fetchVenues();
+      setShowEditForm(false);
+      setEditingVenue(null);
+    }}
+    onCancel={() => {
+      setShowEditForm(false);
+      setEditingVenue(null);
+    }}
+  />
+)}
+
 
     </div>
   );

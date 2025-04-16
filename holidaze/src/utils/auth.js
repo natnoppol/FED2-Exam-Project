@@ -1,11 +1,10 @@
 
 // Save user data and token to localStorage
 export function saveAuth(userData) {
-  localStorage.setItem("token", userData.accessToken);
-  localStorage.setItem("user", JSON.stringify(userData));
 
   if (userData.accessToken) {
     localStorage.setItem("token", userData.accessToken);
+    localStorage.setItem("user", JSON.stringify(userData));
   } else {
     console.warn("Warning: accessToken is undefined. Token not saved to localStorage.");
   }
