@@ -27,51 +27,50 @@ const AdminVenueManagement = () => {
       setVenues(data); // Assuming your API helper returns the .data array
     } catch (error) {
       console.error("Failed to fetch venues:", error);
-    }finally {
-      setLoading(false); 
+    } finally {
+      setLoading(false);
     }
   };
-  useEffect(() => { fetchVenues(); }, [user.name, token]);
-  
+  useEffect(() => {
+    fetchVenues();
+  }, [user.name, token]);
 
   if (loading) return <p>Loading venues...</p>;
 
   const handleDelete = async (id) => {
-    const confirmDelete = confirm(
+    const confirmDelete = window.confirm(
       "Are you sure you want to delete this venue?"
     );
     if (!confirmDelete) return;
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/holidaze/venues/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "X-Noroff-API-Key": API_KEY,
-          },
-        }
-      );
 
-      if (response.ok) {
-        setVenues((prev) => prev.filter((v) => v.id !== id));
+    try {
+      const res = await fetch(`${API_BASE_URL}/holidaze/venues/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-Noroff-API-Key": API_KEY,
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Delete failed:", errorData);
+        setDeleteError("Failed to delete venue. Please try again.");
       } else {
-        console.error("Failed to delete venue");
+        setVenues((prev) => prev.filter((v) => v.id !== id));
+        setDeleteError(""); // Clear error if delete was successful
       }
-    } catch (err) {
-      console.error("Delete failed:", err);
-     setDeleteError("Failed to delete the venue. Please try again.");
+    } catch (error) {
+      console.error("Delete error:", error);
+      setDeleteError("Something went wrong while deleting. Please try again.");
     }
   };
 
   return (
     <div>
       <h1>My Venues</h1>
-      {deleteError && (
-  <div className="text-red-600 bg-red-100 p-2 rounded mb-4">
-    {deleteError}
-  </div>
-)}
+      {deleteError && <p className="text-red-600 mb-4">{deleteError}</p>}
+
       {/* Render your venue list */}
       {venues.map((venue) => (
         <VenueCard
@@ -82,23 +81,21 @@ const AdminVenueManagement = () => {
         />
       ))}
 
-{showEditForm && (
-  <CreateVenueForm
-    mode={editingVenue ? "edit" : "create"}
-    venueData={editingVenue}
-    onSuccess={() => {
-      fetchVenues();
-      setShowEditForm(false);
-      setEditingVenue(null);
-    }}
-    onCancel={() => {
-      setShowEditForm(false);
-      setEditingVenue(null);
-    }}
-  />
-)}
-
-
+      {showEditForm && (
+        <CreateVenueForm
+          mode={editingVenue ? "edit" : "create"}
+          venueData={editingVenue}
+          onSuccess={() => {
+            fetchVenues();
+            setShowEditForm(false);
+            setEditingVenue(null);
+          }}
+          onCancel={() => {
+            setShowEditForm(false);
+            setEditingVenue(null);
+          }}
+        />
+      )}
     </div>
   );
 };
