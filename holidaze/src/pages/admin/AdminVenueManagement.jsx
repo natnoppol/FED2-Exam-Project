@@ -18,22 +18,25 @@ const AdminVenueManagement = () => {
     setShowEditForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" }); // Optional: scroll to form
   };
-
+  
+  const fetchVenues = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/holidaze/profiles/${user.name}/venues?_bookings=true`, {
+        headers: {
+          Authorization: `Bearer ${auth.accessToken}`,
+          "X-Noroff-API-Key": API_KEY,
+        },
+      });
+      const data = await res.json();
+      setVenues(data.data);
+    } catch (error) {
+      console.error("Failed to fetch venues:", error);
+    }
+  };
  
   useEffect(() => {
-    const fetchVenues = async () => {
-      try {
-        const data = await getMyVenues(user.name, token);
-        setVenues(data.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchVenues();
-  }, [token, user.name]);
+  }, []);
 
   if (loading) return <p>Loading venues...</p>;
 
