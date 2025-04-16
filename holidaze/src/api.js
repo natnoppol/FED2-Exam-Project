@@ -38,6 +38,7 @@ export async function getMyVenues(profileName, token) {
       "X-Noroff-API-Key": API_KEY,
     },
   });
+  
 
   if (!res.ok) {
     throw new Error("Failed to fetch venues");

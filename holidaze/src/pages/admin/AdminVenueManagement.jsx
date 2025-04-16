@@ -23,6 +23,11 @@ const AdminVenueManagement = () => {
 
   const fetchVenues = async () => {
     try {
+      if (!user?.name) {
+        console.error("User is null or does not have a name. Cannot fetch venues.");
+        setLoading(false);
+        return;
+      }
       const data = await getMyVenues(user.name, token);
       setVenues(data); // Assuming your API helper returns the .data array
     } catch (error) {
@@ -31,10 +36,10 @@ const AdminVenueManagement = () => {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     fetchVenues();
-  }, [user.name, token]);
-
+  }, [user?.name, token]); // Fetch venues when user name or token changes
   if (loading) return <p>Loading venues...</p>;
 
   const handleDelete = async (id) => {
