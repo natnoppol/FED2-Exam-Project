@@ -3,25 +3,24 @@ import { API_BASE_URL, apiKey } from "../../config";
 
 import { useState } from "react";
 
-const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
+const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess }) {
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    price: "0", // Initialized as a string so it's easy to bind to input fields
-    maxGuests: "1", // Default minimum 1 guest
-    media: "",
-    location: {
-      address: "",
-      city: "",
-      country: "",
-    },
-    meta: {
-      wifi: false,
-      parking: false,
-      breakfast: false,
-      pets: false,
-    },
-  });
+    name: venueData.name || "",
+  description: venueData.description || "",
+  price: venueData.price || "",
+  maxGuests: venueData.maxGuests || "",
+  media: venueData.media || [""],
+  location: venueData.location || {
+    address: "",
+    city: "",
+    country: "",
+  },
+});
+
+  const venueId = venueData?.id;
+
+
+
   
 
   const preparedData = {
@@ -43,7 +42,10 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = mode === "edit" && venueId ? `${API_BASE_URL}/holidaze/venues/${venueId}` : `${API_BASE_URL}/holidaze/venues`;
+      const url =
+  mode === "edit" && venueId
+    ? `${API_BASE_URL}/holidaze/venues/${venueId}`
+    : `${API_BASE_URL}/holidaze/venues`;
 
       const method = mode === "edit" ? "PUT" : "POST";
       const res = await fetch(url, {
@@ -51,7 +53,7 @@ const CreateVenueForm = ({ token, onSuccess, onCancel }) => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-          "X-Noroff-API-Key": apiKey
+          "X-Noroff-API-Key": `${apiKey}`,
         },
         body: JSON.stringify(preparedData),
       });
