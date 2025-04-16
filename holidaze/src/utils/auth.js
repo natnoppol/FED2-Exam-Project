@@ -1,26 +1,28 @@
-export const saveAuth = ({ accessToken, name, email, avatar, banner }) => {
-    if (accessToken) {
-        localStorage.setItem('token', accessToken);
-      }
-      if (name && email) {
-        localStorage.setItem(
-          'user',
-          JSON.stringify({ name, email, avatar, banner })
-        );
-      }
-  };
-  
-export const getToken = () => {
+
+// Save user data and token to localStorage
+export function saveAuth(userData) {
+
+  if (userData.accessToken) {
+    localStorage.setItem("token", userData.accessToken);
+    localStorage.setItem("user", JSON.stringify(userData));
+  } else {
+    console.warn("Warning: accessToken is undefined. Token not saved to localStorage.");
+  }
+}
+
+// Get the saved token
+export function getToken() {
   return localStorage.getItem("token");
-};
-  
-  export const getUser = () => {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
-  };
-  
-  export const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  };
-  
+}
+
+// Get the saved user object
+export function getUser() {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+}
+
+// Clear login data (on logout)
+export function clearAuth() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+}

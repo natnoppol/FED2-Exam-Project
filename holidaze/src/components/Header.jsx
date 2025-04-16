@@ -1,7 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Menu, X, User } from "lucide-react";
-import { getUser, logout } from "../utils/auth";
+import { getUser, clearAuth } from "../utils/auth";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -19,7 +19,7 @@ const Header = () => {
   const user = getUser();
 
   const handleLogout = () => {
-    logout();  // Clear user data
+    clearAuth();  // Clear user data
     navigate('/login'); // Redirect to login page (or home)
   };
 

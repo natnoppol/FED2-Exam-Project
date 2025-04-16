@@ -1,73 +1,79 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { saveAuth } from "../utils/auth";
+import { loginUser } from "../api";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
   const navigate = useNavigate();
   const location = useLocation();
+  // If redirected from a protected route, the location.state.from holds the path
   const from = location.state?.from?.pathname || "/";
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const response = await fetch("https://v2.api.noroff.dev/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.errors?.[0]?.message || "Login failed");
-        return;
-      }
-      saveAuth(data.data);
+      await loginUser({ email, password });
       navigate(from, { replace: true });
     } catch (err) {
-      console.error("Login error:", err); 
-      setError("An unexpected error occurred. Please try again later."); 
+      console.error("Login failed:", err);
+      setError("Invalid email or password. Please try again.");
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 mt-10 bg-white shadow rounded">
-      <h2 className="text-xl font-semibold mb-4">Login</h2>
-      <form onSubmit={handleLogin} className="space-y-4">
-        <div>
-          <label htmlFor={"email"}>Email</label>
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-semibold mb-4">Login</h2>
+      <form onSubmit={handleSubmit}>
+        {error && (
+          <div className="text-red-500 bg-red-100 p-2 rounded mb-4">
+            {error}
+          </div>
+        )}
+        <div className="mb-4">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Email
+          </label>
           <input
-            id="email"
             type="email"
-            className="w-full p-2 border rounded"
+            id="email"
+            name="email"
+            required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            className="mt-1 w-full border p-2 rounded"
+            placeholder="Enter your email"
           />
         </div>
-        <div>
-          <label htmlFor={"password"}>Password</label>
+
+        <div className="mb-4">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Password
+          </label>
           <input
-            id="password"
             type="password"
-            className="w-full p-2 border rounded"
+            id="password"
+            name="password"
+            required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
+            className="mt-1 w-full border p-2 rounded"
+            placeholder="Enter your password"
           />
         </div>
-        {error && <p className="text-red-500">{error}</p>}
+
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
         >
           Log In
         </button>
