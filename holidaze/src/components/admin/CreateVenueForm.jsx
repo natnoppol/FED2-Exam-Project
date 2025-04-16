@@ -103,11 +103,13 @@ const CreateVenueForm = ({ mode = "create", venueData = {}, onSuccess,  onCancel
         />
         <input
           name="media"
-          value={formData.media}
-          onChange={handleChange}
-          required
-          placeholder="Image URL"
-          className="border p-2 rounded"
+          value={formData.media.join(",")}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              media: e.target.value.split(","),
+            })
+          }
         />
       </div>
 
