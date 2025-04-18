@@ -61,7 +61,7 @@ function AdminBookings() {
   useEffect(() => {
     const query = search.toLowerCase();
     const filtered = bookings.filter((booking) =>
-      booking.venue?.name.toLowerCase().includes(query)
+        (booking.venue?.name || '').toLowerCase().includes(query)
     );
     setFilteredBookings(filtered);
   }, [search, bookings]);
