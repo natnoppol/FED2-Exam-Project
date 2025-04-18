@@ -68,7 +68,7 @@ function AdminBookings() {
 
   const handleCancel = async (bookingId) => {
     try {
-      const res = await fetch(
+      const response = await fetch(
         `${API_BASE_URL}/holidaze/bookings/${bookingId}`,
         {
           method: "DELETE",
@@ -79,7 +79,7 @@ function AdminBookings() {
         }
       );
 
-      if (!res.ok) throw new Error("Failed to cancel booking");
+      if (!response.ok) throw new Error("Failed to cancel booking");
       setBookings((prev) => prev.filter((b) => b.id !== bookingId));
       toast.success("Booking cancelled successfully!");
     } catch (error) {
