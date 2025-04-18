@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Menu, X, User } from "lucide-react";
 import { getUser, clearAuth } from "../utils/auth";
 import { toast } from "react-toastify";
+import { useRef, useEffect } from "react";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -18,6 +19,21 @@ const Header = () => {
 
   const navigate = useNavigate();
   const user = getUser();
+
+  const accountRef = useRef();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (accountRef.current && !accountRef.current.contains(event.target)) {
+        setAccountOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = () => {
     clearAuth(); // Clear user data
@@ -46,7 +62,7 @@ const Header = () => {
 
           {/* Account Dropdown */}
           {user && (
-            <div className="relative">
+            <div className="relative" ref={accountRef}>
               <button
                 onClick={toggleAccount}
                 className="flex items-center space-x-2 text-gray-700 hover:text-blue-500"
