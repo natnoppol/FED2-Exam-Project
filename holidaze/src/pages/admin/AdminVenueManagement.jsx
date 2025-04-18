@@ -9,12 +9,15 @@ import { toast } from "react-toastify";
 import { DELETE_ERROR_MESSAGE, DELETE_SUCCESS_MESSAGE } from "../../constants";
 
 const AdminVenueManagement = () => {
-  const [deleteError, setDeleteError] = useState("");
-  const [venues, setVenues] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showEditForm, setShowEditForm] = useState(false);
-  const [editingVenue, setEditingVenue] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [deleteError, setDeleteError] = useState(""); // state for delete error
+  const [venues, setVenues] = useState([]); // state for venues
+  const [loading, setLoading] = useState(true); // loading state for venues
+  const [showEditForm, setShowEditForm] = useState(false); // for showing the edit form
+  const [editingVenue, setEditingVenue] = useState(null); // for editing a venue
+  const [searchTerm, setSearchTerm] = useState(""); // for search functionality
+  const [visibleCount, setVisibleCount] = useState(6); // show 6 venues at a time
+  const loadMore = () => setVisibleCount((prev) => prev + 6); // load 6 more venues
+
   const token = getToken();
   const user = getUser();
 
@@ -107,7 +110,7 @@ const AdminVenueManagement = () => {
       {deleteError && <p className="text-red-600 mb-4">{deleteError}</p>}
 
       {/* Render your venue list */}
-      {filteredVenues.map((venue) => (
+      {filteredVenues.slice(0, visibleCount).map((venue) => (
         <VenueCard
           key={venue.id}
           venue={venue}
@@ -115,6 +118,17 @@ const AdminVenueManagement = () => {
           onDelete={handleDelete}
         />
       ))}
+      
+      {visibleCount < filteredVenues.length && (
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={loadMore}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Load More
+          </button>
+        </div>
+      )}
 
       {showEditForm && (
         <ErrorBoundary>
