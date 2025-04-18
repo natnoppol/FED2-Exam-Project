@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminVenueManagement from './pages/admin/AdminVenueManagement';
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminBookings from './pages/admin/AdminBookings';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         {/* Admin Routes */}
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/manage-venues" element={<ProtectedRoute><AdminVenueManagement /></ProtectedRoute>} />
+        <Route path="/admin/bookings" element={<ProtectedRoute><AdminBookings /></ProtectedRoute>} />
       </Routes>
     </Router>
   );
