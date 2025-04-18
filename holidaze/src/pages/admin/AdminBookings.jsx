@@ -23,7 +23,7 @@ function AdminBookings() {
     const fetchBookings = async () => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/holidaze/profiles/${user.name}/bookings?_venue=true`,
+          `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(user.name)}/bookings?_venue=true`,
           {
             method: "GET",
             headers: {
