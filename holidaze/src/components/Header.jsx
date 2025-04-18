@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Menu, X, User } from "lucide-react";
 import { getUser, clearAuth } from "../utils/auth";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -19,8 +20,9 @@ const Header = () => {
   const user = getUser();
 
   const handleLogout = () => {
-    clearAuth();  // Clear user data
-    navigate('/login'); // Redirect to login page (or home)
+    clearAuth(); // Clear user data
+    toast.success("Logged out successfully!"); // Show success message
+    navigate("/login"); // Redirect to login page (or home)
   };
 
   return (
@@ -49,6 +51,11 @@ const Header = () => {
                 onClick={toggleAccount}
                 className="flex items-center space-x-2 text-gray-700 hover:text-blue-500"
               >
+                <img
+                  src={user?.avatar?.url || "https://via.placeholder.com/40"}
+                  alt={user?.avatar?.alt || user?.name}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
                 <User className="w-5 h-5" />
                 <span>{user?.name}</span>
               </button>
@@ -150,8 +157,16 @@ const Header = () => {
               >
                 Admin Bookings
               </Link>
-              
-              <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="block text-gray-700 hover:text-blue-500 mt-1">Logout</button>
+
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
+                }}
+                className="block text-gray-700 hover:text-blue-500 mt-1"
+              >
+                Logout
+              </button>
             </div>
           )}
         </nav>
