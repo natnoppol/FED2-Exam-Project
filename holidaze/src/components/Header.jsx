@@ -70,9 +70,9 @@ const Header = () => {
                     to="/admin/bookings"
                     className="block px-4 py-2 hover:bg-gray-100"
                   >
-                    Manage Bookings
+                    AdminBookings
                   </Link>
-                  
+
                   <button
                     className="w-full text-left px-4 py-2 hover:bg-gray-100"
                     onClick={handleLogout} // Use consistent logout method
@@ -143,6 +143,14 @@ const Header = () => {
               >
                 Manage Venues
               </Link>
+              <Link
+                to="/admin/bookings"
+                onClick={() => setMenuOpen(false)}
+                className="block text-gray-700 hover:text-blue-500"
+              >
+                AdminBookings
+              </Link>
+              
               <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="block text-gray-700 hover:text-blue-500 mt-1">Logout</button>
             </div>
           )}
