@@ -70,7 +70,7 @@ const Header = () => {
                     to="/admin/bookings"
                     className="block px-4 py-2 hover:bg-gray-100"
                   >
-                    AdminBookings
+                    Admin Bookings
                   </Link>
 
                   <button
@@ -148,7 +148,7 @@ const Header = () => {
                 onClick={() => setMenuOpen(false)}
                 className="block text-gray-700 hover:text-blue-500"
               >
-                AdminBookings
+                Admin Bookings
               </Link>
               
               <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="block text-gray-700 hover:text-blue-500 mt-1">Logout</button>
