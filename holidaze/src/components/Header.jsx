@@ -1,7 +1,9 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X, User } from "lucide-react";
 import { getUser, clearAuth } from "../utils/auth";
+import { toast } from "react-toastify";
+
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,14 +15,31 @@ const Header = () => {
       : "text-gray-700 hover:text-blue-500 transition";
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
-  const toggleAccount = () => setAccountOpen(!accountOpen);
+ // Define the toggleAccount function
+ const toggleAccount = () => setAccountOpen(!accountOpen);
 
   const navigate = useNavigate();
   const user = getUser();
 
+  const accountRef = useRef();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (accountRef.current && !accountRef.current.contains(event.target)) {
+        setAccountOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleLogout = () => {
-    clearAuth();  // Clear user data
-    navigate('/login'); // Redirect to login page (or home)
+    clearAuth(); // Clear user data
+    toast.success("Logged out successfully!"); // Show success message
+    navigate("/login"); // Redirect to login page (or home)
   };
 
   return (
@@ -44,11 +63,16 @@ const Header = () => {
 
           {/* Account Dropdown */}
           {user && (
-            <div className="relative">
+            <div className="relative" ref={accountRef}>
               <button
                 onClick={toggleAccount}
                 className="flex items-center space-x-2 text-gray-700 hover:text-blue-500"
               >
+                <img
+                  src={user?.avatar?.url || "https://via.placeholder.com/40"}
+                  alt={user?.avatar?.alt || user?.name}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
                 <User className="w-5 h-5" />
                 <span>{user?.name}</span>
               </button>
@@ -66,6 +90,13 @@ const Header = () => {
                   >
                     Manage Venues
                   </Link>
+                  <Link
+                    to="/admin/bookings"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                  >
+                    Admin Bookings
+                  </Link>
+
                   <button
                     className="w-full text-left px-4 py-2 hover:bg-gray-100"
                     onClick={handleLogout} // Use consistent logout method
@@ -136,7 +167,23 @@ const Header = () => {
               >
                 Manage Venues
               </Link>
-              <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="block text-gray-700 hover:text-blue-500 mt-1">Logout</button>
+              <Link
+                to="/admin/bookings"
+                onClick={() => setMenuOpen(false)}
+                className="block text-gray-700 hover:text-blue-500"
+              >
+                Admin Bookings
+              </Link>
+
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
+                }}
+                className="block text-gray-700 hover:text-blue-500 mt-1"
+              >
+                Logout
+              </button>
             </div>
           )}
         </nav>
