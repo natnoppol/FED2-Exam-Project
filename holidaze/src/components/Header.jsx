@@ -72,6 +72,7 @@ const Header = () => {
                   >
                     Manage Bookings
                   </Link>
+                  
                   <button
                     className="w-full text-left px-4 py-2 hover:bg-gray-100"
                     onClick={handleLogout} // Use consistent logout method

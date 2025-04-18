@@ -109,27 +109,12 @@ function AdminBookings() {
         <ul className="space-y-4">
           {filteredBookings.map((booking) => (
            
-           <React.Fragment key={booking.id}>
            <AdminBookingCard
+             key={booking.id}
              booking={booking}
              onCancel={handleCancel}
            />
-           <li
-             className="border p-4 rounded shadow-sm bg-white"
-           >
-             <p>
-               <strong>Venue:</strong> {booking.venue?.name || "Unknown Venue"}
-             </p>
-             <p>
-               <strong>Date:</strong>{" "}
-               {new Date(booking.dateFrom).toLocaleDateString()} to{" "}
-               {new Date(booking.dateTo).toLocaleDateString()}
-             </p>
-             <p>
-               <strong>Guests:</strong> {booking.guests}
-             </p>
-           </li>
-         </React.Fragment>
+
           ))}
         </ul>
 
