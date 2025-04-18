@@ -1,9 +1,9 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X, User } from "lucide-react";
 import { getUser, clearAuth } from "../utils/auth";
 import { toast } from "react-toastify";
-import { useRef, useEffect } from "react";
+
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,7 +15,8 @@ const Header = () => {
       : "text-gray-700 hover:text-blue-500 transition";
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
-  const toggleAccount = () => setAccountOpen(!accountOpen);
+ // Define the toggleAccount function
+ const toggleAccount = () => setAccountOpen(!accountOpen);
 
   const navigate = useNavigate();
   const user = getUser();
