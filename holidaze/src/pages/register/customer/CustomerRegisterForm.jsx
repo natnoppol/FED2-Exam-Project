@@ -33,8 +33,18 @@ function CustomerRegisterForm() {
       await registerUser({ ...data, venueManager: false });
       setSuccess("Account created! Redirecting to login...");
       setTimeout(() => navigate("/login"), 2000);
+      
     } catch (err) {
       setError(err.message);
+        if (err.response && err.response.status === 409) {
+            setError("Email is already registered.");
+        } else if (err.message === "Network Error") {
+            setError("There was an issue connecting to the server. Please try again later.");
+        } else {
+            setError("An unexpected error occurred. Please try again.");
+        }
+        console.error("Registration error:", err);
+
     }
   };
 
