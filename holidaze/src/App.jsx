@@ -8,6 +8,8 @@ import AdminVenueManagement from "./pages/admin/AdminVenueManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminBookings from "./pages/admin/AdminBookings";
 import RegisterPage from "./pages/RegisterPage";
+import CustomerRegisterForm from "./pages/register/customer/CustomerRegisterForm";
+import VenueManagerRegisterForm from "./pages/register/venue-manager/VenueManagerRegisterForm";
 
 function App() {
   return (

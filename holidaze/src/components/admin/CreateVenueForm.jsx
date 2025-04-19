@@ -8,6 +8,7 @@ import {
   UPDATE_SUCCESS_MESSAGE,
   UPDATE_ERROR_MESSAGE,
 } from "../../constants";
+import MediaInput from "../form/MediaInput";
 
 const CreateVenueForm = ({
   mode = "create",
@@ -22,7 +23,9 @@ const CreateVenueForm = ({
     price: venueData?.price || "",
     maxGuests: venueData?.maxGuests || "",
     media:
-      venueData?.media && Array.isArray(venueData.media) ? venueData.media : [],
+      venueData?.media && Array.isArray(venueData?.media)
+        ? venueData?.media
+        : [],
     location: venueData?.location || {
       address: "",
       city: "",
@@ -36,13 +39,16 @@ const CreateVenueForm = ({
     ...formData,
     price: Number(formData.price),
     maxGuests: Number(formData.maxGuests),
-    media: Array.isArray(formData.media)
-      ? formData.media.map((url) => ({
-          url,
-          alt: `${formData.name} image`, // or any custom alt text
-        }))
+    media: Array.isArray(formData?.media)
+      ? formData.media
+          .filter((url) => typeof url === "string" && url.trim() !== "")
+          .map((url) => ({
+            url: url.trim(),
+            alt: `${formData.name} image`,
+          }))
       : [],
   };
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,28 +78,20 @@ const CreateVenueForm = ({
       });
       if (!res.ok)
         throw new Error(
-          `Failed to ${
-            mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE
-          }`
+          `${mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE}`
         );
       const venue = await res.json();
       toast.success(
-        `${
-          mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE
-        }`
+        `${mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE}`
       );
       onSuccess(venue);
     } catch (err) {
       setErrorMessage(
-        `Failed to ${
-          mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE
-        }`
+        `${mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE}`
       );
       console.error(err);
       toast.error(
-        `Failed to ${
-          mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE
-        }`
+        ` ${mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE}`
       );
     }
   };
@@ -133,20 +131,12 @@ const CreateVenueForm = ({
           placeholder="Max guests"
           className="border p-2 rounded"
         />
-        <input
-          name="media"
-          value={formData.media.join(",")}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              media: e.target.value
-                .split(",")
-                .map((item) => item.trim())
-                .filter((item) => item !== ""),
-            })
-          }
-          placeholder="Enter media URLs, separated by commas"
-        />
+        <MediaInput
+  value={formData?.media}
+  onChange={(updatedMedia) =>
+    setFormData((prev) => ({ ...prev, media: updatedMedia }))
+  }
+/>
       </div>
 
       <textarea
