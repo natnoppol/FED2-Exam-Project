@@ -98,7 +98,7 @@ const CreateVenueForm = ({
       );
       console.error(err);
       toast.error(
-        ` ${mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE}`
+        `${mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE}`
       );
     }
   };
