@@ -41,11 +41,18 @@ const CreateVenueForm = ({
     maxGuests: Number(formData.maxGuests),
     media: Array.isArray(formData?.media)
       ? formData.media
-          .filter((url) => typeof url === "string" && url.trim() !== "")
-          .map((url) => ({
-            url: url.trim(),
-            alt: `${formData.name} image`,
-          }))
+      .map((item) => {
+        if (typeof item === "string" && item.trim() !== "") {
+          return { url: item.trim(), alt: `${formData.name} image` };
+        } else if (typeof item === "object" && item.url) {
+          return {
+            url: item.url.trim(),
+            alt: item.alt || `${formData.name} image`,
+          };
+        }
+        return null;
+      })
+      .filter((item) => item !== null)
       : [],
   };
   

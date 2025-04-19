@@ -66,7 +66,7 @@ function CustomerRegisterForm() {
         Register
       </button>
       <button
-          type="cancel"
+           type="button"
             onClick={() => navigate("/register")}
           className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
         >

@@ -5,7 +5,7 @@ export default function VenueCard({ venue, onEdit, onDelete }) {
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden p-4 flex flex-col justify-between">
       <img
-        src={venue.media?.[0]?.url || "No Image"}
+        src={venue.media?.[0]?.url || "https://via.placeholder.com/150"}
         alt={venue.media?.[0]?.alt || venue.name}
         className="w-full h-40 object-cover rounded"
       />
