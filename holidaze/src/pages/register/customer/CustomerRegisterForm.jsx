@@ -33,9 +33,9 @@ function CustomerRegisterForm() {
       await registerUser({ ...data, venueManager: false });
       setSuccess("Account created! Redirecting to login...");
       setTimeout(() => navigate("/login"), 2000);
-      
+
     } catch (err) {
-      setError(err.message);
+        
         if (err.response && err.response.status === 409) {
             setError("Email is already registered.");
         } else if (err.message === "Network Error") {
