@@ -1,16 +1,21 @@
 import React from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useNavigate } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-
 const schema = Yup.object().shape({
   name: Yup.string()
-    .matches(/^[A-Za-z0-9_]+$/, "Only letters, numbers, and underscores are allowed")
+    .matches(
+      /^[A-Za-z0-9_]+$/,
+      "Only letters, numbers, and underscores are allowed"
+    )
     .required("Name is required"),
   email: Yup.string()
     .email("Invalid email")
-    .matches(/^[a-zA-Z0-9._%+-]+@stud\.noroff\.no$/, "Must be a @stud.noroff.no email")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@stud\.noroff\.no$/,
+      "Must be a @stud.noroff.no email"
+    )
     .required("Email is required"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
@@ -24,6 +29,7 @@ const schema = Yup.object().shape({
 });
 
 function VenueManagerRegisterForm() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -43,57 +49,108 @@ function VenueManagerRegisterForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="max-w-xl mx-auto p-4 space-y-4 bg-white shadow rounded"
     >
+      <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md text-center">
+        <h2 className="text-2xl font-semibold mb-6">Register</h2>
+        <p className="mb-4 text-gray-600">Choose your account type:</p>
+
+        <div className="space-y-4">
+          <button
+            onClick={() => navigate("/register/customer")}
+            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+          >
+            Register as Customer
+          </button>
+
+          <button
+            onClick={() => navigate("/register/venue-manager")}
+            className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition-colors"
+          >
+            Register as Venue Manager
+          </button>
+        </div>
+      </div>
       <div>
         <label className="block font-medium">Name</label>
         <input {...register("name")} className="w-full p-2 border rounded" />
-        {errors.name && <p className="text-red-600 text-sm">{errors.name.message}</p>}
+        {errors.name && (
+          <p className="text-red-600 text-sm">{errors.name.message}</p>
+        )}
       </div>
 
       <div>
         <label className="block font-medium">Email</label>
         <input {...register("email")} className="w-full p-2 border rounded" />
-        {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
+        {errors.email && (
+          <p className="text-red-600 text-sm">{errors.email.message}</p>
+        )}
       </div>
 
       <div>
         <label className="block font-medium">Password</label>
-        <input type="password" {...register("password")} className="w-full p-2 border rounded" />
-        {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
+        <input
+          type="password"
+          {...register("password")}
+          className="w-full p-2 border rounded"
+        />
+        {errors.password && (
+          <p className="text-red-600 text-sm">{errors.password.message}</p>
+        )}
       </div>
 
       <div>
         <label className="block font-medium">Bio (optional)</label>
         <textarea {...register("bio")} className="w-full p-2 border rounded" />
-        {errors.bio && <p className="text-red-600 text-sm">{errors.bio.message}</p>}
+        {errors.bio && (
+          <p className="text-red-600 text-sm">{errors.bio.message}</p>
+        )}
       </div>
 
       <div>
         <label className="block font-medium">Avatar URL</label>
-        <input {...register("avatarUrl")} className="w-full p-2 border rounded" />
-        {errors.avatarUrl && <p className="text-red-600 text-sm">{errors.avatarUrl.message}</p>}
+        <input
+          {...register("avatarUrl")}
+          className="w-full p-2 border rounded"
+        />
+        {errors.avatarUrl && (
+          <p className="text-red-600 text-sm">{errors.avatarUrl.message}</p>
+        )}
       </div>
 
       <div>
         <label className="block font-medium">Avatar Alt</label>
-        <input {...register("avatarAlt")} className="w-full p-2 border rounded" />
-        {errors.avatarAlt && <p className="text-red-600 text-sm">{errors.avatarAlt.message}</p>}
+        <input
+          {...register("avatarAlt")}
+          className="w-full p-2 border rounded"
+        />
+        {errors.avatarAlt && (
+          <p className="text-red-600 text-sm">{errors.avatarAlt.message}</p>
+        )}
       </div>
 
       <div>
         <label className="block font-medium">Banner URL</label>
-        <input {...register("bannerUrl")} className="w-full p-2 border rounded" />
-        {errors.bannerUrl && <p className="text-red-600 text-sm">{errors.bannerUrl.message}</p>}
+        <input
+          {...register("bannerUrl")}
+          className="w-full p-2 border rounded"
+        />
+        {errors.bannerUrl && (
+          <p className="text-red-600 text-sm">{errors.bannerUrl.message}</p>
+        )}
       </div>
 
       <div>
         <label className="block font-medium">Banner Alt</label>
-        <input {...register("bannerAlt")} className="w-full p-2 border rounded" />
-        {errors.bannerAlt && <p className="text-red-600 text-sm">{errors.bannerAlt.message}</p>}
+        <input
+          {...register("bannerAlt")}
+          className="w-full p-2 border rounded"
+        />
+        {errors.bannerAlt && (
+          <p className="text-red-600 text-sm">{errors.bannerAlt.message}</p>
+        )}
       </div>
 
       <div className="flex items-center">
-        <input type="checkbox" {...register("venueManager")}
-          className="mr-2" />
+        <input type="checkbox" {...register("venueManager")} className="mr-2" />
         <label>I want to be a venue manager</label>
       </div>
 
@@ -107,4 +164,4 @@ function VenueManagerRegisterForm() {
   );
 }
 
-export default VenueManagerRegisterForm
+export default VenueManagerRegisterForm;
