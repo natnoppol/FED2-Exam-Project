@@ -4,6 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import ErrorMessage from "../../../components/ErrorMessage";
 
 const schema = Yup.object({
   name: Yup.string()
@@ -41,7 +42,7 @@ function CustomerRegisterForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto p-4 space-y-4 bg-white shadow rounded mt-8">
       <h2 className="text-xl font-semibold text-center">Register as Customer</h2>
 
-      {error && <div className="text-red-500 text-center">{error}</div>}
+      <ErrorMessage message={error} />
       {success && <div className="text-green-600 text-center">{success}</div>}
 
       <div>

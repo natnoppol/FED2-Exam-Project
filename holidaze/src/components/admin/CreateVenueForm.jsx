@@ -47,7 +47,7 @@ const CreateVenueForm = ({
         } else if (typeof item === "object" && item.url) {
           return {
             url: item.url.trim(),
-            alt: item.alt || `${formData.name} image`,
+            alt: `${formData.name || "Venue"} image`,
           };
         }
         return null;
