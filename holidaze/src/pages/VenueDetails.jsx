@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"; // For getting the dynamic ID from URL
-import { getVenueById } from "../../api"; 
-import { getUser } from "../../utils/auth";
+import { getVenueById } from "../api"; 
+import { getUser } from "../utils/auth";
 import BookingForm from "../components/BookingForm"; 
 
 
