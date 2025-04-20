@@ -16,6 +16,7 @@ const AdminVenueManagement = () => {
   const [editingVenue, setEditingVenue] = useState(null); // for editing a venue
   const [searchTerm, setSearchTerm] = useState(""); // for search functionality
   const [visibleCount, setVisibleCount] = useState(6); // show 6 venues at a time
+
   const loadMore = () => setVisibleCount((prev) => prev + 6); // load 6 more venues
 
   const token = getToken();
@@ -75,9 +76,17 @@ const AdminVenueManagement = () => {
         setDeleteError(DELETE_ERROR_MESSAGE);
         toast.error(DELETE_ERROR_MESSAGE);
       } else {
-        setVenues((prev) => prev.filter((v) => v.id !== id));
         setDeleteError(""); // Clear error if delete was successful
         toast.success(DELETE_SUCCESS_MESSAGE);
+        // Reset edit state if the deleted venue is currently being edited
+        if (editingVenue?.id === id) {
+          setEditingVenue(null);
+          setShowEditForm(false);
+        }
+
+        //  Re-fetch updated list from the server
+        setLoading(true);
+        await fetchVenues();
       }
     } catch (error) {
       console.error("Delete error:", error);
@@ -118,7 +127,11 @@ const AdminVenueManagement = () => {
           onDelete={handleDelete}
         />
       ))}
-      
+       {/* "No venues found" Message */}
+      {filteredVenues.length === 0 && !loading && (
+        <p className="text-gray-500 text-center mt-4">No venues found.</p>
+      )}
+
       {visibleCount < filteredVenues.length && (
         <div className="flex justify-center mt-4">
           <button
