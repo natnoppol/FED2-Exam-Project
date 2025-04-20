@@ -1,8 +1,6 @@
 import { API_BASE_URL, LOGGING_ENABLED, API_KEY} from "./config";
 import { saveAuth } from "./utils/auth";
 
-
-
 export async function loginUser(credentials) {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -47,3 +45,49 @@ export async function getMyVenues(profileName, token) {
   const json = await res.json();
   return json.data; // So your component gets just the array
 }
+
+//fetch the list of venues in Homepage and so on!
+export const getVenues = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/venues`, {
+      method: "GET",
+      headers: {
+        "X-Noroff-API-Key": API_KEY, 
+        "Content-Type": "application/json", 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch venues");
+
+    }
+
+    const data = await response.json();
+    return data; // The data returned should be an array of venues
+  } catch (error) {
+    console.error("Error fetching venues:", error);
+    throw error; // You may choose to handle the error in a different way
+  }
+};
+
+export const getVenueById = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/venues/${id}`, {
+      method: "GET",
+      headers: {
+        "X-Noroff-API-Key": API_KEY, // If needed
+        "Content-Type": "application/json", // Assuming the API returns JSON
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch venue with ID: ${id}`);
+    }
+
+    const data = await response.json();
+    return data; // The data returned should be the details of the venue
+  } catch (error) {
+    console.error("Error fetching venue by ID:", error);
+    throw error; // You may choose to handle the error in a different way
+  }
+};
