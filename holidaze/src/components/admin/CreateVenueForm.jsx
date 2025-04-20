@@ -9,6 +9,7 @@ import {
   UPDATE_ERROR_MESSAGE,
 } from "../../constants";
 import MediaInput from "../form/MediaInput";
+import { useNavigate } from "react-router-dom";
 
 
 const CreateVenueForm = ({
@@ -33,7 +34,7 @@ const CreateVenueForm = ({
       country: "",
     },
   });
-
+  const navigate = useNavigate();
 
   const venueId = venueData?.id;
 
@@ -92,9 +93,24 @@ const CreateVenueForm = ({
       toast.success(
         `${mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE}`
       );
-      onSuccess(venue);
-      //  Clear form and redirect
       
+      // Clear form and redirect
+      setFormData({
+        name: "",
+        description: "",
+        price: "",
+        maxGuests: "",
+        media: [],
+        location: {
+          address: "",
+          city: "",
+          country: "",
+        },
+      });
+
+      onSuccess(venue);
+      navigate("/admin/manage-venues");
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
     } catch (err) {
       setErrorMessage(
