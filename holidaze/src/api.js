@@ -49,7 +49,7 @@ export async function getMyVenues(profileName, token) {
 //fetch the list of venues in Homepage and so on!
 export const getVenues = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/venues`, {
+    const response = await fetch(`${API_BASE_URL}/holidaze/venues`, {
       method: "GET",
       headers: {
         "X-Noroff-API-Key": API_KEY, 
@@ -59,11 +59,10 @@ export const getVenues = async () => {
 
     if (!response.ok) {
       throw new Error("Failed to fetch venues");
-
     }
 
-    const data = await response.json();
-    return data; // The data returned should be an array of venues
+    const json = await response.json();
+    return json.data; // Noroff API typically wraps response in { data: [...] }
   } catch (error) {
     console.error("Error fetching venues:", error);
     throw error; // You may choose to handle the error in a different way
@@ -72,7 +71,7 @@ export const getVenues = async () => {
 
 export const getVenueById = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/venues/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/holidaze/venues/${id}`, {
       method: "GET",
       headers: {
         "X-Noroff-API-Key": API_KEY, // If needed
@@ -84,8 +83,8 @@ export const getVenueById = async (id) => {
       throw new Error(`Failed to fetch venue with ID: ${id}`);
     }
 
-    const data = await response.json();
-    return data; // The data returned should be the details of the venue
+    const json = await response.json();
+    return json.data; // The data returned should be the details of the venue
   } catch (error) {
     console.error("Error fetching venue by ID:", error);
     throw error; // You may choose to handle the error in a different way

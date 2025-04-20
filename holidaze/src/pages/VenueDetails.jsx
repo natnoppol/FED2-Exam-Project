@@ -19,6 +19,20 @@ const VenueDetails = ({ user }) => {
     // You might want to show a success message or redirect after successful booking
   };
 
+  const handleEdit = (venueId) => {
+    // Logic for editing venue (e.g., navigate to edit page or show edit form)
+    console.log("Edit venue", venueId);
+  };
+
+  const handleDelete = (venueId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this venue?");
+    if (!confirmDelete) return;
+
+    // Logic to delete venue
+    console.log("Deleting venue", venueId);
+    // Add API call and redirect here
+  };
+
   useEffect(() => {
     // Check if the logged-in user is a venue manager
     if (user?.role === "venue_manager") {
@@ -46,7 +60,11 @@ const VenueDetails = ({ user }) => {
     <div>
       <h1>{venue.name}</h1>
       <p>{venue.description}</p>
-      <img src={venue.media[0]} alt={venue.name} /> {/* Assuming media is an array */}
+      <img
+              src={venue.media[0]?.url || "https://plus.unsplash.com/premium_photo-1699544856963-49c417549268?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
+              alt={venue.media[0]?.alt || venue.name}
+            />
+      
       <p>Price: ${venue.price}</p>
       
       {isManager ? (
@@ -82,16 +100,7 @@ const VenueDetails = ({ user }) => {
     </div>
   );
 };
-const handleEdit = (venueId) => {
-  // Navigate to the edit page (implement your navigation logic)
-  console.log("Editing venue", venueId);
-};
 
-const handleDelete = async (venueId) => {
-  // Call your delete API to remove the venue
-  console.log("Deleting venue", venueId);
-  // After deletion, you may want to redirect or update the state
-};
 
 
 export default VenueDetails;
