@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getVenues } from "../../api"; 
+import { getVenues } from "../api"; 
 
 const Homepage = () => {
   const [venues, setVenues] = useState([]);
