@@ -3,7 +3,7 @@ import { getVenues } from "../api";
 import { Link } from "react-router-dom";
 
 
-const Homepage = () => {
+const HomePage = () => {
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,4 +47,4 @@ const Homepage = () => {
   );
 };
 
-export default Homepage;
+export default HomePage;
