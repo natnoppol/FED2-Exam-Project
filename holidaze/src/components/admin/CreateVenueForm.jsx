@@ -10,6 +10,7 @@ import {
 } from "../../constants";
 import MediaInput from "../form/MediaInput";
 
+
 const CreateVenueForm = ({
   mode = "create",
   venueData = {},
@@ -33,6 +34,7 @@ const CreateVenueForm = ({
     },
   });
 
+
   const venueId = venueData?.id;
 
   const preparedData = {
@@ -41,21 +43,20 @@ const CreateVenueForm = ({
     maxGuests: Number(formData.maxGuests),
     media: Array.isArray(formData?.media)
       ? formData.media
-      .map((item) => {
-        if (typeof item === "string" && item.trim() !== "") {
-          return { url: item.trim(), alt: `${formData.name} image` };
-        } else if (typeof item === "object" && item.url) {
-          return {
-            url: item.url.trim(),
-            alt: `${formData.name || "Venue"} image`,
-          };
-        }
-        return null;
-      })
-      .filter((item) => item !== null)
+          .map((item) => {
+            if (typeof item === "string" && item.trim() !== "") {
+              return { url: item.trim(), alt: `${formData.name} image` };
+            } else if (typeof item === "object" && item.url) {
+              return {
+                url: item.url.trim(),
+                alt: `${formData.name || "Venue"} image`,
+              };
+            }
+            return null;
+          })
+          .filter((item) => item !== null)
       : [],
   };
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -92,6 +93,9 @@ const CreateVenueForm = ({
         `${mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE}`
       );
       onSuccess(venue);
+      //  Clear form and redirect
+      
+
     } catch (err) {
       setErrorMessage(
         `${mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE}`
@@ -139,11 +143,11 @@ const CreateVenueForm = ({
           className="border p-2 rounded"
         />
         <MediaInput
-  value={formData?.media}
-  onChange={(updatedMedia) =>
-    setFormData((prev) => ({ ...prev, media: updatedMedia }))
-  }
-/>
+          value={formData?.media}
+          onChange={(updatedMedia) =>
+            setFormData((prev) => ({ ...prev, media: updatedMedia }))
+          }
+        />
       </div>
 
       <textarea
