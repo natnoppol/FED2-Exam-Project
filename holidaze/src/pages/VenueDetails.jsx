@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"; // For getting the dynamic ID from URL
 import { getVenueById } from "../api"; 
-import { getUser } from "../utils/auth";
 import BookingForm from "../components/BookingForm"; 
 
 
@@ -11,7 +10,7 @@ const VenueDetails = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isManager, setIsManager] = useState(false); // State to check if the user is a venue manager
-  const loggedInUser = getUser(); // Get the logged-in user
+  
 
   const handleBooking = (bookingData) => {
     // Handle the booking logic here (e.g., send the booking data to an API)
@@ -51,7 +50,7 @@ const VenueDetails = ({ user }) => {
       }
     };
     fetchVenueDetails(); // Fetch the venue details when component mounts
-  }, [venueId, loggedInUser?.role]); // Refetch if ID and Role changes (useful if route is dynamic)
+  }, [venueId, user?.role]); // Refetch if ID and Role changes (useful if route is dynamic)
 
   if (loading) return <p>Loading venue details...</p>;
   if (error) return <p>{error}</p>;
