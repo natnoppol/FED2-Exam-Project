@@ -111,7 +111,7 @@ const Header = () => {
 
         {/* Mobile Hamburger Button */}
         <button
-          className="md:hidden"
+          className="md:hidden bg-gray-200 p-2"
           onClick={toggleMenu}
           aria-label="Toggle menu"
           aria-expanded={menuOpen}

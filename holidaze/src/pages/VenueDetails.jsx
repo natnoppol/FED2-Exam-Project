@@ -1,14 +1,105 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom"; // For getting the dynamic ID from URL
+import { getVenueById } from "../api"; 
+import BookingForm from "../components/BookingForm"; 
 
-const VenueDetails = () => {
-  const { id } = useParams(); // Get venue id from the URL
+
+const VenueDetails = ({ user }) => {
+  const { venueId } = useParams(); // Get venue ID from the URL params
+  const [venue, setVenue] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isManager, setIsManager] = useState(false); // State to check if the user is a venue manager
+  
+
+  const handleBooking = (bookingData) => {
+    // Handle the booking logic here (e.g., send the booking data to an API)
+    console.log("Booking data:", bookingData);
+    // You might want to show a success message or redirect after successful booking
+  };
+
+  const handleEdit = (venueId) => {
+    // Logic for editing venue (e.g., navigate to edit page or show edit form)
+    console.log("Edit venue", venueId);
+  };
+
+  const handleDelete = (venueId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this venue?");
+    if (!confirmDelete) return;
+
+    // Logic to delete venue
+    console.log("Deleting venue", venueId);
+    // Add API call and redirect here
+  };
+
+  useEffect(() => {
+    // Check if the logged-in user is a venue manager
+    if (user?.role === "venue_manager") {
+      setIsManager(true);
+    }
+    
+    const fetchVenueDetails = async () => {
+      try {
+        const data = await getVenueById(venueId); // Call getVenueById to fetch data for the selected venue
+        setVenue(data); // Set venue data to state
+      } catch (error) {
+        setError("Failed to fetch venue details");
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVenueDetails(); // Fetch the venue details when component mounts
+  }, [venueId, user?.role]); // Refetch if ID and Role changes (useful if route is dynamic)
+
+  if (loading) return <p>Loading venue details...</p>;
+  if (error) return <p>{error}</p>;
+
   return (
     <div>
-      <h1>Venue {id} Details</h1>
-      {/* You can fetch and display data for the venue here */}
+      <h1>{venue.name}</h1>
+      <p>{venue.description}</p>
+      <img
+              src={venue.media[0]?.url || "https://plus.unsplash.com/premium_photo-1699544856963-49c417549268?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
+              alt={venue.media[0]?.alt || venue.name}
+            />
+      
+      <p>Price: ${venue.price}</p>
+      
+      {isManager ? (
+        // Show buttons for venue manager
+        <div>
+          <button onClick={() => handleEdit(venue.id)} className="btn btn-primary">
+            Edit Venue
+          </button>
+          <button onClick={() => handleDelete(venue.id)} className="btn btn-danger">
+            Delete Venue
+          </button>
+        </div>
+      ) : (
+        // Show booking form for customers
+        <BookingForm venue={venue} onBook={handleBooking} />
+      )}
+
+      {/* Show bookings for venue managers */}
+      {isManager && (
+        <div>
+          <h3>Customer Bookings</h3>
+          <ul>
+            {venue.bookings?.map((booking) => (
+              <li key={booking.id}>
+                <p>Customer: {booking.customerName}</p>
+                <p>Dates: {new Date(booking.dateFrom).toLocaleDateString()} - {new Date(booking.dateTo).toLocaleDateString()}</p>
+                <p>Guests: {booking.guests}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
+
+
 
 export default VenueDetails;
