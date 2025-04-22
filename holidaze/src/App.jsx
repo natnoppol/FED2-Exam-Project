@@ -10,6 +10,7 @@ import AdminBookings from "./pages/admin/AdminBookings";
 import RegisterPage from "./pages/RegisterPage";
 import CustomerRegisterForm from "./pages/register/customer/CustomerRegisterForm";
 import VenueManagerRegisterForm from "./pages/register/venue-manager/VenueManagerRegisterForm";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
           path="/register/venue-manager"
           element={<VenueManagerRegisterForm />}
         />
+
+        <Route path="/profile" element={<ProfilePage />} />
 
         {/* 🔐 Protected Admin Routes */}
         {/* Admin Routes */}
