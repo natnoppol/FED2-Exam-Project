@@ -11,9 +11,9 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
-    avatar: user?.avatar?.url || "",
-    banner: user?.banner?.url || "",
-    venueManager: user?.venueManager || false,
+    avatar: "",
+    banner: "",
+    venueManager: false,
   });
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const ProfilePage = () => {
       const fetchProfile = async () => {
         try {
           const data = await fetch(
-            `${API_BASE_URL}/holidaze/profiles/${profileData.name}/bookings?_venue=true`,
+            `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(profileData.name)}/bookings?_venue=true`,
             {
               headers: {
                 "Content-Type": "application/json",
