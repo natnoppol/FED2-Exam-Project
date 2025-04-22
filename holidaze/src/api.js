@@ -106,6 +106,7 @@ export const updateProfile = async (profileName, formData) => {
         "X-Noroff-API-Key": API_KEY,
       },
       body: JSON.stringify({
+        bio: formData.bio,
         avatar: formData.avatar ? { url: formData.avatar } : undefined,
         banner: formData.banner ? { url: formData.banner } : undefined,
         venueManager: formData.venueManager,
