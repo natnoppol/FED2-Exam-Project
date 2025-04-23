@@ -11,6 +11,8 @@ import RegisterPage from "./pages/RegisterPage";
 import CustomerRegisterForm from "./pages/register/customer/CustomerRegisterForm";
 import VenueManagerRegisterForm from "./pages/register/venue-manager/VenueManagerRegisterForm";
 import ProfilePage from "./pages/ProfilePage";
+import "react-datepicker/dist/react-datepicker.css";
+
 
 function App() {
   return (

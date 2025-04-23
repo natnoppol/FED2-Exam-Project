@@ -6,6 +6,7 @@ import { updateProfile } from "../api";
 import { toast } from "react-toastify";
 
 const ProfilePage = () => {
+  const [cancellingId, setCancellingId] = useState(null);
   const [user, setUser] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,6 +17,35 @@ const ProfilePage = () => {
     banner: "",
     venueManager: false,
   });
+
+  const handleCancelBooking = async (bookingId) => {
+    const confirmCancel = window.confirm("Are you sure you want to cancel this booking?");
+    if (!confirmCancel) return;
+  
+    setCancellingId(bookingId);
+  
+    try {
+      const response = await fetch(`${API_BASE_URL}/holidaze/bookings/${bookingId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "X-Noroff-API-Key": API_KEY,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to cancel booking.");
+      }
+  
+      toast.success("Booking cancelled.");
+      setBookings((prev) => prev.filter((b) => b.id !== bookingId));
+    } catch (error) {
+      toast.error(error.message || "Something went wrong.");
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
 
   useEffect(() => {
     const profileData = getUser();
@@ -187,6 +217,17 @@ const ProfilePage = () => {
                 <strong>Dates:</strong> {booking.dateFrom.slice(0, 10)} →{" "}
                 {booking.dateTo.slice(0, 10)}
               </p>
+              <button
+  onClick={() => handleCancelBooking(booking.id)}
+  disabled={cancellingId === booking.id}
+  className={`mt-2 px-4 py-2 rounded text-white transition-all ${
+    cancellingId === booking.id
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-red-600 hover:bg-red-700"
+  }`}
+>
+  {cancellingId === booking.id ? "Cancelling..." : "Cancel Booking"}
+</button>
             </li>
           ))}
         </ul>

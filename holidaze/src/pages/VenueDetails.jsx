@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"; // For getting the dynamic ID from URL
 import { getVenueById } from "../api"; 
 import BookingForm from "../components/BookingForm"; 
+import { toast } from "react-toastify"; // For showing notifications
+import { useNavigate } from "react-router-dom"; // For navigation after booking
 
 
 const VenueDetails = ({ user }) => {
@@ -10,12 +12,13 @@ const VenueDetails = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isManager, setIsManager] = useState(false); // State to check if the user is a venue manager
+  const navigate = useNavigate(); // For navigation after booking
   
 
   const handleBooking = (bookingData) => {
-    // Handle the booking logic here (e.g., send the booking data to an API)
     console.log("Booking data:", bookingData);
-    // You might want to show a success message or redirect after successful booking
+     toast.success("Booking successful!");
+     navigate("/profile"); 
   };
 
   const handleEdit = (venueId) => {
@@ -78,7 +81,7 @@ const VenueDetails = ({ user }) => {
         </div>
       ) : (
         // Show booking form for customers
-        <BookingForm venue={venue} onBook={handleBooking} />
+        <BookingForm venue={venue} bookings={venue.bookings} onBook={handleBooking} />
       )}
 
       {/* Show bookings for venue managers */}
