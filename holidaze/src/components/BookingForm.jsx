@@ -31,6 +31,11 @@ const BookingForm = ({ venue, bookings = [], onBook }) => {
       toast.error("Please select both start and end dates.");
       return;
     }
+  
+    if (dateTo <= dateFrom) {
+      toast.error("End date must be after the start date.");
+      return;
+    }
 
     if (guests > venue.maxGuests) {
       toast.error(`Max allowed guests: ${venue.maxGuests}`);
