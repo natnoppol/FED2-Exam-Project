@@ -1,83 +1,164 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
+import { API_BASE_URL, API_KEY } from "../config";
+import { getToken } from "../utils/auth"; // Assuming you have a utility function to get the token
+import DatePicker from "react-datepicker";
+import { parseISO } from "date-fns";
+import { generateDisabledDates } from "../utils/bookingUtils";
 
 
-const BookingForm = ({ venue, onBook }) => {
-    const [selectedDate, setSelectedDate] = useState(""); // For selected booking date
-  const [guestCount, setGuestCount] = useState(1); // Default guest count to 1
-  const [totalPrice, setTotalPrice] = useState(venue.price); // Initial total price based on venue price
+const BookingForm = ({ venue, bookings = [], onBook }) => {
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
+  const [guests, setGuests] = useState(1);
+  const disabledDates = generateDisabledDates(bookings);
 
-  // Update total price based on number of guests
-  const handleGuestCountChange = (e) => {
-    const guestNumber = parseInt(e.target.value, 10);
-    setGuestCount(guestNumber);
-    setTotalPrice(venue.price * guestNumber); // Assuming price is per guest
-  };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const bookingData = {
+
+    if (!dateFrom || !dateTo) {
+      toast.error("Please select both start and end dates.");
+      return;
+    }
+  
+    if (dateTo <= dateFrom) {
+      toast.error("End date must be after the start date.");
+      return;
+    }
+
+    if (guests > venue.maxGuests) {
+      toast.error(`Max allowed guests: ${venue.maxGuests}`);
+      return;
+    }
+
+    const hasOverlap = bookings.some((booking) => {
+      const bookingStart = parseISO(booking.dateFrom);
+      const bookingEnd = parseISO(booking.dateTo);
+      return dateFrom < bookingEnd && dateTo > bookingStart;
+    });
+    
+
+
+    // Check if the selected dates overlap with any existing bookings
+    if (hasOverlap) {
+      toast.error("Selected dates overlap with an existing booking.");
+      return;
+    }
+
+    const payload = {
+      dateFrom: dateFrom.toISOString(),
+      dateTo: dateTo.toISOString(),
+      guests: parseInt(guests, 10),
       venueId: venue.id,
-      bookingDate: selectedDate,
-      guestCount,
-      totalPrice,
     };
-    onBook(bookingData); // Call onBook callback to handle booking logic (e.g., API request)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/holidaze/bookings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+          "X-Noroff-API-Key": API_KEY,
+        }, body: JSON.stringify(payload),
+      });
+
+      const json = await response.json();
+
+      if (!response.ok) {
+        const errorMsg = json.errors?.[0]?.message || "Booking failed";
+      
+        if (response.status === 409) {
+          // Specific handling for conflict errors (overlap or too many guests)
+          toast.error(errorMsg);
+        } else {
+          toast.error(errorMsg);
+        }
+        return;
+      }
+      
+
+      toast.success("Booking successful!");
+      onBook?.(json); // optional callback to refresh or redirect
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
+
+  const getNights = () => {
+    if (!dateFrom || !dateTo) return 0;
+    const diff = Math.ceil((dateTo - dateFrom) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 0;
+  };
+  
+  const totalPrice = getNights() * venue.price;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl">Book This Venue</h2>
+      <h2 className="text-xl font-semibold">Book This Venue</h2>
 
-      {/* Date Picker */}
       <div>
-        <label htmlFor="bookingDate" className="block text-gray-700">
-          Select Booking Date:
-        </label>
-        <input
-          type="date"
-          id="bookingDate"
-          name="bookingDate"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          required
-          className="mt-1 p-2 border border-gray-300 rounded"
+        <label className="block">From:</label>
+        <DatePicker
+          selected={dateFrom}
+          onChange={(date) => setDateFrom(date)}
+          excludeDates={disabledDates}
+          minDate={new Date()}
+          selectsStart
+          startDate={dateFrom}
+          endDate={dateTo}
+          className="mt-1 p-2 border border-gray-300 rounded w-full"
+          placeholderText="Select start date"
         />
       </div>
 
-      {/* Guest Count */}
       <div>
-        <label htmlFor="guestCount" className="block text-gray-700">
-          Number of Guests:
-        </label>
+        <label className="block">To:</label>
+        <DatePicker
+          selected={dateTo}
+          onChange={(date) => setDateTo(date)}
+          excludeDates={disabledDates}
+          minDate={dateFrom || new Date()}
+          selectsEnd
+          startDate={dateFrom}
+          endDate={dateTo}
+          className="mt-1 p-2 border border-gray-300 rounded w-full"
+          placeholderText="Select end date"
+        />
+      </div>
+
+      <div>
+        <label className="block">Guests (max {venue.maxGuests}):</label>
         <input
           type="number"
-          id="guestCount"
-          name="guestCount"
-          value={guestCount}
-          onChange={handleGuestCountChange}
-          min="1"
-          required
-          className="mt-1 p-2 border border-gray-300 rounded"
+          name="guests"
+          value={guests}
+          onChange={(e) => {
+            const value = parseInt(e.target.value, 10);
+            if (!isNaN(value) && value >= 1 && value <= venue.maxGuests) {
+              setGuests(value);
+            } else if (e.target.value === "") {
+              setGuests(1); // Optional fallback to default
+            }
+          }}
+          min={1}
+          max={venue.maxGuests}
+          className="mt-1 p-2 border border-gray-300 rounded w-full"
         />
       </div>
 
-      {/* Total Price */}
-      <div>
-        <p className="text-lg">
-          Total Price: ${totalPrice}
-        </p>
-      </div>
+      {getNights() > 0 && (
+  <div>
+    <p>{getNights()} nights × ${venue.price} = <strong>${totalPrice}</strong></p>
+  </div>
+)}
 
-      {/* Submit Button */}
-      <div>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Book Now
-        </button>
-      </div>
+      <button
+        type="submit"
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Book Now
+      </button>
     </form>
   );
 };
