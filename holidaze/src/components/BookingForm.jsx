@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { API_BASE_URL, API_KEY } from "../config";
 import { getToken } from "../utils/auth"; // Assuming you have a utility function to get the token
 import DatePicker from "react-datepicker";
-import { isWithinInterval, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 
 
 const BookingForm = ({ venue, bookings = [], onBook }) => {
@@ -37,17 +37,14 @@ const BookingForm = ({ venue, bookings = [], onBook }) => {
       return;
     }
 
-    const hasOverlap = bookings.some((booking) =>
-      isWithinInterval(dateFrom, {
-        start: parseISO(booking.dateFrom),
-        end: parseISO(booking.dateTo),
-      }) ||
-      isWithinInterval(dateTo, {
-        start: parseISO(booking.dateFrom),
-        end: parseISO(booking.dateTo),
-      })
-    );
+    const hasOverlap = bookings.some((booking) => {
+      const bookingStart = parseISO(booking.dateFrom);
+      const bookingEnd = parseISO(booking.dateTo);
+      return dateFrom < bookingEnd && dateTo > bookingStart;
+    });
     
+
+
     // Check if the selected dates overlap with any existing bookings
     if (hasOverlap) {
       toast.error("Selected dates overlap with an existing booking.");
