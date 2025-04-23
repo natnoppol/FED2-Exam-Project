@@ -143,7 +143,14 @@ const BookingForm = ({ venue, bookings = [], onBook }) => {
           type="number"
           name="guests"
           value={guests}
-          onChange={(e) => setGuests(parseInt(e.target.value))}
+          onChange={(e) => {
+            const value = parseInt(e.target.value, 10);
+            if (!isNaN(value) && value >= 1 && value <= venue.maxGuests) {
+              setGuests(value);
+            } else if (e.target.value === "") {
+              setGuests(1); // Optional fallback to default
+            }
+          }}
           min={1}
           max={venue.maxGuests}
           className="mt-1 p-2 border border-gray-300 rounded w-full"
