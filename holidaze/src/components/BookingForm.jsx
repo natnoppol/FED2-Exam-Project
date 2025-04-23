@@ -4,24 +4,14 @@ import { API_BASE_URL, API_KEY } from "../config";
 import { getToken } from "../utils/auth"; // Assuming you have a utility function to get the token
 import DatePicker from "react-datepicker";
 import { parseISO } from "date-fns";
+import { generateDisabledDates } from "../utils/bookingUtils";
 
 
 const BookingForm = ({ venue, bookings = [], onBook }) => {
   const [dateFrom, setDateFrom] = useState(null);
   const [dateTo, setDateTo] = useState(null);
   const [guests, setGuests] = useState(1);
-
-  // Create array of all disabled dates from existing bookings
-  const disabledDates = bookings.flatMap((booking) => {
-    const start = new Date(booking.dateFrom);
-    const end = new Date(booking.dateTo);
-    const days = [];
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      days.push(new Date(d));
-    }
-    
-    return days;
-  });
+  const disabledDates = generateDisabledDates(bookings);
 
 
   const handleSubmit = async (e) => {
