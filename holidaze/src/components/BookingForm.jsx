@@ -71,8 +71,6 @@ const BookingForm = ({ venue, bookings = [], onBook }) => {
         if (response.status === 409) {
           toast.error("Selected dates overlap with an existing booking.");
           toast.error(errorMsg);
-        } else {
-          toast.error(errorMsg);
         }
         return;
       }

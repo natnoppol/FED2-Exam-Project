@@ -40,10 +40,15 @@ const ProfilePage = () => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const val = type === "checkbox" ? checked : value;
-    setFormData((prev) => ({ ...prev, [name]: val }));
+    const { name, type } = e.target;
+    const value = type === "checkbox" ? e.target.checked : e.target.value;
+  
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
+  
 
 
   if (!user) {
@@ -152,7 +157,6 @@ const ProfilePage = () => {
                 className="w-full p-2 border rounded-md"
               />
             </div>
-            
             <div className="mb-4">
               <label className="block">Avatar URL:</label>
               <input
