@@ -40,14 +40,11 @@ const ProfilePage = () => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, type } = e.target;
-    const value = type === "checkbox" ? e.target.checked : e.target.value;
-  
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const { name, value, type, checked } = e.target;
+  const val = type === "checkbox" ? checked : value;
+  setFormData((prev) => ({ ...prev, [name]: val }));
+};
+
   
 
 
