@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { getToken } from "../utils/auth";
 import { API_BASE_URL, API_KEY } from "../config";
+import { cancelBookingById } from "../utils/cancelBooking";
+import { toast } from "react-toastify";
 
 // In useBookings.js
 export const useBookings = (username) => {
@@ -55,29 +57,21 @@ export const useBookings = (username) => {
       currentPage,
       totalPages,
       cancellingId,
+
       handleCancelBooking: async (bookingId) => {
         const confirmCancel = window.confirm("Are you sure you want to cancel this booking?");
         if (!confirmCancel) return;
   
         setCancellingId(bookingId);
         try {
-          const response = await fetch(`${API_BASE_URL}/holidaze/bookings/${bookingId}`, {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${getToken()}`,
-              "X-Noroff-API-Key": API_KEY,
-            },
-          });
-          if (response.ok) {
+            await cancelBookingById(bookingId);
+            toast.success("Booking cancelled.");
             setBookings((prev) => prev.filter((b) => b.id !== bookingId));
-          } else {
-            throw new Error("Failed to cancel booking.");
+          } catch (error) {
+            toast.error(error.message || "Something went wrong.");
+          } finally {
+            setCancellingId(null);
           }
-        } catch (error) {
-          console.error(error);
-        } finally {
-          setCancellingId(null);
-        }
       },
     };
   };
