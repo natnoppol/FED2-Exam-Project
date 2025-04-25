@@ -17,6 +17,16 @@ export const useBookings = (username) => {
   const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
   const totalPages = Math.ceil(bookings.length / itemsPerPage);
 
+    // Adjust currentPage if necessary when bookings change
+    useEffect(() => {
+        if (bookings.length > 0) {
+          const maxPages = Math.ceil(bookings.length / itemsPerPage);
+          if (currentPage > maxPages) {
+            setCurrentPage(maxPages); 
+          }
+        }
+      }, [bookings, currentPage]);
+
 
   useEffect(() => {
     const fetchBookings = async () => {
