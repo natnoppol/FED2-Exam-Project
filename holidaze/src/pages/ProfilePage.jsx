@@ -17,13 +17,22 @@ const ProfilePage = () => {
     banner: "",
     venueManager: false,
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
+  const indexOfLastBooking = currentPage * itemsPerPage;
+  const indexOfFirstBooking = indexOfLastBooking - itemsPerPage;
+  const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
+  const totalPages = Math.ceil(bookings.length / itemsPerPage);
+
+  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   const handleCancelBooking = async (bookingId) => {
     const confirmCancel = window.confirm("Are you sure you want to cancel this booking?");
     if (!confirmCancel) return;
-  
+
     setCancellingId(bookingId);
-  
+
     try {
       const response = await fetch(`${API_BASE_URL}/holidaze/bookings/${bookingId}`, {
         method: "DELETE",
@@ -32,11 +41,11 @@ const ProfilePage = () => {
           "X-Noroff-API-Key": API_KEY,
         },
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to cancel booking.");
       }
-  
+
       toast.success("Booking cancelled.");
       setBookings((prev) => prev.filter((b) => b.id !== bookingId));
     } catch (error) {
@@ -45,7 +54,6 @@ const ProfilePage = () => {
       setCancellingId(null);
     }
   };
-
 
   useEffect(() => {
     const profileData = getUser();
@@ -64,9 +72,7 @@ const ProfilePage = () => {
       const fetchProfile = async () => {
         try {
           const data = await fetch(
-            `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(
-              profileData.name
-            )}/bookings?_venue=true`,
+            `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(profileData.name)}/bookings?_venue=true`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -77,7 +83,6 @@ const ProfilePage = () => {
           );
           const json = await data.json();
           if (!data.ok) throw new Error("Failed to fetch profile data");
-
           setBookings(json.data);
         } catch (error) {
           console.error("Error fetching bookings:", error);
@@ -87,9 +92,9 @@ const ProfilePage = () => {
       };
       fetchProfile();
     } else {
-        setLoading(false);
-      }
-    }, []);
+      setLoading(false);
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -101,7 +106,7 @@ const ProfilePage = () => {
     try {
       const updated = await updateProfile(user.name, formData);
       setUser(updated);
-      localStorage.setItem("user", JSON.stringify(updated)); // Persist changes
+      localStorage.setItem("user", JSON.stringify(updated));
       setEditing(false);
       toast.success("Profile updated!");
     } catch (error) {
@@ -112,6 +117,64 @@ const ProfilePage = () => {
 
   if (!user) {
     return <div className="text-center mt-10">Loading profile...</div>;
+  }
+
+  let renderBookingsContent;
+
+  if (loading) {
+    renderBookingsContent = <p>Loading bookings...</p>;
+  } else if (bookings.length > 0) {
+    renderBookingsContent = (
+      <>
+        <ul className="space-y-4">
+          {currentBookings.map((booking) => (
+            <li key={booking.id} className="border p-3 rounded-md shadow-sm bg-gray-50">
+              <Link to={`/venue/${booking.venue.id}`} className="text-blue-600 font-medium hover:underline">
+                {booking.venue?.name}
+              </Link>
+              <p>
+                <strong>Guests:</strong> {booking.guests}
+              </p>
+              <p>
+                <strong>Dates:</strong>{" "}
+                {new Date(booking.dateFrom).toLocaleDateString()} →{" "}
+                {new Date(booking.dateTo).toLocaleDateString()}
+              </p>
+              <button
+                onClick={() => handleCancelBooking(booking.id)}
+                disabled={cancellingId === booking.id}
+                className={`mt-2 px-4 py-2 rounded text-white transition-all ${
+                  cancellingId === booking.id ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+                }`}
+              >
+                {cancellingId === booking.id ? "Cancelling..." : "Cancel Booking"}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="px-4">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </>
+    );
+  } else {
+    renderBookingsContent = <p>You have no bookings yet.</p>;
   }
 
   return (
@@ -164,10 +227,7 @@ const ProfilePage = () => {
             <button onClick={handleUpdate} className="btn btn-primary">
               Save
             </button>
-            <button
-              onClick={() => setEditing(false)}
-              className="btn btn-secondary"
-            >
+            <button onClick={() => setEditing(false)} className="btn btn-secondary">
               Cancel
             </button>
           </div>
@@ -184,56 +244,14 @@ const ProfilePage = () => {
           <p>
             <strong>Venue Manager:</strong> {user.venueManager ? "Yes" : "No"}
           </p>
-          <button
-            onClick={() => setEditing(true)}
-            className="btn btn-outline mt-2"
-          >
+          <button onClick={() => setEditing(true)} className="btn btn-outline mt-2">
             Edit Profile
           </button>
         </div>
       )}
 
-      {/* Bookings List */}
       <h2 className="text-xl font-semibold mt-6 mb-2">My Bookings</h2>
-      {loading ? (
-        <p>Loading bookings...</p>
-      ) : bookings.length > 0 ? (
-        <ul className="space-y-4">
-          {bookings.map((booking) => (
-            <li
-              key={booking.id}
-              className="border p-3 rounded-md shadow-sm bg-gray-50"
-            >
-              <Link
-                to={`/venue/${booking.venue.id}`}
-                className="text-blue-600 font-medium hover:underline"
-              >
-                {booking.venue?.name}
-              </Link>
-              <p>
-                <strong>Guests:</strong> {booking.guests}
-              </p>
-              <p>
-                <strong>Dates:</strong> {booking.dateFrom.slice(0, 10)} →{" "}
-                {booking.dateTo.slice(0, 10)}
-              </p>
-              <button
-  onClick={() => handleCancelBooking(booking.id)}
-  disabled={cancellingId === booking.id}
-  className={`mt-2 px-4 py-2 rounded text-white transition-all ${
-    cancellingId === booking.id
-      ? "bg-gray-400 cursor-not-allowed"
-      : "bg-red-600 hover:bg-red-700"
-  }`}
->
-  {cancellingId === booking.id ? "Cancelling..." : "Cancel Booking"}
-</button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>You have no bookings yet.</p>
-      )}
+      {renderBookingsContent}
     </div>
   );
 };
