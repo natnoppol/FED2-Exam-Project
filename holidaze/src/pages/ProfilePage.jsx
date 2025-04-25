@@ -4,9 +4,11 @@ import { Link } from "react-router-dom";
 import { API_BASE_URL, API_KEY } from "../config";
 import { updateProfile } from "../api";
 import { toast } from "react-toastify";
+import { usePagination } from "../hooks/usePagination";
+import { useCancelBooking } from "../hooks/useCancelBooking";
 
 const ProfilePage = () => {
-  const [cancellingId, setCancellingId] = useState(null);
+  const { cancellingId, cancelBooking } = useCancelBooking();
   const [user, setUser] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,47 +19,13 @@ const ProfilePage = () => {
     banner: "",
     venueManager: false,
   });
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
-  const indexOfLastBooking = currentPage * itemsPerPage;
-  const indexOfFirstBooking = indexOfLastBooking - itemsPerPage;
-  const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
-  const totalPages = Math.ceil(bookings.length / itemsPerPage);
-
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [bookings, totalPages, currentPage]);
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-
-  const handleCancelBooking = async (bookingId) => {
-    const confirmCancel = window.confirm("Are you sure you want to cancel this booking?");
-    if (!confirmCancel) return;
-
-    setCancellingId(bookingId);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/holidaze/bookings/${bookingId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-          "X-Noroff-API-Key": API_KEY,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to cancel booking.");
-      }
-
-      toast.success("Booking cancelled.");
-      setBookings((prev) => prev.filter((b) => b.id !== bookingId));
-    } catch (error) {
-      toast.error(error.message || "Something went wrong.");
-    } finally {
-      setCancellingId(null);
-    }
-  };
+  const {
+    currentPage,
+    totalPages,
+    currentItems: currentBookings,
+    handlePrevPage,
+    handleNextPage,
+  } = usePagination(bookings, 4);
 
   useEffect(() => {
     const profileData = getUser();
@@ -76,7 +44,9 @@ const ProfilePage = () => {
       const fetchProfile = async () => {
         try {
           const data = await fetch(
-            `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(profileData.name)}/bookings?_venue=true`,
+            `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(
+              profileData.name
+            )}/bookings?_venue=true`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -132,8 +102,14 @@ const ProfilePage = () => {
       <>
         <ul className="space-y-4">
           {currentBookings.map((booking) => (
-            <li key={booking.id} className="border p-3 rounded-md shadow-sm bg-gray-50">
-              <Link to={`/venue/${booking.venue.id}`} className="text-blue-600 font-medium hover:underline">
+            <li
+              key={booking.id}
+              className="border p-3 rounded-md shadow-sm bg-gray-50"
+            >
+              <Link
+                to={`/venue/${booking.venue.id}`}
+                className="text-blue-600 font-medium hover:underline"
+              >
                 {booking.venue?.name}
               </Link>
               <p>
@@ -145,13 +121,21 @@ const ProfilePage = () => {
                 {new Date(booking.dateTo).toLocaleDateString()}
               </p>
               <button
-                onClick={() => handleCancelBooking(booking.id)}
+                onClick={() =>
+                  cancelBooking(booking.id, (id) =>
+                    setBookings((prev) => prev.filter((b) => b.id !== id))
+                  )
+                }
                 disabled={cancellingId === booking.id}
                 className={`mt-2 px-4 py-2 rounded text-white transition-all ${
-                  cancellingId === booking.id ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+                  cancellingId === booking.id
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-red-600 hover:bg-red-700"
                 }`}
               >
-                {cancellingId === booking.id ? "Cancelling..." : "Cancel Booking"}
+                {cancellingId === booking.id
+                  ? "Cancelling..."
+                  : "Cancel Booking"}
               </button>
             </li>
           ))}
@@ -231,7 +215,10 @@ const ProfilePage = () => {
             <button onClick={handleUpdate} className="btn btn-primary">
               Save
             </button>
-            <button onClick={() => setEditing(false)} className="btn btn-secondary">
+            <button
+              onClick={() => setEditing(false)}
+              className="btn btn-secondary"
+            >
               Cancel
             </button>
           </div>
@@ -248,7 +235,10 @@ const ProfilePage = () => {
           <p>
             <strong>Venue Manager:</strong> {user.venueManager ? "Yes" : "No"}
           </p>
-          <button onClick={() => setEditing(true)} className="btn btn-outline mt-2">
+          <button
+            onClick={() => setEditing(true)}
+            className="btn btn-outline mt-2"
+          >
             Edit Profile
           </button>
         </div>
