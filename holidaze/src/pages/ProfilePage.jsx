@@ -23,7 +23,7 @@ const ProfilePage = () => {
 
 
   // Get bookings only after the user is fetched
-  const { bookings, loadingBookings, handlePrevPage, handleNextPage, currentPage, totalPages, cancellingId, handleCancelBooking } = useBookings(user?.name);
+  const { currentBookings, loadingBookings, handlePrevPage, handleNextPage, currentPage, totalPages, cancellingId, handleCancelBooking } = useBookings(user?.name);
 
   useEffect(() => {
     const profileData = getUser();
@@ -56,11 +56,11 @@ const ProfilePage = () => {
 
   if (loadingBookings) {
     renderBookingsContent = <p>Loading bookings...</p>;
-  } else if (bookings.length > 0) {
+  } else if (currentBookings.length > 0) {
     renderBookingsContent = (
       <>
         <ul className="space-y-4">
-          {bookings.map((booking) => (
+          {currentBookings.map((booking) => (
             <li
               key={booking.id}
               className="border p-3 rounded-md shadow-sm bg-gray-50"

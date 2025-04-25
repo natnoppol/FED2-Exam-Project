@@ -49,7 +49,7 @@ export const useBookings = (username) => {
     }, [username]);
   
     return {
-      bookings: currentBookings,
+    currentBookings,
       loadingBookings,
       setBookings, // Added setBookings to update the state
       handlePrevPage: () => setCurrentPage((prev) => Math.max(prev - 1, 1)),
