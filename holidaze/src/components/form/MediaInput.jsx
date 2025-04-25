@@ -18,7 +18,7 @@ const MediaInput = ({ value = [], onChange }) => {
 
   return (
     <div className="space-y-4">
-      <label className="block font-medium mb-1">Media</label>
+       <label className="block font-medium mb-1">Media</label>
 
       {value.map((media, index) => (
         <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-2 items-center">

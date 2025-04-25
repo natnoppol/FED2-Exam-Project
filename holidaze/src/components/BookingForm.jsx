@@ -69,10 +69,7 @@ const BookingForm = ({ venue, bookings = [], onBook }) => {
         const errorMsg = json.errors?.[0]?.message || "Booking failed";
       
         if (response.status === 409) {
-          // Specific handling for conflict errors (overlap or too many guests)
-          toast.error(errorMsg);
-        } else {
-          toast.error(errorMsg);
+          toast.error(`Selected dates overlap with an existing booking. ${errorMsg}`);
         }
         return;
       }

@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { getUser, getToken } from "../utils/auth";
+import { getUser } from "../utils/auth"; 
+import { useUpdateProfile } from "../hooks/useUpdateProfile"; // Assuming this is the correct path to your update function
 import { Link } from "react-router-dom";
-import { API_BASE_URL, API_KEY } from "../config";
-import { updateProfile } from "../api";
-import { toast } from "react-toastify";
+import { useBookings } from "../hooks/useBookings";
 
 const ProfilePage = () => {
-  const [cancellingId, setCancellingId] = useState(null);
   const [user, setUser] = useState(null);
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     bio: "",
@@ -17,35 +13,17 @@ const ProfilePage = () => {
     banner: "",
     venueManager: false,
   });
-
-  const handleCancelBooking = async (bookingId) => {
-    const confirmCancel = window.confirm("Are you sure you want to cancel this booking?");
-    if (!confirmCancel) return;
-  
-    setCancellingId(bookingId);
-  
-    try {
-      const response = await fetch(`${API_BASE_URL}/holidaze/bookings/${bookingId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-          "X-Noroff-API-Key": API_KEY,
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error("Failed to cancel booking.");
-      }
-  
-      toast.success("Booking cancelled.");
-      setBookings((prev) => prev.filter((b) => b.id !== bookingId));
-    } catch (error) {
-      toast.error(error.message || "Something went wrong.");
-    } finally {
-      setCancellingId(null);
-    }
+  const { updateUserProfile } = useUpdateProfile();
+  const handleUpdate = () => {
+    updateUserProfile(user.name, formData, (updated) => {
+      setUser(updated);
+      setEditing(false);
+    });
   };
 
+
+  // Get bookings only after the user is fetched
+  const { currentBookings, loadingBookings, handlePrevPage, handleNextPage, currentPage, totalPages, cancellingId, handleCancelBooking } = useBookings(user?.name);
 
   useEffect(() => {
     const profileData = getUser();
@@ -59,147 +37,30 @@ const ProfilePage = () => {
         venueManager: profileData?.venueManager || false,
       });
     }
-
-    if (profileData?.name) {
-      const fetchProfile = async () => {
-        try {
-          const data = await fetch(
-            `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(
-              profileData.name
-            )}/bookings?_venue=true`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${getToken()}`,
-                "X-Noroff-API-Key": API_KEY,
-              },
-            }
-          );
-          const json = await data.json();
-          if (!data.ok) throw new Error("Failed to fetch profile data");
-
-          setBookings(json.data);
-        } catch (error) {
-          console.error("Error fetching bookings:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchProfile();
-    } else {
-        setLoading(false);
-      }
-    }, []);
+  }, []);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const val = type === "checkbox" ? checked : value;
-    setFormData((prev) => ({ ...prev, [name]: val }));
-  };
+  const { name, value, type, checked } = e.target;
+  const val = type === "checkbox" ? checked : value;
+  setFormData((prev) => ({ ...prev, [name]: val }));
+};
 
-  const handleUpdate = async () => {
-    try {
-      const updated = await updateProfile(user.name, formData);
-      setUser(updated);
-      localStorage.setItem("user", JSON.stringify(updated)); // Persist changes
-      setEditing(false);
-      toast.success("Profile updated!");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Failed to update profile.");
-    }
-  };
+  
+
 
   if (!user) {
     return <div className="text-center mt-10">Loading profile...</div>;
   }
 
-  return (
-    <div className="max-w-xl mx-auto mt-10 p-4 bg-white shadow-md rounded-lg">
-      <h1 className="text-2xl font-bold mb-4">Welcome, {user.name}</h1>
+  let renderBookingsContent;
 
-      {editing ? (
-        <div className="space-y-4">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="venueManager"
-              checked={formData.venueManager}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  venueManager: e.target.checked,
-                }))
-              }
-            />
-            Venue Manager
-          </label>
-
-          <input
-            type="url"
-            name="avatar"
-            value={formData.avatar}
-            onChange={handleChange}
-            placeholder="Avatar URL"
-            className="input"
-          />
-
-          <input
-            type="url"
-            name="banner"
-            value={formData.banner}
-            onChange={handleChange}
-            placeholder="Banner URL"
-            className="input"
-          />
-          <textarea
-            name="bio"
-            value={formData.bio}
-            onChange={handleChange}
-            placeholder="Tell us about yourself"
-            className="input"
-          />
-
-          <div className="flex gap-2">
-            <button onClick={handleUpdate} className="btn btn-primary">
-              Save
-            </button>
-            <button
-              onClick={() => setEditing(false)}
-              className="btn btn-secondary"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-2 text-center">
-          <img
-            src={user.avatar?.url}
-            alt={user.avatar?.alt || user.name}
-            className="w-24 h-24 rounded-full object-cover mx-auto"
-          />
-          <h2 className="text-xl font-semibold">{user.name}</h2>
-          <strong>Bio:</strong> {user.bio}
-          <p>
-            <strong>Venue Manager:</strong> {user.venueManager ? "Yes" : "No"}
-          </p>
-          <button
-            onClick={() => setEditing(true)}
-            className="btn btn-outline mt-2"
-          >
-            Edit Profile
-          </button>
-        </div>
-      )}
-
-      {/* Bookings List */}
-      <h2 className="text-xl font-semibold mt-6 mb-2">My Bookings</h2>
-      {loading ? (
-        <p>Loading bookings...</p>
-      ) : bookings.length > 0 ? (
+  if (loadingBookings) {
+    renderBookingsContent = <p>Loading bookings...</p>;
+  } else if (currentBookings.length > 0) {
+    renderBookingsContent = (
+      <>
         <ul className="space-y-4">
-          {bookings.map((booking) => (
+          {currentBookings.map((booking) => (
             <li
               key={booking.id}
               className="border p-3 rounded-md shadow-sm bg-gray-50"
@@ -214,26 +75,135 @@ const ProfilePage = () => {
                 <strong>Guests:</strong> {booking.guests}
               </p>
               <p>
-                <strong>Dates:</strong> {booking.dateFrom.slice(0, 10)} →{" "}
-                {booking.dateTo.slice(0, 10)}
+                <strong>Dates:</strong>{" "}
+                {new Date(booking.dateFrom).toLocaleDateString('en-US')} →{" "}
+                {new Date(booking.dateTo).toLocaleDateString('en-US')}
               </p>
               <button
-  onClick={() => handleCancelBooking(booking.id)}
-  disabled={cancellingId === booking.id}
-  className={`mt-2 px-4 py-2 rounded text-white transition-all ${
-    cancellingId === booking.id
-      ? "bg-gray-400 cursor-not-allowed"
-      : "bg-red-600 hover:bg-red-700"
-  }`}
->
-  {cancellingId === booking.id ? "Cancelling..." : "Cancel Booking"}
-</button>
+                onClick={() => handleCancelBooking(booking.id)}
+                disabled={cancellingId === booking.id}
+                className={`mt-2 px-4 py-2 rounded text-white transition-all ${
+                  cancellingId === booking.id
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-red-600 hover:bg-red-700"
+                }`}
+              >
+                {cancellingId === booking.id ? "Cancelling..." : "Cancel Booking"}
+              </button>
             </li>
           ))}
         </ul>
-      ) : (
-        <p>You have no bookings yet.</p>
-      )}
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="px-4">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </>
+    );
+  } else {
+    renderBookingsContent = <p>You have no bookings yet.</p>;
+  }
+
+  return (
+    <div className="max-w-xl mx-auto mt-10 p-4 bg-white shadow-md rounded-lg">
+      {/* Profile section */}
+      <div className="space-y-2 text-center">
+        <img
+          src={user.avatar?.url}
+          alt={user.avatar?.alt || user.name}
+          className="w-24 h-24 rounded-full object-cover mx-auto"
+        />
+        <h2 className="text-xl font-semibold">{user.name}</h2>
+        {/* Display bio and venue manager status */}
+        {!editing ? (
+          <>
+            <p><strong>Bio:</strong> {user.bio}</p>
+            <p>
+              <strong>Venue Manager:</strong> {user.venueManager ? "Yes" : "No"}
+            </p>
+            <button
+              onClick={() => setEditing(true)}
+              className="btn btn-outline mt-2"
+            >
+              Edit Profile
+            </button>
+          </>
+        ) : 
+        (
+          <div>
+            <div className="mb-4">
+              <label className="block">Bio:</label>
+              <textarea
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                className="w-full p-2 border rounded-md"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block">Avatar URL:</label>
+              <input
+                type="text"
+                name="avatar"
+                value={formData.avatar}
+                onChange={handleChange}
+                className="w-full p-2 border rounded-md"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block">Banner URL:</label>
+              <input
+                type="text"
+                name="banner"
+                value={formData.banner}
+                onChange={handleChange}
+                className="w-full p-2 border rounded-md"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block">Venue Manager:</label>
+              <input
+                type="checkbox"
+                name="venueManager"
+                checked={formData.venueManager}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              Yes, I am a venue manager
+            </div>
+            <button
+              onClick={handleUpdate}
+              className="btn btn-primary mt-4"
+            >
+              Save Changes
+            </button>
+            <button
+              onClick={() => setEditing(false)}
+              className="btn btn-outline mt-2"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Booking section */}
+      <h2 className="text-xl font-semibold mt-6 mb-2">My Bookings</h2>
+      {renderBookingsContent}
     </div>
   );
 };
