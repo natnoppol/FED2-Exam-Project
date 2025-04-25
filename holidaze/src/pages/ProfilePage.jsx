@@ -24,7 +24,11 @@ const ProfilePage = () => {
   const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
   const totalPages = Math.ceil(bookings.length / itemsPerPage);
 
-  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [bookings, totalPages, currentPage]);
   const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   const handleCancelBooking = async (bookingId) => {
