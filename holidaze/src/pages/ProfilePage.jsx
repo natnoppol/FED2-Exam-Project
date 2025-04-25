@@ -76,8 +76,8 @@ const ProfilePage = () => {
               </p>
               <p>
                 <strong>Dates:</strong>{" "}
-                {new Date(booking.dateFrom).toLocaleDateString()} →{" "}
-                {new Date(booking.dateTo).toLocaleDateString()}
+                {new Date(booking.dateFrom).toLocaleDateString('en-US')} →{" "}
+                {new Date(booking.dateTo).toLocaleDateString('en-US')}
               </p>
               <button
                 onClick={() => handleCancelBooking(booking.id)}
