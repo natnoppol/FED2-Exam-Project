@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import { getUser, getToken } from "../utils/auth";
 import { Link } from "react-router-dom";
 import { API_BASE_URL, API_KEY } from "../config";
-import { updateProfile } from "../api";
-import { toast } from "react-toastify";
 import { usePagination } from "../hooks/usePagination";
 import { useCancelBooking } from "../hooks/useCancelBooking";
+import { useUpdateProfile } from "../hooks/useUpdateProfile";
 
 const ProfilePage = () => {
   const { cancellingId, cancelBooking } = useCancelBooking();
@@ -26,6 +25,7 @@ const ProfilePage = () => {
     handlePrevPage,
     handleNextPage,
   } = usePagination(bookings, 4);
+  const { updating, updateUserProfile } = useUpdateProfile();
 
   useEffect(() => {
     const profileData = getUser();
@@ -74,19 +74,6 @@ const ProfilePage = () => {
     const { name, value, type, checked } = e.target;
     const val = type === "checkbox" ? checked : value;
     setFormData((prev) => ({ ...prev, [name]: val }));
-  };
-
-  const handleUpdate = async () => {
-    try {
-      const updated = await updateProfile(user.name, formData);
-      setUser(updated);
-      localStorage.setItem("user", JSON.stringify(updated));
-      setEditing(false);
-      toast.success("Profile updated!");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Failed to update profile.");
-    }
   };
 
   if (!user) {
@@ -165,6 +152,13 @@ const ProfilePage = () => {
     renderBookingsContent = <p>You have no bookings yet.</p>;
   }
 
+  const handleUpdate = () => {
+    updateUserProfile(user.name, formData, (updated) => {
+      setUser(updated);
+      setEditing(false);
+    });
+  };
+
   return (
     <div className="max-w-xl mx-auto mt-10 p-4 bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold mb-4">Welcome, {user.name}</h1>
@@ -212,8 +206,12 @@ const ProfilePage = () => {
           />
 
           <div className="flex gap-2">
-            <button onClick={handleUpdate} className="btn btn-primary">
-              Save
+            <button
+              onClick={handleUpdate}
+              className="btn btn-primary"
+              disabled={updating}
+            >
+              {updating ? "Saving..." : "Save"}
             </button>
             <button
               onClick={() => setEditing(false)}
