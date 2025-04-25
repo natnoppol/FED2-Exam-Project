@@ -142,8 +142,8 @@ const ProfilePage = () => {
               Edit Profile
             </button>
           </>
-        ) : (
-          // Editable form when in editing mode
+        ) : 
+        (
           <div>
             <div className="mb-4">
               <label className="block">Bio:</label>
