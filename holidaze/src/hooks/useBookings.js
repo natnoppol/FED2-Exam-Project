@@ -9,7 +9,7 @@ export const useBookings = (username) => {
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const { cancellingId, cancelBooking } = useCancelBooking();
+  const { cancellingId, setCancellingId, cancelBooking } = useCancelBooking();
 
   const itemsPerPage = 4;
   const indexOfLastBooking = currentPage * itemsPerPage;
