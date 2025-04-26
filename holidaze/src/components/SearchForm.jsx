@@ -70,7 +70,7 @@ const SearchForm = ({ onSearch }) => {
             id="guests"
             name="guests"
             value={guests}
-            onChange={(e) => setGuests(e.target.value)}
+            onChange={(e) => setGuests(Number(e.target.value))}
             className="w-full p-2 border rounded"
           >
             {[...Array(10).keys()].map((i) => (
