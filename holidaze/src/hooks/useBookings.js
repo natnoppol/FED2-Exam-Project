@@ -21,9 +21,8 @@ export const useBookings = (username) => {
     useEffect(() => {
         if (bookings.length > 0) {
           const maxPages = Math.ceil(bookings.length / itemsPerPage);
-          if (currentPage > maxPages) {
-            setCurrentPage(maxPages); 
-          }
+          setCurrentPage((prevPage) => Math.min(prevPage, maxPages));
+
         }
       }, [bookings, currentPage]);
 
