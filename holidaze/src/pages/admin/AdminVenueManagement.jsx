@@ -97,6 +97,25 @@ const AdminVenueManagement = () => {
 
   return (
     <div>
+      {/* Create Venue Form should be above the venue list */}
+      {showEditForm && (
+        <ErrorBoundary>
+          <CreateVenueForm
+            mode={editingVenue ? "edit" : "create"}
+            venueData={editingVenue}
+            onSuccess={() => {
+              fetchVenues(); // loading new venues after edit/create
+              setShowEditForm(false);
+              setEditingVenue(null);
+            }}
+            onCancel={() => {
+              setShowEditForm(false);
+              setEditingVenue(null);
+            }}
+          />
+        </ErrorBoundary>
+      )}
+
       <input
         type="text"
         placeholder="Search venues..."
@@ -127,7 +146,8 @@ const AdminVenueManagement = () => {
           onDelete={handleDelete}
         />
       ))}
-       {/* "No venues found" Message */}
+
+      {/* "No venues found" Message */}
       {filteredVenues.length === 0 && !loading && (
         <p className="text-gray-500 text-center mt-4">No venues found.</p>
       )}
@@ -141,24 +161,6 @@ const AdminVenueManagement = () => {
             Load More
           </button>
         </div>
-      )}
-
-      {showEditForm && (
-        <ErrorBoundary>
-          <CreateVenueForm
-            mode={editingVenue ? "edit" : "create"}
-            venueData={editingVenue}
-            onSuccess={() => {
-              fetchVenues(); // loading new venues after edit/create
-              setShowEditForm(false);
-              setEditingVenue(null);
-            }}
-            onCancel={() => {
-              setShowEditForm(false);
-              setEditingVenue(null);
-            }}
-          />
-        </ErrorBoundary>
       )}
     </div>
   );
