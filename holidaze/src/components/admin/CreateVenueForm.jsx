@@ -18,6 +18,7 @@ const CreateVenueForm = ({
   onSuccess,
   onCancel,
 }) => {
+  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // Initialize error state
   const [formData, setFormData] = useState({
     name: venueData?.name || "",
@@ -35,9 +36,7 @@ const CreateVenueForm = ({
     },
   });
   const navigate = useNavigate();
-
   const venueId = venueData?.id;
-
   const preparedData = {
     ...formData,
     price: Number(formData.price),
@@ -69,6 +68,8 @@ const CreateVenueForm = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage(""); // Reset error message on submit
+    setLoading(true); // start loading
     try {
       const url =
         mode === "edit" && venueId
@@ -120,6 +121,8 @@ const CreateVenueForm = ({
       toast.error(
         `${mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE}`
       );
+    } finally {
+      setLoading(false); //  stop loading no matter what
     }
   };
   return (
@@ -179,6 +182,7 @@ const CreateVenueForm = ({
       <div className="flex gap-2 mt-4">
         <button
           type="submit"
+          disabled={loading}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
           {mode === "edit" ? "Update" : "Create"}
