@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getUser } from "../utils/auth"; 
+import { getUser } from "../utils/auth";
 import { useUpdateProfile } from "../hooks/useUpdateProfile"; // Assuming this is the correct path to your update function
 import { Link } from "react-router-dom";
 import { useBookings } from "../hooks/useBookings";
+import { useVenuesByManager } from "../hooks/useVenuesByManager";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -20,10 +21,24 @@ const ProfilePage = () => {
       setEditing(false);
     });
   };
-
+  const [activeTab, setActiveTab] = useState("bookings");
 
   // Get bookings only after the user is fetched
-  const { currentBookings, loadingBookings, handlePrevPage, handleNextPage, currentPage, totalPages, cancellingId, handleCancelBooking } = useBookings(user?.name);
+  const {
+    currentBookings,
+    loadingBookings,
+    handlePrevPage,
+    handleNextPage,
+    currentPage,
+    totalPages,
+    cancellingId,
+    handleCancelBooking,
+  } = useBookings(user?.name);
+  const {
+    venues,
+    loadingVenues,
+    error: venuesError,
+  } = useVenuesByManager(user?.name);
 
   useEffect(() => {
     const profileData = getUser();
@@ -40,13 +55,10 @@ const ProfilePage = () => {
   }, []);
 
   const handleChange = (e) => {
-  const { name, value, type, checked } = e.target;
-  const val = type === "checkbox" ? checked : value;
-  setFormData((prev) => ({ ...prev, [name]: val }));
-};
-
-  
-
+    const { name, value, type, checked } = e.target;
+    const val = type === "checkbox" ? checked : value;
+    setFormData((prev) => ({ ...prev, [name]: val }));
+  };
 
   if (!user) {
     return <div className="text-center mt-10">Loading profile...</div>;
@@ -55,10 +67,11 @@ const ProfilePage = () => {
   let renderBookingsContent;
 
   if (loadingBookings) {
-    renderBookingsContent = 
-    <div className="flex justify-center items-center">
-    <p>Loading bookings...</p>
-  </div>;
+    renderBookingsContent = (
+      <div className="flex justify-center items-center">
+        <p>Loading bookings...</p>
+      </div>
+    );
   } else if (currentBookings.length > 0) {
     renderBookingsContent = (
       <>
@@ -79,8 +92,8 @@ const ProfilePage = () => {
               </p>
               <p>
                 <strong>Dates:</strong>{" "}
-                {new Date(booking.dateFrom).toLocaleDateString('en-US')} →{" "}
-                {new Date(booking.dateTo).toLocaleDateString('en-US')}
+                {new Date(booking.dateFrom).toLocaleDateString("en-US")} →{" "}
+                {new Date(booking.dateTo).toLocaleDateString("en-US")}
               </p>
               <button
                 onClick={() => handleCancelBooking(booking.id)}
@@ -91,7 +104,9 @@ const ProfilePage = () => {
                     : "bg-red-600 hover:bg-red-700"
                 }`}
               >
-                {cancellingId === booking.id ? "Cancelling..." : "Cancel Booking"}
+                {cancellingId === booking.id
+                  ? "Cancelling..."
+                  : "Cancel Booking"}
               </button>
             </li>
           ))}
@@ -134,19 +149,30 @@ const ProfilePage = () => {
         {/* Display bio and venue manager status */}
         {!editing ? (
           <>
-            <p><strong>Bio:</strong> {user.bio}</p>
+            <p>
+              <strong>Bio:</strong> {user.bio}
+            </p>
             <p>
               <strong>Venue Manager:</strong> {user.venueManager ? "Yes" : "No"}
             </p>
-            <button
-              onClick={() => setEditing(true)}
-              className="btn btn-outline mt-2"
-            >
-              Edit Profile
-            </button>
+            <div className="flex justify-center gap-4 mt-2">
+              <button
+                onClick={() => setEditing(true)}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm transition"
+              >
+                Edit Profile
+              </button>
+              {user.venueManager && (
+                <Link
+                  to="/admin/manage-venues"
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm transition"
+                >
+                  Add New Venue
+                </Link>
+              )}
+            </div>
           </>
-        ) : 
-        (
+        ) : (
           <div>
             <div className="mb-4">
               <label className="block">Bio:</label>
@@ -188,10 +214,7 @@ const ProfilePage = () => {
               />
               Yes, I am a venue manager
             </div>
-            <button
-              onClick={handleUpdate}
-              className="btn btn-primary mt-4"
-            >
+            <button onClick={handleUpdate} className="btn btn-primary mt-4">
               Save Changes
             </button>
             <button
@@ -203,10 +226,67 @@ const ProfilePage = () => {
           </div>
         )}
       </div>
-
-      {/* Booking section */}
-      <h2 className="text-xl font-semibold mt-6 mb-2">My Bookings</h2>
-      {renderBookingsContent}
+      {user.venueManager && (
+        <div className="">
+          <button
+            onClick={() => setActiveTab("bookings")}
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === "bookings"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200"
+            }`}
+          >
+            My Bookings
+          </button>
+          <button
+            onClick={() => setActiveTab("venues")}
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === "venues" ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            My Venues
+          </button>
+          {activeTab === "bookings" ? (
+            <>
+              <h2 className="text-xl font-semibold mt-6 mb-2">My Bookings</h2>
+              {renderBookingsContent}
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold mt-6 mb-2">My Venues</h2>
+              {loadingVenues ? (
+                <div className="flex justify-center items-center">
+                  <p>Loading venues...</p>
+                </div>
+              ) : venuesError ? (
+                <p className="text-red-500">{venuesError}</p> // Display error if any
+              ) : venues.length > 0 ? (
+                <ul className="space-y-4">
+                  {venues.map((venue) => (
+                    <li
+                      key={venue.id}
+                      className="border p-3 rounded-md shadow-sm bg-gray-50"
+                    >
+                      <Link
+                        to={`/venue/${venue.id}`}
+                        className="text-blue-600 font-medium hover:underline"
+                      >
+                        {venue.name}
+                      </Link>
+                      <p>
+                        {venue.location?.city}, {venue.location?.country}
+                      </p>
+                      <p>Max Guests: {venue.maxGuests}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>You have not created any venues yet.</p>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };
