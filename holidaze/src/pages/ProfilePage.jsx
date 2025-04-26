@@ -259,7 +259,7 @@ const ProfilePage = () => {
                   <p>Loading venues...</p>
                 </div>
               ) : venuesError ? (
-                <p className="text-red-500">{venuesError}</p> // ➡️ แสดง error ถ้ามี
+                <p className="text-red-500">{venuesError}</p> // Display error if any
               ) : venues.length > 0 ? (
                 <ul className="space-y-4">
                   {venues.map((venue) => (
