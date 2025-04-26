@@ -51,10 +51,14 @@ export async function getMyVenues(profileName, token) {
   return json.data; // So your component gets just the array
 }
 
-//fetch the list of venues in Homepage and so on!
-export const getVenues = async () => {
+
+export const getVenues = async (filters = {}) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/holidaze/venues`, {
+    // Build the query parameters based on the filters object
+    const queryParams = new URLSearchParams(filters).toString();
+    const url = `${API_BASE_URL}/holidaze/venues${queryParams ? `?${queryParams}` : ''}`;
+    
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "X-Noroff-API-Key": API_KEY,
@@ -67,12 +71,13 @@ export const getVenues = async () => {
     }
 
     const json = await response.json();
-    return json.data; // Noroff API typically wraps response in { data: [...] }
+    return json.data; // Assuming the response contains venues under the `data` property
   } catch (error) {
     console.error("Error fetching venues:", error);
-    throw error; // You may choose to handle the error in a different way
+    throw error; // You may choose to handle the error differently
   }
 };
+
 
 export const getVenueById = async (id) => {
   try {
