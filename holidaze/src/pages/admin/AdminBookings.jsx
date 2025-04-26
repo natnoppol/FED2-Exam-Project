@@ -21,6 +21,7 @@ function AdminBookings() {
       return;
     }
     const fetchBookings = async () => {
+      const loadingToast = toast.loading("Loading bookings...");
       try {
         const response = await fetch(
           `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(user.name)}/bookings?_venue=true`,
@@ -50,6 +51,7 @@ function AdminBookings() {
         console.error("Error fetching bookings:", error);
         toast.error("Failed to fetch bookings. Please try again later.");
       } finally {
+        toast.dismiss(loadingToast);
         setLoading(false);
       }
     };

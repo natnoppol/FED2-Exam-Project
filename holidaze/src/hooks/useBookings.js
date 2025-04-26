@@ -21,9 +21,8 @@ export const useBookings = (username) => {
     useEffect(() => {
         if (bookings.length > 0) {
           const maxPages = Math.ceil(bookings.length / itemsPerPage);
-          if (currentPage > maxPages) {
-            setCurrentPage(maxPages); 
-          }
+          setCurrentPage((prevPage) => Math.min(prevPage, maxPages));
+
         }
       }, [bookings, currentPage]);
 
@@ -75,7 +74,14 @@ export const useBookings = (username) => {
   const handleCancelBooking = (bookingId) => {
     cancelBooking(bookingId, {
       onSuccess: () => {
-        setBookings((prev) => prev.filter((b) => b.id !== bookingId));
+        setBookings((prev) => {
+          const updatedBookings = prev.filter((b) => b.id !== bookingId);
+          const maxPages = Math.ceil(updatedBookings.length / itemsPerPage);
+          if (currentPage > maxPages) {
+            setCurrentPage(maxPages); 
+          }
+          return updatedBookings;
+        });
       },
       onError: (error) => {
         toast.error(error.message || "Something went wrong.");

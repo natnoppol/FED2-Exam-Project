@@ -55,7 +55,10 @@ const ProfilePage = () => {
   let renderBookingsContent;
 
   if (loadingBookings) {
-    renderBookingsContent = <p>Loading bookings...</p>;
+    renderBookingsContent = 
+    <div className="flex justify-center items-center">
+    <p>Loading bookings...</p>
+  </div>;
   } else if (currentBookings.length > 0) {
     renderBookingsContent = (
       <>
