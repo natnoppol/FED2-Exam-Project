@@ -9,7 +9,10 @@ export const useVenuesByManager = (username) => {
 
   useEffect(() => {
     const fetchVenues = async () => {
-      if (!username) return;
+        if (!username) {
+            setLoadingVenues(false); // Stop loading
+            return;
+          }
 
       try {
         const response = await fetch(
