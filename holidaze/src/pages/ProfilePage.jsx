@@ -34,7 +34,11 @@ const ProfilePage = () => {
     cancellingId,
     handleCancelBooking,
   } = useBookings(user?.name);
-  const { venues, loadingVenues } = useVenuesByManager(user?.name);
+  const {
+    venues,
+    loadingVenues,
+    error: venuesError,
+  } = useVenuesByManager(user?.name);
 
   useEffect(() => {
     const profileData = getUser();
@@ -254,6 +258,8 @@ const ProfilePage = () => {
                 <div className="flex justify-center items-center">
                   <p>Loading venues...</p>
                 </div>
+              ) : venuesError ? (
+                <p className="text-red-500">{venuesError}</p> // ➡️ แสดง error ถ้ามี
               ) : venues.length > 0 ? (
                 <ul className="space-y-4">
                   {venues.map((venue) => (

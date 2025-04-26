@@ -5,6 +5,7 @@ import { getToken } from "../utils/auth";
 export const useVenuesByManager = (username) => {
   const [venues, setVenues] = useState([]);
   const [loadingVenues, setLoadingVenues] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -25,11 +26,13 @@ export const useVenuesByManager = (username) => {
 
         if (response.ok) {
           setVenues(data.data);
+          setError(null);
         } else {
           throw new Error(data.message || "Failed to fetch venues.");
         }
       } catch (error) {
         console.error(error);
+        setError(error.message || "An error occurred while fetching venues.");
       } finally {
         setLoadingVenues(false);
       }
@@ -38,5 +41,5 @@ export const useVenuesByManager = (username) => {
     fetchVenues();
   }, [username]);
 
-  return { venues, loadingVenues };
+  return { venues, loadingVenues, error };
 };
