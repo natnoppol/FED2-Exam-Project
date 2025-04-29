@@ -69,11 +69,24 @@ const CreateVenueForm = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  
+    if (name.startsWith("location.")) {
+      const key = name.split(".")[1];
+      setFormData((prev) => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          [key]: value,
+        },
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -115,6 +128,7 @@ const CreateVenueForm = ({
           address: "",
           city: "",
           country: "",
+          zip: "",
         },
       });
 
@@ -196,7 +210,7 @@ const CreateVenueForm = ({
           className="border p-2 rounded"
           min="0"
           max="5"
-          step="0.1"
+          step="1"
         />
 
         <div className="flex flex-col gap-2">
@@ -252,6 +266,12 @@ const CreateVenueForm = ({
             />
             Parking
           </label>
+          
+      <h3 className="font-semibold">Location</h3>
+      <input name="location.address" value={formData.location.address} onChange={handleChange} placeholder="Address" className="input" />
+      <input name="location.city" value={formData.location.city} onChange={handleChange} placeholder="City" className="input" />
+      <input name="location.country" value={formData.location.country} onChange={handleChange} placeholder="Country" className="input" />
+      <input name="location.zip" value={formData.location.zip} onChange={handleChange} placeholder="Zip" className="input" />
         </div>
       </div>
 

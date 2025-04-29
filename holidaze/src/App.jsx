@@ -12,6 +12,7 @@ import CustomerRegisterForm from "./pages/register/customer/CustomerRegisterForm
 import VenueManagerRegisterForm from "./pages/register/venue-manager/VenueManagerRegisterForm";
 import ProfilePage from "./pages/ProfilePage";
 import "react-datepicker/dist/react-datepicker.css";
+import VenueBookingsPage from "./pages/VenueBookingsPage";
 
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/admin/venue/:id/bookings" element={<ProtectedRoute><VenueBookingsPage /></ProtectedRoute>} />
       </Routes>
     </Router>
   );
