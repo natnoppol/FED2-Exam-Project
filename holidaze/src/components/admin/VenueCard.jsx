@@ -22,10 +22,10 @@ export default function VenueCard({ venue, onEdit, onDelete }) {
         <p className="mt-1 font-medium">Price: ${venue.price}</p>
         <p className="text-sm text-gray-500">Max Guests: {venue.maxGuests}</p>
         <p className="text-sm text-gray-500">Amenities</p>
-        <p className="text-sm text-gray-500">Wifi: {venue.meta.wifi  ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
-        <p className="text-sm text-gray-500">Parking: {venue.meta.parking ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
-        <p className="text-sm text-gray-500">Breakfast: {venue.meta.breakfast ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
-        <p className="text-sm text-gray-500">Pets: {venue.meta.pets ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
+        <p className="text-sm text-gray-500">Wifi: {venue.meta?.wifi  ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
+        <p className="text-sm text-gray-500">Parking: {venue.meta?.parking ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
+        <p className="text-sm text-gray-500">Breakfast: {venue.meta?.breakfast ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
+        <p className="text-sm text-gray-500">Pets: {venue.meta?.pets ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
 
         <h2 className="text-xl font-bold">{venue.location.address}</h2>
         <p className="text-sm text-gray-500">{venue.location.city}</p>
