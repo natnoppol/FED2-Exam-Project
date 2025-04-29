@@ -11,7 +11,6 @@ import {
 import MediaInput from "../form/MediaInput";
 import { useNavigate } from "react-router-dom";
 
-
 const CreateVenueForm = ({
   mode = "create",
   venueData = {},
@@ -25,6 +24,7 @@ const CreateVenueForm = ({
     description: venueData?.description || "",
     price: venueData?.price || "",
     maxGuests: venueData?.maxGuests || "",
+    rating: venueData?.rating || 0,
     media:
       venueData?.media && Array.isArray(venueData?.media)
         ? venueData?.media
@@ -33,6 +33,13 @@ const CreateVenueForm = ({
       address: "",
       city: "",
       country: "",
+      zip: "",
+    },
+    meta: venueData?.meta || {
+      wifi: false,
+      parking: false,
+      breakfast: false,
+      pets: false,
     },
   });
   const navigate = useNavigate();
@@ -41,6 +48,8 @@ const CreateVenueForm = ({
     ...formData,
     price: Number(formData.price),
     maxGuests: Number(formData.maxGuests),
+    rating: Number(formData.rating),
+    meta: formData.meta,
     media: Array.isArray(formData?.media)
       ? formData.media
           .map((item) => {
@@ -94,7 +103,7 @@ const CreateVenueForm = ({
       toast.success(
         `${mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE}`
       );
-      
+
       // Clear form and redirect
       setFormData({
         name: "",
@@ -112,7 +121,6 @@ const CreateVenueForm = ({
       onSuccess(venue);
       navigate("/admin/manage-venues");
       window.scrollTo({ top: 0, behavior: "smooth" });
-
     } catch (err) {
       setErrorMessage(
         `${mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE}`
@@ -178,6 +186,74 @@ const CreateVenueForm = ({
         className="border p-2 rounded w-full mt-4"
         rows={4}
       />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <input
+          type="number"
+          name="rating"
+          value={formData.rating}
+          onChange={handleChange}
+          placeholder="Rating (0 to 5)"
+          className="border p-2 rounded"
+          min="0"
+          max="5"
+          step="0.1"
+        />
+
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={formData.meta.wifi}
+              onChange={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  meta: { ...prev.meta, wifi: !prev.meta.wifi },
+                }))
+              }
+            />
+            WiFi
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={formData.meta.breakfast}
+              onChange={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  meta: { ...prev.meta, breakfast: !prev.meta.breakfast },
+                }))
+              }
+            />
+            Breakfast
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={formData.meta.pets}
+              onChange={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  meta: { ...prev.meta, pets: !prev.meta.pets },
+                }))
+              }
+            />
+            Pets Allowed
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={formData.meta.parking}
+              onChange={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  meta: { ...prev.meta, parking: !prev.meta.parking },
+                }))
+              }
+            />
+            Parking
+          </label>
+        </div>
+      </div>
 
       <div className="flex gap-2 mt-4">
         <button
