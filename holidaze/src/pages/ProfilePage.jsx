@@ -4,8 +4,10 @@ import { useUpdateProfile } from "../hooks/useUpdateProfile"; // Assuming this i
 import { Link } from "react-router-dom";
 import { useBookings } from "../hooks/useBookings";
 import { useVenuesByManager } from "../hooks/useVenuesByManager";
+import { fallbackImage } from "../api";
 
 const ProfilePage = () => {
+  const [updateMessage, setUpdateMessage] = useState("");
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -19,6 +21,8 @@ const ProfilePage = () => {
     updateUserProfile(user.name, formData, (updated) => {
       setUser(updated);
       setEditing(false);
+      setUpdateMessage("Profile updated successfully!");
+      setTimeout(() => setUpdateMessage(""), 3000);
     });
   };
   const [activeTab, setActiveTab] = useState("bookings");
@@ -141,7 +145,7 @@ const ProfilePage = () => {
       {/* Profile section */}
       <div className="space-y-2 text-center">
         <img
-          src={user.avatar?.url}
+          src={user.avatar?.url || fallbackImage}
           alt={user.avatar?.alt || user.name}
           className="w-24 h-24 rounded-full object-cover mx-auto"
         />
@@ -171,6 +175,11 @@ const ProfilePage = () => {
                 </Link>
               )}
             </div>
+            {updateMessage && (
+              <p className="text-green-600 font-medium text-sm mt-2">
+                {updateMessage}
+              </p>
+            )}
           </>
         ) : (
           <div>
@@ -226,67 +235,96 @@ const ProfilePage = () => {
           </div>
         )}
       </div>
-      {user.venueManager && (
-        <div className="">
-          <button
-            onClick={() => setActiveTab("bookings")}
-            className={`px-4 py-2 rounded-lg ${
-              activeTab === "bookings"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200"
-            }`}
-          >
-            My Bookings
-          </button>
-          <button
-            onClick={() => setActiveTab("venues")}
-            className={`px-4 py-2 rounded-lg ${
-              activeTab === "venues" ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
-          >
-            My Venues
-          </button>
-          {activeTab === "bookings" ? (
-            <>
-              <h2 className="text-xl font-semibold mt-6 mb-2">My Bookings</h2>
-              {renderBookingsContent}
-            </>
-          ) : (
-            <>
-              <h2 className="text-xl font-semibold mt-6 mb-2">My Venues</h2>
-              {loadingVenues ? (
-                <div className="flex justify-center items-center">
-                  <p>Loading venues...</p>
-                </div>
-              ) : venuesError ? (
-                <p className="text-red-500">{venuesError}</p> // Display error if any
-              ) : venues.length > 0 ? (
-                <ul className="space-y-4">
-                  {venues.map((venue) => (
-                    <li
-                      key={venue.id}
-                      className="border p-3 rounded-md shadow-sm bg-gray-50"
-                    >
-                      <Link
-                        to={`/venue/${venue.id}`}
-                        className="text-blue-600 font-medium hover:underline"
+      <div className="flex flex-col sm:flex-row justify-center gap-2 mt-4">
+        {user.venueManager && (
+          <div className="">
+            <button
+              onClick={() => setActiveTab("bookings")}
+              className={`px-4 py-2 rounded-lg ${
+                activeTab === "bookings"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              My Bookings
+            </button>
+            <button
+              onClick={() => setActiveTab("venues")}
+              className={`px-4 py-2 rounded-lg ${
+                activeTab === "venues"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              My Venues
+            </button>
+            {activeTab === "bookings" ? (
+              <>
+                <h2 className="text-xl font-semibold mt-6 mb-2">My Bookings</h2>
+                {renderBookingsContent}
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-semibold mt-6 mb-2">My Venues</h2>
+                {loadingVenues ? (
+                  <div className="flex justify-center items-center">
+                    <p>Loading venues...</p>
+                  </div>
+                ) : venuesError ? (
+                  <p className="text-red-500">{venuesError}</p> // Display error if any
+                ) : venues.length > 0 ? (
+                  <ul className="space-y-4">
+                    {venues.map((venue) => (
+                      <li
+                        key={venue.id}
+                        className="border p-3 rounded-md shadow-sm bg-gray-50"
                       >
-                        {venue.name}
-                      </Link>
-                      <p>
-                        {venue.location?.city}, {venue.location?.country}
-                      </p>
-                      <p>Max Guests: {venue.maxGuests}</p>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>You have not created any venues yet.</p>
-              )}
-            </>
-          )}
-        </div>
-      )}
+                        <Link
+                          to={`/venue/${venue.id}`}
+                          className="text-blue-600 font-medium hover:underline"
+                        >
+                          {venue.name}
+                        </Link>
+                        <p>
+                          {venue.location?.city}, {venue.location?.country}
+                        </p>
+                        <p>Max Guests: {venue.maxGuests}</p>
+                        <p>{venue.description}</p>
+                        <img
+                          src={venue.media[0]?.url || fallbackImage}
+                          alt={
+                            venue.media[0]?.alt || venue.name || "Venue image"
+                          }
+                          className="w-full h-48 object-cover rounded-md mt-2"
+                        />
+                        <p>Price: ${venue.price}</p>
+                        <p>Rating: ⭐ {venue.rating ?? "N/A"}</p>
+                        <div className="mt-2 text-sm text-gray-700">
+                          <p>Amenities:</p>
+                          <ul className="list-disc list-inside">
+                            {venue.meta?.wifi && <li>WiFi</li>}
+                            {venue.meta?.breakfast && <li>Breakfast</li>}
+                            {venue.meta?.pets && <li>Pets Allowed</li>}
+                            {venue.meta?.parking && <li>Parking</li>}
+                          </ul>
+                        </div>
+                        <Link
+  to={`/admin/venue/${venue.id}/bookings`}
+  className="btn btn-primary mt-3"
+>
+  View Bookings
+</Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>You have not created any venues yet.</p>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

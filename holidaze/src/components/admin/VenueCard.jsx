@@ -1,22 +1,35 @@
 import React from "react";
+import {fallbackImage} from "../../api"; // Assuming this is the path to your fallback image
+import { CheckCircle, XCircle } from "lucide-react";
+
 
 
 export default function VenueCard({ venue, onEdit, onDelete }) {
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden p-4 flex flex-col justify-between">
       <img
-        src={venue.media?.[0]?.url || "https://plus.unsplash.com/premium_photo-1699544856963-49c417549268?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
+        src={venue.media?.[0]?.url || fallbackImage}
         alt={venue.media?.[0]?.alt || venue.name}
         className="w-full h-40 object-cover rounded"
       />
 
       <div className="mt-4">
         <h2 className="text-lg font-semibold">{venue.name}</h2>
+        <p className="text-sm text-gray-500">Rating: {venue.rating}</p>
         <p className="text-sm text-gray-600 line-clamp-2">
           {venue.description}
         </p>
         <p className="mt-1 font-medium">Price: ${venue.price}</p>
         <p className="text-sm text-gray-500">Max Guests: {venue.maxGuests}</p>
+        <p className="text-sm text-gray-500">Amenities</p>
+        <p className="text-sm text-gray-500">Wifi: {venue.meta?.wifi  ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
+        <p className="text-sm text-gray-500">Parking: {venue.meta?.parking ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
+        <p className="text-sm text-gray-500">Breakfast: {venue.meta?.breakfast ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
+        <p className="text-sm text-gray-500">Pets: {venue.meta?.pets ? <CheckCircle className="text-green-600 w-4 h-4" /> : <XCircle className="text-red-500 w-4 h-4" />}</p>
+
+        <h2 className="text-xl font-bold">{venue.location.address}</h2>
+        <p className="text-sm text-gray-500">{venue.location.city}</p>
+        <p className="text-sm text-gray-500">{venue.location.country}</p>
       </div>
 
       <div className="flex justify-between mt-4">
