@@ -101,8 +101,8 @@ const ResponsiveNav = () => {
       {isOpen && user && (
         <div className="md:hidden">
           <ul className="space-y-2 px-4 py-3 bg-gray-700">
-            {navMenuItems.map((item, index) => (
-              <li key={index}>
+          {navMenuItems.map((item) => (
+              <li key={item.url}>
                 <Link
                   to={item.url}
                   className="block text-gray-300 hover:text-white hover:underline"
