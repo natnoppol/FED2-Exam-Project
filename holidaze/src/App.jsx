@@ -1,6 +1,6 @@
 
 import React from "react";
-import Header from "./components/Header";
+import ResponsiveNav from "./components/Header";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import VenueDetails from "./pages/VenueDetails";
@@ -20,7 +20,7 @@ import VenueBookingsPage from "./pages/VenueBookingsPage";
 function App() {
   return (
     <Router>
-      <Header />
+      <ResponsiveNav />
       <Routes>
         {/* Customer Routes */}
         <Route path="/" element={<HomePage />} />
