@@ -1,9 +1,10 @@
+
+import React from "react";
 import Header from "./components/Header";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import VenueDetails from "./pages/VenueDetails";
 import LoginPage from "./pages/LoginPage";
-import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminVenueManagement from "./pages/admin/AdminVenueManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminBookings from "./pages/admin/AdminBookings";
@@ -13,6 +14,7 @@ import VenueManagerRegisterForm from "./pages/register/venue-manager/VenueManage
 import ProfilePage from "./pages/ProfilePage";
 import "react-datepicker/dist/react-datepicker.css";
 import VenueBookingsPage from "./pages/VenueBookingsPage";
+
 
 
 function App() {
@@ -35,14 +37,7 @@ function App() {
 
         {/* 🔐 Protected Admin Routes */}
         {/* Admin Routes */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
+        
         <Route
           path="/admin/manage-venues"
           element={
