@@ -65,8 +65,8 @@ const ResponsiveNav = () => {
           )}
 
           <ul className="hidden md:flex space-x-6 items-center">
-            {navMenuItems.map((item, index) => (
-              <li key={index}>
+            {navMenuItems.map((item) => (
+              <li key={item.url}>
                 <Link
                   to={item.url}
                   className="text-gray-300 hover:text-white hover:underline"
