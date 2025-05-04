@@ -8,7 +8,7 @@ const SearchForm = ({ onSearch }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch({ location, checkIn, checkOut, guests });
+    onSearch({ country: location, checkIn, checkOut, guests });
   };
 
   return (
@@ -18,7 +18,7 @@ const SearchForm = ({ onSearch }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label htmlFor="location" className="block text-sm font-medium mb-1">
-            Where to?
+            Country
           </label>
           <input
             type="text"
@@ -26,7 +26,7 @@ const SearchForm = ({ onSearch }) => {
             name="location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="Enter destination"
+            placeholder="e.g. Norway, USA"
             className="w-full p-2 border rounded"
             required
           />
