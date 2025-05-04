@@ -1,195 +1,139 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
-import { Menu, X, User } from "lucide-react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { getUser, clearAuth } from "../utils/auth";
+import { fallbackImage } from "../api";
 import { toast } from "react-toastify";
 
-
-const Header = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
-
-  const getNavLinkClass = ({ isActive }) =>
-    isActive
-      ? "text-blue-500 font-semibold"
-      : "text-gray-700 hover:text-blue-500 transition";
-
-  const toggleMenu = () => setMenuOpen(!menuOpen);
- // Define the toggleAccount function
- const toggleAccount = () => setAccountOpen(!accountOpen);
-
-  const navigate = useNavigate();
+const ResponsiveNav = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const user = getUser();
-
-  const accountRef = useRef();
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (accountRef.current && !accountRef.current.contains(event.target)) {
-        setAccountOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    clearAuth(); // Clear user data
-    toast.success("Logged out successfully!"); // Show success message
-    navigate("/login"); // Redirect to login page (or home)
+    clearAuth();
+    toast.success("Logged out successfully");
+    navigate("/login");
   };
 
+  const navMenuItems = user?.venueManager
+    ? [
+        { label: "Profile", url: "/profile" },
+        { label: "Manage Venues", url: "/admin/manage-venues" },
+        { label: "Admin Bookings", url: "/admin/bookings" },
+      ]
+    : user
+    ? [{ label: "Profile", url: "/profile" }]
+    : [];
+
   return (
-    <header className="bg-white shadow-md p-4 sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
-        <Link to="/" className="text-2xl font-bold text-blue-600">
-          Holidaze
-        </Link>
+    <nav className="bg-gradient-to-r from-indigo-900 to-blue-900 text-white shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <Link
+            to="/"
+            className="text-2xl font-extrabold tracking-tight hover:text-indigo-200 transition-colors duration-200"
+          >
+            Holidaze
+          </Link>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex space-x-6 items-center">
-          <NavLink to="/" className={getNavLinkClass}>
-            Home
-          </NavLink>
-          <NavLink to="/login" className={getNavLinkClass}>
-            Login
-          </NavLink>
-          <NavLink to="/admin" className={getNavLinkClass}>
-            Admin
-          </NavLink>
+          {!user && (
+            <div className="md:hidden">
+              <Link
+                to="/login"
+                className="text-sm bg-indigo-600 px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors duration-200 font-medium"
+              >
+                Sign In
+              </Link>
+            </div>
+          )}
 
-          {/* Account Dropdown */}
           {user && (
-            <div className="relative" ref={accountRef}>
+            <div className="flex md:hidden items-center space-x-4">
+              <div className="text-sm text-right">
+                <p className="font-semibold">{user.name}</p>
+                <p className="text-indigo-200 text-xs">
+                  {user.venueManager ? "Admin" : "Customer"}
+                </p>
+              </div>
               <button
-                onClick={toggleAccount}
-                className="flex items-center space-x-2 text-gray-700 hover:text-blue-500"
+                onClick={() => setIsOpen(!isOpen)}
+                className="focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-full"
+                aria-label="Toggle mobile menu"
+                aria-expanded={isOpen}
               >
                 <img
-                  src={user?.avatar?.url || "https://via.placeholder.com/40"}
-                  alt={user?.avatar?.alt || user?.name}
-                  className="w-8 h-8 rounded-full object-cover"
+                  src={user.avatar?.url || fallbackImage}
+                  alt={user.avatar?.alt || `${user.name}'s avatar`}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-indigo-300"
                 />
-                <User className="w-5 h-5" />
-                <span>{user?.name}</span>
               </button>
-              {accountOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-2 z-10">
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    to="/admin/manage-venues"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                  >
-                    Manage Venues
-                  </Link>
-                  <Link
-                    to="/admin/bookings"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                  >
-                    Admin Bookings
-                  </Link>
-
-                  <button
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                    onClick={handleLogout} // Use consistent logout method
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
             </div>
           )}
-        </div>
 
-        {/* Mobile Hamburger Button */}
-        <button
-          className="md:hidden bg-gray-200 p-2"
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-          aria-expanded={menuOpen}
-          aria-controls="mobile-nav"
-        >
-          {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+          <ul className="hidden md:flex space-x-8 items-center">
+            {navMenuItems.map((item) => (
+              <li key={item.url}>
+                <Link
+                  to={item.url}
+                  className="text-indigo-100 hover:text-white hover:bg-indigo-800 px-3 py-2 rounded-md transition-all duration-200 font-medium"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+            {user ? (
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="text-indigo-100 hover:text-white hover:bg-indigo-800 px-3 py-2 rounded-md transition-all duration-200 font-medium"
+                >
+                  Sign Out
+                </button>
+              </li>
+            ) : (
+              <li>
+                <Link
+                  to="/login"
+                  className="text-indigo-100 hover:text-white hover:bg-indigo-800 px-3 py-2 rounded-md transition-all duration-200 font-medium"
+                >
+                  Sign In
+                </Link>
+              </li>
+            )}
+          </ul>
+        </div>
       </div>
 
-      {/* Mobile Nav Menu */}
-      {menuOpen && (
-        <nav
-          id="mobile-nav"
-          className="md:hidden bg-white border-t px-4 pb-4 space-y-3"
-        >
-          <NavLink
-            to="/"
-            className={getNavLinkClass}
-            onClick={() => setMenuOpen(false)}
-          >
-            Home
-          </NavLink>
-          <NavLink
-            to="/login"
-            className={getNavLinkClass}
-            onClick={() => setMenuOpen(false)}
-          >
-            Login
-          </NavLink>
-          <NavLink
-            to="/admin"
-            className={getNavLinkClass}
-            onClick={() => setMenuOpen(false)}
-          >
-            Admin
-          </NavLink>
-          {user && (
-            <div className="pt-2 border-t">
-              <p className="text-sm font-medium text-gray-700 mb-1">
-                {user.name}
-              </p>
-              <Link
-                to="/profile"
-                onClick={() => setMenuOpen(false)}
-                className="block text-gray-700 hover:text-blue-500"
-              >
-                Profile
-              </Link>
-              <Link
-                to="/admin/manage-venues"
-                onClick={() => setMenuOpen(false)}
-                className="block text-gray-700 hover:text-blue-500"
-              >
-                Manage Venues
-              </Link>
-              <Link
-                to="/admin/bookings"
-                onClick={() => setMenuOpen(false)}
-                className="block text-gray-700 hover:text-blue-500"
-              >
-                Admin Bookings
-              </Link>
-
+      {isOpen && user && (
+        <div className="md:hidden">
+          <ul className="space-y-2 px-4 py-4 bg-indigo-950/95 backdrop-blur-sm">
+            {navMenuItems.map((item) => (
+              <li key={item.url}>
+                <Link
+                  to={item.url}
+                  className="block text-indigo-100 hover:text-white hover:bg-indigo-800 px-3 py-2 rounded-md transition-all duration-200 font-medium"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+            <li>
               <button
                 onClick={() => {
+                  setIsOpen(false);
                   handleLogout();
-                  setMenuOpen(false);
                 }}
-                className="block text-gray-700 hover:text-blue-500 mt-1"
+                className="w-full text-left text-indigo-100 hover:text-white hover:bg-indigo-800 px-3 py-2 rounded-md transition-all duration-200 font-medium"
               >
-                Logout
+                Sign Out
               </button>
-            </div>
-          )}
-        </nav>
+            </li>
+          </ul>
+        </div>
       )}
-    </header>
+    </nav>
   );
 };
 
-export default Header;
+export default ResponsiveNav;
