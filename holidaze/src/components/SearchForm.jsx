@@ -24,9 +24,22 @@ const SearchForm = ({ onSearch }) => {
     }
   };
 
+  if (new Date(checkIn) >= new Date(checkOut)) {
+    alert("Check-out must be after Check-in");
+    setIsSubmitting(false);
+    return;
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+
   return (
-    <form onSubmit={handleSubmit} className="p-4 bg-white rounded-lg shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">ค้นหาสถานที่</h2>
+    <form
+      onSubmit={handleSubmit}
+      className={`p-4 bg-white rounded-lg shadow-lg ${
+        isSubmitting ? "opacity-50 pointer-events-none" : ""
+      }`}
+    >
+      <h2 className="text-xl font-semibold mb-4">Find Venues</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label htmlFor="location" className="block text-sm font-medium mb-1">
@@ -41,6 +54,7 @@ const SearchForm = ({ onSearch }) => {
             placeholder="Country"
             className="w-full p-2 border rounded"
             required
+            aria-labelledby="location-label"
           />
         </div>
         <div>
@@ -52,6 +66,7 @@ const SearchForm = ({ onSearch }) => {
             id="check-in"
             name="check-in"
             value={checkIn}
+            min={today}
             onChange={(e) => setCheckIn(e.target.value)}
             className="w-full p-2 border rounded"
             required
@@ -66,6 +81,7 @@ const SearchForm = ({ onSearch }) => {
             id="check-out"
             name="check-out"
             value={checkOut}
+            min={checkIn || today}
             onChange={(e) => setCheckOut(e.target.value)}
             className="w-full p-2 border rounded"
             required
@@ -84,7 +100,7 @@ const SearchForm = ({ onSearch }) => {
           >
             {[...Array(10).keys()].map((i) => (
               <option key={i + 1} value={i + 1}>
-                {i + 1} {i + 1 === 1 ? "Guest" : "Guest"}
+                {i + 1} {i + 1 === 1 ? "Guest" : "Guests"}
               </option>
             ))}
           </select>
@@ -97,6 +113,18 @@ const SearchForm = ({ onSearch }) => {
           className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
         >
           {isSubmitting ? "Searching..." : "Search"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setLocation("");
+            setCheckIn("");
+            setCheckOut("");
+            setGuests(1);
+          }}
+          className="ml-4 text-black bg-gray-100 border border-blue-600 px-6 py-2 rounded hover:bg-white"
+        >
+          Reset
         </button>
       </div>
     </form>

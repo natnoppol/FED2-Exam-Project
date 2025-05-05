@@ -2,6 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { fetchVenues, fallbackImage } from '../api';
 import SearchForm from '../components/SearchForm';
 
+const VenueCard = ({ venue }) => (
+  <div className="venue-card border rounded-lg shadow-lg overflow-hidden">
+    <img
+      src={venue.media[0]?.url || fallbackImage}
+      alt={venue.media[0]?.alt || venue.name}
+      className="w-full h-48 object-cover"
+    />
+    <div className="p-4">
+      <h2 className="text-xl font-semibold">{venue.name}</h2>
+      <p className="text-gray-600 mb-4">{venue.description}</p>
+      <p className="text-lg font-bold text-green-600">
+        Price: ${venue.price}
+      </p>
+      <a
+        href={`/venue/${venue.id}`}
+        className="btn btn-primary mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+      >
+        View Details
+      </a>
+    </div>
+  </div>
+);
+
+
 const HomePage = () => {
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,12 +67,16 @@ const HomePage = () => {
     }
   };
 
-  if (loading) return <p>Loading venues...</p>;
+  if (loading) return (
+    <div className="flex justify-center items-center mt-6">
+      <div className="spinner-border animate-spin border-4 border-t-blue-600 rounded-full w-8 h-8" />
+    </div>
+  );
+
 
   return (
     <div>
-      <SearchForm onSearch={handleSearch} />{' '}
-      {/* Pass handleSearch to SearchForm */}
+      <SearchForm onSearch={handleSearch} />
       {error && <p className="text-red-600">{error}</p>}
       <h1 className="text-2xl font-bold mb-6">Available Venues</h1>
       <div className="venue-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -57,31 +85,7 @@ const HomePage = () => {
             No venues found for your search criteria.
           </p>
         ) : (
-          venues.map((venue, idx) => (
-            <div
-              key={idx}
-              className="venue-card border rounded-lg shadow-lg overflow-hidden"
-            >
-              <img
-                src={venue.media[0]?.url || fallbackImage}
-                alt={venue.media[0]?.alt || venue.name}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h2 className="text-xl font-semibold">{venue.name}</h2>
-                <p className="text-gray-600 mb-4">{venue.description}</p>
-                <p className="text-lg font-bold text-green-600">
-                  Price: ${venue.price}
-                </p>
-                <a
-                  href={`/venue/${venue.id}`}
-                  className="btn btn-primary mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  View Details
-                </a>
-              </div>
-            </div>
-          ))
+          venues.map((venue) => <VenueCard key={venue.id} venue={venue} />)
         )}
       </div>
     </div>

@@ -2,6 +2,7 @@ import { API_BASE_URL, LOGGING_ENABLED, API_KEY } from "./config";
 import { saveAuth } from "./utils/auth";
 import { getToken } from "./utils/auth";
 
+
 export async function loginUser(credentials) {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -15,9 +16,10 @@ export async function loginUser(credentials) {
 
     const data = await response.json();
 
-    if (!response.ok)
-      throw new Error(data.errors?.[0]?.message || "Login failed");
-
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`${errorData.errors?.[0]?.message || 'Login failed'} (Status: ${response.status})`);
+    }
     if (LOGGING_ENABLED) {
       console.log("Login response:", data);
     }
@@ -73,12 +75,13 @@ export const fetchAllPages = async () => {
       const json = await response.json();
       allData.push(...json.data); // Append the data from the current page
 
-      // Update currentPage and pageCount from the meta data
-      currentPage = json.meta.currentPage + 1;
-      pageCount = json.meta.pageCount;
+      currentPage = json.meta?.currentPage + 1 || currentPage;
+      pageCount = json.meta?.pageCount || 0;
     } while (currentPage <= pageCount);
 
-    console.log("Fetched all pages:", allData); // Debugging line
+    if (LOGGING_ENABLED) {
+      console.log("Fetched all pages:", allData); // Debugging line
+    }
 
     return allData; // Return the combined array of data
   } catch (error) {
