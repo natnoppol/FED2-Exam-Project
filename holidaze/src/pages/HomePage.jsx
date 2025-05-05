@@ -85,7 +85,7 @@ const HomePage = () => {
             No venues found for your search criteria.
           </p>
         ) : (
-          venues.map((venue, index) => <VenueCard key={`${venue.id}-${index}`} venue={venue} />)
+          venues.map((venue, idx) => <VenueCard key={venue.id + idx} venue={venue} />)
         )}
       </div>
     </div>
