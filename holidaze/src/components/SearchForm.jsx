@@ -4,24 +4,29 @@ const SearchForm = ({ onSearch }) => {
   const [location, setLocation] = useState("");
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState(1); // default to 1 guest
+  const [guests, setGuests] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Trim and normalize the country value
-    const trimmedCountry = location.trim();
-    onSearch({
-      country: trimmedCountry,
-      checkIn,
-      checkOut,
-      guests,
-    });
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const trimmedCountry = location.trim();
+      await onSearch({
+        country: trimmedCountry,
+        checkIn,
+        checkOut,
+        guests,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="p-4 bg-white rounded-lg shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">Search Venues</h2>
-
+      <h2 className="text-xl font-semibold mb-4">ค้นหาสถานที่</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label htmlFor="location" className="block text-sm font-medium mb-1">
@@ -33,15 +38,14 @@ const SearchForm = ({ onSearch }) => {
             name="location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="Enter country"
+            placeholder="Country"
             className="w-full p-2 border rounded"
             required
           />
         </div>
-
         <div>
           <label htmlFor="check-in" className="block text-sm font-medium mb-1">
-            Check-in
+            Check-In
           </label>
           <input
             type="date"
@@ -53,10 +57,9 @@ const SearchForm = ({ onSearch }) => {
             required
           />
         </div>
-
         <div>
           <label htmlFor="check-out" className="block text-sm font-medium mb-1">
-            Check-out
+            Check-Out
           </label>
           <input
             type="date"
@@ -68,10 +71,9 @@ const SearchForm = ({ onSearch }) => {
             required
           />
         </div>
-
         <div>
           <label htmlFor="guests" className="block text-sm font-medium mb-1">
-            Guests
+            Guests 1-10
           </label>
           <select
             id="guests"
@@ -82,19 +84,19 @@ const SearchForm = ({ onSearch }) => {
           >
             {[...Array(10).keys()].map((i) => (
               <option key={i + 1} value={i + 1}>
-                {i + 1} {i + 1 === 1 ? "Guest" : "Guests"}
+                {i + 1} {i + 1 === 1 ? "Guest" : "Guest"}
               </option>
             ))}
           </select>
         </div>
       </div>
-
       <div className="mt-4 flex justify-center">
         <button
           type="submit"
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          disabled={isSubmitting}
+          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
         >
-          Search
+          {isSubmitting ? "Searching..." : "Search"}
         </button>
       </div>
     </form>
