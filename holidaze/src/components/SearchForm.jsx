@@ -8,7 +8,14 @@ const SearchForm = ({ onSearch }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch({ country: location, checkIn, checkOut, guests });
+    // Trim and normalize the country value
+    const trimmedCountry = location.trim();
+    onSearch({
+      country: trimmedCountry,
+      checkIn,
+      checkOut,
+      guests,
+    });
   };
 
   return (
@@ -26,7 +33,7 @@ const SearchForm = ({ onSearch }) => {
             name="location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="e.g. Norway, USA"
+            placeholder="Enter country"
             className="w-full p-2 border rounded"
             required
           />

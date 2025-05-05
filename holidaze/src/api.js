@@ -51,13 +51,14 @@ export async function getMyVenues(profileName, token) {
   return json.data; // So your component gets just the array
 }
 
-
 export const getVenues = async (filters = {}) => {
   try {
     // Build the query parameters based on the filters object
     const queryParams = new URLSearchParams(filters).toString();
-    const url = `${API_BASE_URL}/holidaze/venues${queryParams ? `?${queryParams}` : ''}`;
-    
+    const url = `${API_BASE_URL}/holidaze/venues${
+      queryParams ? `?${queryParams}` : ""
+    }`;
+
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -71,13 +72,50 @@ export const getVenues = async (filters = {}) => {
     }
 
     const json = await response.json();
-    return json.data; // Assuming the response contains venues under the `data` property
+    let venues = json.data;
+
+    // Apply frontend filtering by country if requested
+    if (filters.country) {
+      venues = venues.filter(
+        (venue) =>
+          venue.location?.country?.toLowerCase() ===
+          filters.country.toLowerCase()
+      );
+    }
+
+    // Filter by guests
+    if (filters.guests) {
+      venues = venues.filter((venue) => venue.maxGuests >= filters.guests);
+    }
+
+    // Filter by check-in and check-out dates
+    if (filters.checkIn && filters.checkOut) {
+      const checkInDate = new Date(filters.checkIn);
+      const checkOutDate = new Date(filters.checkOut);
+
+      venues = venues.filter((venue) => {
+        // If no bookings, it's available
+        if (!venue.bookings?.length) return true;
+
+        // Check if desired dates overlap with existing bookings
+        return venue.bookings.every((booking) => {
+          const bookedFrom = new Date(booking.dateFrom);
+          const bookedTo = new Date(booking.dateTo);
+
+          // Return true if no overlap
+          return (
+            checkOutDate <= bookedFrom || checkInDate >= bookedTo
+          );
+        });
+      });
+    }
+
+    return venues;
   } catch (error) {
     console.error("Error fetching venues:", error);
     throw error; // You may choose to handle the error differently
   }
 };
-
 
 export const getVenueById = async (id) => {
   try {
@@ -103,20 +141,23 @@ export const getVenueById = async (id) => {
 
 export const updateProfile = async (profileName, formData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/holidaze/profiles/${profileName}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`,
-        "X-Noroff-API-Key": API_KEY,
-      },
-      body: JSON.stringify({
-        bio: formData.bio,
-        avatar: formData.avatar ? { url: formData.avatar } : undefined,
-        banner: formData.banner ? { url: formData.banner } : undefined,
-        venueManager: formData.venueManager,
-      }),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/holidaze/profiles/${profileName}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+          "X-Noroff-API-Key": API_KEY,
+        },
+        body: JSON.stringify({
+          bio: formData.bio,
+          avatar: formData.avatar ? { url: formData.avatar } : undefined,
+          banner: formData.banner ? { url: formData.banner } : undefined,
+          venueManager: formData.venueManager,
+        }),
+      }
+    );
     const json = await response.json();
     if (!response.ok) {
       throw new Error(json.errors?.[0]?.message || "Failed to update profile");
@@ -129,4 +170,5 @@ export const updateProfile = async (profileName, formData) => {
   }
 };
 
-export const fallbackImage = "https://plus.unsplash.com/premium_photo-1699544856963-49c417549268?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+export const fallbackImage =
+  "https://plus.unsplash.com/premium_photo-1699544856963-49c417549268?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
