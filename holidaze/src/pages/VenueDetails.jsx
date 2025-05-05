@@ -4,6 +4,7 @@ import { getVenueById } from "../api";
 import BookingForm from "../components/BookingForm";
 import { toast } from "react-toastify";
 import { fallbackImage } from "../api";
+import { deleteVenueById } from "../api"; // Import the delete function
 
 const VenueDetails = ({ user }) => {
   const { venueId } = useParams();
@@ -15,6 +16,7 @@ const VenueDetails = ({ user }) => {
 
   const handleBookingSuccess = () => {
     toast.success("Booking successful!");
+    sessionStorage.removeItem("holidaze_all_venues"); // clear cache
     navigate("/profile");
   };
 
@@ -27,15 +29,21 @@ const VenueDetails = ({ user }) => {
   };
 
   const handleDelete = (venueId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this venue?"
-    );
+    const confirmDelete = window.confirm("Are you sure you want to delete this venue?");
     if (!confirmDelete) return;
-
-    // TODO: Implement actual delete API call
-    toast.success("Venue deleted (not yet implemented)", venueId);
+  
+    deleteVenueById(venueId)
+      .then(() => {
+        toast.success("Venue successfully deleted.");
+        sessionStorage.removeItem("holidaze_all_venues"); // clear cache
+        navigate("/profile");
+      })
+      .catch((error) => {
+        toast.error("Failed to delete venue. Please try again.");
+        console.error("Delete venue error:", error);
+      });
   };
-
+  
   useEffect(() => {
     if (user?.venueManager) {
       setIsManager(true);

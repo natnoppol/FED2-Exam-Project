@@ -3,19 +3,20 @@ import { getVenues, fallbackImage } from "../api"; // Assuming this fetches all 
 import { Link } from "react-router-dom";
 import SearchForm from "../components/SearchForm"; // Import the search form
 
+
 const HomePage = () => {
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Fetch venues with or without filters
-  const fetchVenues = async (filters = {}) => {
+  const fetchVenues = async (filters = {}, fetchAll = false) => {
     setLoading(true);
     setError(null);
-
+  
     try {
-      const data = await getVenues(filters); // Get filtered venues based on the filters object
-      setVenues(data); // Set venues based on the filtered response
+      const data = await getVenues(filters, fetchAll);
+      setVenues(data);
     } catch (error) {
       setError("Failed to load venues. Please try again later.");
       console.error("Error fetching venues:", error);
@@ -23,15 +24,34 @@ const HomePage = () => {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchVenues(); // Initial fetch without filters
   }, []);
 
-  // Handle the form submission and search
-  const handleSearch = (searchParams) => {
-    fetchVenues(searchParams); // Fetch venues with the provided search filters
+  
+
+
+  const handleSearch = async (searchParams) => {
+    setLoading(true);
+    setError(null);
+  
+    try {
+      // ถ้าค้นหา country ให้ดึงข้อมูลทั้งหมด
+      const shouldFetchAll = !!searchParams.country;
+      const venuesData = await getVenues(searchParams, shouldFetchAll);
+  
+      setVenues(venuesData);
+    } catch (err) {
+      setError("Failed to load venues");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
+  
+  
 
   if (loading) return <p>Loading venues...</p>;
 

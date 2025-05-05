@@ -1,102 +1,80 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import debounce from "lodash.debounce";
 
 const SearchForm = ({ onSearch }) => {
-  const [location, setLocation] = useState("");
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState(1); // default to 1 guest
+  const [searchInput, setSearchInput] = useState({
+    country: "",
+    guests: "",
+    checkIn: "",
+    checkOut: "",
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Trim and normalize the country value
-    const trimmedCountry = location.trim();
-    onSearch({
-      country: trimmedCountry,
-      checkIn,
-      checkOut,
-      guests,
-    });
+
+  const debouncedSearch = debounce((input) => {
+    onSearch(input);
+  }, 500); 
+
+
+  useEffect(() => {
+    debouncedSearch(searchInput);
+    return () => debouncedSearch.cancel(); // cancel the debounce when the component is unmounted or before the next effect
+  }, [searchInput]); 
+
+  const handleChange = (e) => {
+    setSearchInput({ ...searchInput, [e.target.name]: e.target.value });
   };
 
+
+  const getValidSearchParams = () => {
+    const { country, guests, checkIn, checkOut } = searchInput;
+    const validSearchParams = {};
+
+    if (country) validSearchParams.country = country;
+    if (guests) validSearchParams.guests = parseInt(guests, 10); 
+    if (checkIn) validSearchParams.checkIn = checkIn;
+    if (checkOut) validSearchParams.checkOut = checkOut;
+
+    return validSearchParams;
+  };
+
+
+  useEffect(() => {
+    const validSearchParams = getValidSearchParams();
+    debouncedSearch(validSearchParams); 
+  }, [searchInput]);
+
   return (
-    <form onSubmit={handleSubmit} className="p-4 bg-white rounded-lg shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">Search Venues</h2>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="location" className="block text-sm font-medium mb-1">
-            Country
-          </label>
-          <input
-            type="text"
-            id="location"
-            name="location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="Enter country"
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="check-in" className="block text-sm font-medium mb-1">
-            Check-in
-          </label>
-          <input
-            type="date"
-            id="check-in"
-            name="check-in"
-            value={checkIn}
-            onChange={(e) => setCheckIn(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="check-out" className="block text-sm font-medium mb-1">
-            Check-out
-          </label>
-          <input
-            type="date"
-            id="check-out"
-            name="check-out"
-            value={checkOut}
-            onChange={(e) => setCheckOut(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="guests" className="block text-sm font-medium mb-1">
-            Guests
-          </label>
-          <select
-            id="guests"
-            name="guests"
-            value={guests}
-            onChange={(e) => setGuests(Number(e.target.value))}
-            className="w-full p-2 border rounded"
-          >
-            {[...Array(10).keys()].map((i) => (
-              <option key={i + 1} value={i + 1}>
-                {i + 1} {i + 1 === 1 ? "Guest" : "Guests"}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="mt-4 flex justify-center">
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-        >
-          Search
-        </button>
-      </div>
+    <form className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <input
+        type="text"
+        name="country"
+        placeholder="Search by country"
+        value={searchInput.country}
+        onChange={handleChange}
+        className="p-2 border rounded"
+      />
+      <input
+        type="number"
+        name="guests"
+        placeholder="Guests"
+        value={searchInput.guests}
+        onChange={handleChange}
+        className="p-2 border rounded"
+      />
+      <input
+        type="date"
+        name="checkIn"
+        value={searchInput.checkIn}
+        onChange={handleChange}
+        className="p-2 border rounded"
+      />
+      <input
+        type="date"
+        name="checkOut"
+        value={searchInput.checkOut}
+        onChange={handleChange}
+        className="p-2 border rounded"
+      />
     </form>
   );
 };
