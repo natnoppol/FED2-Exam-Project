@@ -17,8 +17,7 @@ export async function loginUser(credentials) {
     const data = await response.json();
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`${errorData.errors?.[0]?.message || 'Login failed'} (Status: ${response.status})`);
+      throw new Error(`${data.errors?.[0]?.message || 'Login failed'} (Status: ${response.status})`);
     }
     if (LOGGING_ENABLED) {
       console.log("Login response:", data);
