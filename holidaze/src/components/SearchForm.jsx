@@ -24,12 +24,6 @@ const SearchForm = ({ onSearch }) => {
     }
   };
 
-  if (new Date(checkIn) >= new Date(checkOut)) {
-    alert("Check-out must be after Check-in");
-    setIsSubmitting(false);
-    return;
-  }
-
   const today = new Date().toISOString().split("T")[0];
 
   return (
