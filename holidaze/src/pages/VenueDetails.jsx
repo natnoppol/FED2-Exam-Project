@@ -31,9 +31,8 @@ const VenueDetails = ({ user }) => {
       "Are you sure you want to delete this venue?"
     );
     if (!confirmDelete) return;
-
-    // TODO: Implement actual delete API call
-    toast.success("Venue deleted (not yet implemented)", venueId);
+    
+    toast.success(`Venue ${venueId} deleted (not yet implemented)`);
   };
 
   useEffect(() => {

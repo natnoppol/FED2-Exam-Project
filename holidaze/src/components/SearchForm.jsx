@@ -48,7 +48,7 @@ const SearchForm = ({ onSearch }) => {
             placeholder="Country"
             className="w-full p-2 border rounded"
             required
-            aria-labelledby="location-label"
+            aria-label="Country"
           />
         </div>
         <div>
