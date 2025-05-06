@@ -29,11 +29,14 @@ const SearchForm = ({ onSearch }) => {
     setErrorMessage(""); // Reset error message
     try {
       const trimmedCountry = location.trim();
+
+      // Check if check-out date is after check-in date
       if (new Date(checkOut) <= new Date(checkIn)) {
-        alert("Check-Out must be after Check-In.");
+        setErrorMessage("Check-Out must be after Check-In.");
         setIsSubmitting(false);
         return;
       }
+      // Check if country is empty
       await onSearch({ country: trimmedCountry, checkIn, checkOut, guests });
     } finally {
       setIsSubmitting(false);
@@ -121,6 +124,7 @@ const SearchForm = ({ onSearch }) => {
             />
           </div>
 
+          {/* Inline error message */}
           {errorMessage && (
             <div className="text-red-600 text-sm mt-2">{errorMessage}</div>
           )}
