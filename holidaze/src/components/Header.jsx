@@ -85,7 +85,7 @@ const ResponsiveNav = () => {
               <li>
                 <button
                   onClick={handleLogout}
-                  className="text-indigo-100 hover:text-white hover:bg-indigo-800 px-3 py-2 rounded-md transition-all duration-200 font-medium"
+                  className="text-indigo-100 hover:text-white hover:bg-indigo-800 px-3 py-2 rounded-md transition-all duration-200 font-medium cursor-pointer"
                 >
                   Sign Out
                 </button>
