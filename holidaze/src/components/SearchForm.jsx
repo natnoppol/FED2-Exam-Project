@@ -124,11 +124,7 @@ const SearchForm = ({ onSearch }) => {
             />
           </div>
 
-          {/* Inline error message */}
-          {errorMessage && (
-            <div className="text-red-600 text-sm mt-2">{errorMessage}</div>
-          )}
-
+          
           <div>
             <label htmlFor="guests" className="block text-sm font-medium mb-1">
               Guests 1-10
@@ -165,6 +161,10 @@ const SearchForm = ({ onSearch }) => {
             Reset
           </button>
         </div>
+        {/* Inline error message */}
+        {errorMessage && (
+            <div className="text-red-600 text-sm mt-2">{errorMessage}</div>
+          )}
       </div>
     </form>
   );

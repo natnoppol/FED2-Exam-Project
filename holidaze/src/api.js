@@ -52,7 +52,7 @@ export async function getMyVenues(profileName, token) {
   return json.data; // So your component gets just the array
 }
 
-export const fetchAllPages = async () => {
+export const fetchAllPages = async (maxPages = Infinity) => {
   try {
     const allData = [];
     let currentPage = 1;
@@ -68,26 +68,28 @@ export const fetchAllPages = async () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch data for page ${currentPage}`);
+        throw new Error(`fetch pages ${currentPage} failed`);
       }
 
       const json = await response.json();
-      allData.push(...json.data); // Append the data from the current page
+      allData.push(...json.data);
 
+   
       if (!json.meta || typeof json.meta.currentPage !== "number" || typeof json.meta.pageCount !== "number") {
-        throw new Error("Pagination metadata is missing or invalid. Unable to continue fetching pages.");
+        throw new Error("failed to load pages");
       }
+
       currentPage = json.meta.currentPage + 1;
-      pageCount = json.meta.pageCount;
+      pageCount = Math.min(json.meta.pageCount, maxPages); 
     } while (currentPage <= pageCount);
 
     if (LOGGING_ENABLED) {
-      console.log("Fetched all pages:", allData); // Debugging line
+      console.log("fetch all pages:", allData);
     }
 
-    return allData; // Return the combined array of data
+    return allData;
   } catch (error) {
-    console.error("Error fetching all pages:", error);
+    console.error("failed to fetch pages:", error);
     throw error;
   }
 };
