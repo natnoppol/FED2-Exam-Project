@@ -76,7 +76,7 @@ export const fetchAllPages = async (maxPages = Infinity) => {
 
    
       if (!json.meta || typeof json.meta.currentPage !== "number" || typeof json.meta.pageCount !== "number") {
-        throw new Error("failed to load pages");
+        throw new Error(`Failed to load pages on page ${currentPage}. Received meta: ${JSON.stringify(json.meta)}`);
       }
 
       currentPage = json.meta.currentPage + 1;
