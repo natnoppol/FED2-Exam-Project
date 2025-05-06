@@ -57,7 +57,7 @@ const ResponsiveNav = () => {
               </div>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-full"
+                className="focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-full cursor-pointer"
                 aria-label="Toggle mobile menu"
                 aria-expanded={isOpen}
               >
