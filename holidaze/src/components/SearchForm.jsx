@@ -8,6 +8,7 @@ const SearchForm = ({ onSearch }) => {
   const [guests, setGuests] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMobileFields, setShowMobileFields] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     setShowMobileFields(location.trim().length > 0);
@@ -25,6 +26,7 @@ const SearchForm = ({ onSearch }) => {
     e.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
+    setErrorMessage(""); // Reset error message
     try {
       const trimmedCountry = location.trim();
       if (new Date(checkOut) <= new Date(checkIn)) {
@@ -38,10 +40,8 @@ const SearchForm = ({ onSearch }) => {
     }
   };
 
-// Get today's date in YYYY-MM-DD format
+  // Get today's date in YYYY-MM-DD format
   const today = new Date().toISOString().split("T")[0];
-
-
 
   return (
     <form
@@ -74,14 +74,20 @@ const SearchForm = ({ onSearch }) => {
       <div
         className={`
           overflow-hidden transition-all duration-500
-          ${showMobileFields ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"}
+          ${
+            showMobileFields
+              ? "max-h-[1000px] opacity-100"
+              : "max-h-0 opacity-0"
+          }
           sm:max-h-none sm:opacity-100 sm:block
         `}
       >
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-
           <div>
-            <label htmlFor="check-in" className="block text-sm font-medium mb-1">
+            <label
+              htmlFor="check-in"
+              className="block text-sm font-medium mb-1"
+            >
               Check-In
             </label>
             <input
@@ -97,7 +103,10 @@ const SearchForm = ({ onSearch }) => {
           </div>
 
           <div>
-            <label htmlFor="check-out" className="block text-sm font-medium mb-1">
+            <label
+              htmlFor="check-out"
+              className="block text-sm font-medium mb-1"
+            >
               Check-Out
             </label>
             <input
@@ -111,6 +120,10 @@ const SearchForm = ({ onSearch }) => {
               required
             />
           </div>
+
+          {errorMessage && (
+            <div className="text-red-600 text-sm mt-2">{errorMessage}</div>
+          )}
 
           <div>
             <label htmlFor="guests" className="block text-sm font-medium mb-1">

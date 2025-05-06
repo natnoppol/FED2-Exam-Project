@@ -53,7 +53,7 @@ const VenueDetails = ({ user }) => {
     };
 
     fetchVenueDetails();
-  }, [venueId, user]);
+  }, [venueId, user?.venueManager]);
 
   if (loading) return <p>Loading venue details...</p>;
   if (error) return <p>{error}</p>;
