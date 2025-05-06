@@ -75,8 +75,7 @@ export const fetchAllPages = async () => {
       allData.push(...json.data); // Append the data from the current page
 
       if (!json.meta || typeof json.meta.currentPage !== "number" || typeof json.meta.pageCount !== "number") {
-        console.warn("Missing or invalid pagination metadata. Terminating pagination loop.");
-        break;
+        throw new Error("Pagination metadata is missing or invalid. Unable to continue fetching pages.");
       }
       currentPage = json.meta.currentPage + 1;
       pageCount = json.meta.pageCount;
