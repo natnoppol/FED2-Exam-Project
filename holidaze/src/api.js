@@ -52,6 +52,68 @@ export async function getMyVenues(profileName, token) {
   return json.data; // So your component gets just the array
 }
 
+export const fetchVenues = async (filters = {}, page = 1, limit = 9) => {
+  try {
+    const allVenues = await fetchAllPages();
+    const filteredVenues = filterVenues(allVenues, filters);
+
+    const total = filteredVenues.length;
+    const totalPages = Math.ceil(total / limit);
+
+    
+    const paginatedVenues = filteredVenues.slice((page - 1) * limit, page * limit); 
+
+    return {
+      venues: paginatedVenues,
+      totalPages,
+    };
+  } catch (error) {
+    console.error("Error fetching and filtering venues:", error);
+    throw error;
+  }
+};
+
+
+export const filterVenues = (venues, filters = {}) => {
+  let filteredVenues = [...venues];
+
+  const normalize = (str) => str.trim().toLowerCase();
+  if (filters.country) {
+    const target = normalize(filters.country);
+    filteredVenues = filteredVenues.filter(venue => 
+      normalize(venue.location?.country || '').includes(target)
+    );
+  }
+  
+
+  // Filter by guests
+  if (filters.guests) {
+    filteredVenues = filteredVenues.filter((venue) => venue.maxGuests >= filters.guests);
+  }
+
+  // Filter by check-in and check-out dates
+  if (filters.checkIn && filters.checkOut) {
+    const checkInDate = new Date(filters.checkIn);
+    const checkOutDate = new Date(filters.checkOut);
+
+    filteredVenues = filteredVenues.filter((venue) => {
+      // If no bookings, it's available
+      if (!venue.bookings?.length) return true;
+
+      // Check if desired dates overlap with existing bookings
+      return venue.bookings.every((booking) => {
+        const bookedFrom = new Date(booking.dateFrom);
+        const bookedTo = new Date(booking.dateTo);
+
+        // Return true if no overlap
+        return checkOutDate <= bookedFrom || checkInDate >= bookedTo;
+      });
+    });
+  }
+
+  return filteredVenues;
+};
+
 export const fetchAllPages = async (maxPages = Infinity) => {
   try {
     const allData = [];
@@ -87,6 +149,9 @@ export const fetchAllPages = async (maxPages = Infinity) => {
       console.log("fetch all pages:", allData);
     }
 
+    if (currentPage > 100) throw new Error("Over 100 Pages, Stop loop!");
+
+
     return allData;
   } catch (error) {
     console.error("failed to fetch pages:", error);
@@ -94,59 +159,28 @@ export const fetchAllPages = async (maxPages = Infinity) => {
   }
 };
 
-export const filterVenues = (venues, filters = {}) => {
-  let filteredVenues = [...venues];
+export const fetchPaginatedVenues = async (page = 1, limit = 9) => {
+  const response = await fetch(`${API_BASE_URL}/holidaze/venues?page=${page}&limit=${limit}`, {
+    headers: {
+      "X-Noroff-API-Key": API_KEY,
+      "Content-Type": "application/json",
+    },
+  });
 
-  // Filter by country
-  if (filters.country) {
-    filteredVenues = filteredVenues.filter(
-      (venue) =>
-        venue.location?.country?.toLowerCase() === filters.country.toLowerCase()
-    );
+  if (!response.ok) {
+    throw new Error(`Failed to fetch page ${page}`);
   }
 
-  // Filter by guests
-  if (filters.guests) {
-    filteredVenues = filteredVenues.filter((venue) => venue.maxGuests >= filters.guests);
-  }
-
-  // Filter by check-in and check-out dates
-  if (filters.checkIn && filters.checkOut) {
-    const checkInDate = new Date(filters.checkIn);
-    const checkOutDate = new Date(filters.checkOut);
-
-    filteredVenues = filteredVenues.filter((venue) => {
-      // If no bookings, it's available
-      if (!venue.bookings?.length) return true;
-
-      // Check if desired dates overlap with existing bookings
-      return venue.bookings.every((booking) => {
-        const bookedFrom = new Date(booking.dateFrom);
-        const bookedTo = new Date(booking.dateTo);
-
-        // Return true if no overlap
-        return checkOutDate <= bookedFrom || checkInDate >= bookedTo;
-      });
-    });
-  }
-
-  return filteredVenues;
+  const json = await response.json();
+  return {
+    venues: json.data,
+    currentPage: json.meta.currentPage,
+    totalPages: json.meta.pageCount,
+  };
 };
 
-export const fetchVenues = async (filters = {}) => {
-  try {
-    // Fetch all pages of data
-    const allVenues = await fetchAllPages();
 
-    // Apply filters to the fetched data
-    const filteredVenues = filterVenues(allVenues, filters);
 
-    return filteredVenues; // Return the filtered venues
-  } catch (error) {
-    console.error("Error fetching and filtering venues:", error);
-    throw error;
-  }
-};
 
 export const getVenueById = async (id) => {
   try {
