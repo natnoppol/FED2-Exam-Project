@@ -57,7 +57,7 @@ const ResponsiveNav = () => {
               </div>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-full"
+                className="focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-full cursor-pointer"
                 aria-label="Toggle mobile menu"
                 aria-expanded={isOpen}
               >
@@ -85,7 +85,7 @@ const ResponsiveNav = () => {
               <li>
                 <button
                   onClick={handleLogout}
-                  className="text-indigo-100 hover:text-white hover:bg-indigo-800 px-3 py-2 rounded-md transition-all duration-200 font-medium"
+                  className="text-indigo-100 hover:text-white hover:bg-indigo-800 px-3 py-2 rounded-md transition-all duration-200 font-medium cursor-pointer"
                 >
                   Sign Out
                 </button>

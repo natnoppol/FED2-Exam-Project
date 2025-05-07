@@ -50,3 +50,5 @@ export default function VenueCard({ venue, onEdit, onDelete }) {
     </div>
   );
 }
+
+
