@@ -149,9 +149,6 @@ export const fetchAllPages = async (maxPages = Infinity) => {
       console.log("fetch all pages:", allData);
     }
 
-    if (currentPage > 100) throw new Error("Over 100 Pages, Stop loop!");
-
-
     return allData;
   } catch (error) {
     console.error("failed to fetch pages:", error);
