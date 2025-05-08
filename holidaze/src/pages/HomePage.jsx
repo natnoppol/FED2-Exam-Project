@@ -5,8 +5,7 @@ import { Spinner } from "../components/Spinner";
 import { HiLocationMarker } from "react-icons/hi"; 
 
 const VenueCard = ({ venue }) => {
-  const city = venue.location?.city || "Unknown City";
-  const country = venue.location?.country || "Unknown Country";
+  const { city = "Unknown City", country = "Unknown Country" } = venue.location || {};
 
   return (
     <div className="venue-card border rounded-lg shadow-lg overflow-hidden">
