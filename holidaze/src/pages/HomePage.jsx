@@ -2,27 +2,43 @@ import React, { useState, useEffect } from "react";
 import { fetchVenues, fallbackImage, fetchPaginatedVenues } from "../api";
 import SearchForm from "../components/SearchForm";
 import { Spinner } from "../components/Spinner";
+import { HiLocationMarker } from "react-icons/hi"; 
 
-const VenueCard = ({ venue }) => (
-  <div className="venue-card border rounded-lg shadow-lg overflow-hidden">
-    <img
-      src={venue.media[0]?.url || fallbackImage}
-      alt={venue.media[0]?.alt || venue.name}
-      className="w-full h-48 object-cover"
-    />
-    <div className="p-4">
-      <h2 className="text-xl font-semibold">{venue.name}</h2>
-      <p className="text-gray-600 mb-4">{venue.description}</p>
-      <p className="text-lg font-bold text-green-600">Price: ${venue.price}</p>
-      <a
-        href={`/venue/${venue.id}`}
-        className="btn btn-primary mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        View Details
-      </a>
+const VenueCard = ({ venue }) => {
+  const city = venue.location?.city || "Unknown City";
+  const country = venue.location?.country || "Unknown Country";
+
+  return (
+    <div className="venue-card border rounded-lg shadow-lg overflow-hidden">
+      <img
+        src={venue.media[0]?.url || fallbackImage}
+        alt={venue.media[0]?.alt || venue.name}
+        className="w-full h-48 object-cover"
+      />
+      <div className="p-4">
+        <h2 className="text-xl font-semibold mb-1">{venue.name}</h2>
+
+        {/* Location with icon */}
+        <p className="text-gray-700 text-sm font-medium mb-2 flex items-center gap-2">
+          <HiLocationMarker className="text-red-500 text-lg" />
+          {city}, {country}
+        </p>
+
+        {/* Price per night */}
+        <p className="text-lg font-bold text-green-600 mb-2">
+          Price: ${venue.price} / night
+        </p>
+
+        <a
+          href={`/venue/${venue.id}`}
+          className="btn btn-primary mt-2 inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          View Details
+        </a>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const HomePage = () => {
   const [venues, setVenues] = useState([]);
