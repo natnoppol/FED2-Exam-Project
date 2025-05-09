@@ -48,7 +48,7 @@ const BookingForm = ({ venue, bookings = [], onBook }) => {
       dateFrom: dateFrom.toISOString(),
       dateTo: dateTo.toISOString(),
       guests: parseInt(guests, 10),
-      venueId: venue.id || "",
+      venueId: venue.id,
     };
 
     setLoading(true);
