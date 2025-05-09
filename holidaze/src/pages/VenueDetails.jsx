@@ -17,8 +17,6 @@ const VenueDetails = ({ user }) => {
   const [isManager, setIsManager] = useState(false);
   const navigate = useNavigate();
 
-  console.log("isManager", isManager);
-
   const handleBookingSuccess = () => {
     toast.success("Booking successful!");
     navigate("/profile");
