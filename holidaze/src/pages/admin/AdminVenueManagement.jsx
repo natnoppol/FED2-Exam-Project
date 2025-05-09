@@ -7,17 +7,16 @@ import CreateVenueForm from "../../components/admin/CreateVenueForm";
 import ErrorBoundary from "../../components/ErrorBoundary";
 import { toast } from "react-toastify";
 import { DELETE_ERROR_MESSAGE, DELETE_SUCCESS_MESSAGE } from "../../constants";
+import { PlusCircle, Hotel, Search } from "lucide-react";
 
 const AdminVenueManagement = () => {
-  const [deleteError, setDeleteError] = useState(""); // state for delete error
-  const [venues, setVenues] = useState([]); // state for venues
-  const [loading, setLoading] = useState(true); // loading state for venues
-  const [showEditForm, setShowEditForm] = useState(false); // for showing the edit form
-  const [editingVenue, setEditingVenue] = useState(null); // for editing a venue
-  const [searchTerm, setSearchTerm] = useState(""); // for search functionality
-  const [visibleCount, setVisibleCount] = useState(6); // show 6 venues at a time
-
-  const loadMore = () => setVisibleCount((prev) => prev + 6); // load 6 more venues
+  const [deleteError, setDeleteError] = useState("");
+  const [venues, setVenues] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [editingVenue, setEditingVenue] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [visibleCount, setVisibleCount] = useState(6);
 
   const token = getToken();
   const user = getUser();
@@ -26,23 +25,23 @@ const AdminVenueManagement = () => {
     venue.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const loadMore = () => setVisibleCount((prev) => prev + 6);
+
   const handleEdit = (venue) => {
     setEditingVenue(venue);
     setShowEditForm(true);
-    window.scrollTo({ top: 0, behavior: "smooth" }); // Optional: scroll to form
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const fetchVenues = async () => {
     try {
       if (!user?.name) {
-        console.error(
-          "User is null or does not have a name. Cannot fetch venues."
-        );
+        console.error("User missing or invalid.");
         setLoading(false);
         return;
       }
       const data = await getMyVenues(user.name, token);
-      setVenues(data); // Assuming your API helper returns the .data array
+      setVenues(data);
     } catch (error) {
       console.error("Failed to fetch venues:", error);
     } finally {
@@ -52,13 +51,10 @@ const AdminVenueManagement = () => {
 
   useEffect(() => {
     fetchVenues();
-  }, [user?.name, token]); // Fetch venues when user name or token changes
-  if (loading) return <p>Loading venues...</p>;
+  }, [user?.name, token]);
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this venue?"
-    );
+    const confirmDelete = window.confirm("Are you sure you want to delete this venue?");
     if (!confirmDelete) return;
 
     try {
@@ -76,15 +72,12 @@ const AdminVenueManagement = () => {
         setDeleteError(DELETE_ERROR_MESSAGE);
         toast.error(DELETE_ERROR_MESSAGE);
       } else {
-        setDeleteError(""); // Clear error if delete was successful
+        setDeleteError("");
         toast.success(DELETE_SUCCESS_MESSAGE);
-        // Reset edit state if the deleted venue is currently being edited
         if (editingVenue?.id === id) {
           setEditingVenue(null);
           setShowEditForm(false);
         }
-
-        //  Re-fetch updated list from the server
         setLoading(true);
         await fetchVenues();
       }
@@ -96,71 +89,97 @@ const AdminVenueManagement = () => {
   };
 
   return (
-    <div>
-      {/* Create Venue Form should be above the venue list */}
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+          <Hotel className="text-blue-600" size={32} />
+          Venue Manager
+        </h1>
+        <p className="text-gray-600">Create, edit, and manage your venues easily.</p>
+      </header>
+
       {showEditForm && (
-        <ErrorBoundary>
-          <CreateVenueForm
-            mode={editingVenue ? "edit" : "create"}
-            venueData={editingVenue}
-            onSuccess={() => {
-              fetchVenues(); // loading new venues after edit/create
-              setShowEditForm(false);
-              setEditingVenue(null);
-            }}
-            onCancel={() => {
-              setShowEditForm(false);
-              setEditingVenue(null);
-            }}
-          />
-        </ErrorBoundary>
-      )}
-
-      <input
-        type="text"
-        placeholder="Search venues..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="border px-3 py-2 rounded mb-4 w-full md:w-1/2"
-      />
-      <h1>My Venues</h1>
-      <button
-        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mb-4"
-        onClick={() => {
-          setShowEditForm(true);
-          setEditingVenue(null); // break loading old venue
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }}
-      >
-        Create New Venue
-      </button>
-
-      {deleteError && <p className="text-red-600 mb-4">{deleteError}</p>}
-
-      {/* Render your venue list */}
-      {filteredVenues.slice(0, visibleCount).map((venue) => (
-        <VenueCard
-          key={venue.id}
-          venue={venue}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
-      ))}
-
-      {/* "No venues found" Message */}
-      {filteredVenues.length === 0 && !loading && (
-        <p className="text-gray-500 text-center mt-4">No venues found.</p>
-      )}
-
-      {visibleCount < filteredVenues.length && (
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={loadMore}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Load More
-          </button>
+        <div className="mb-8 animate-fade-in">
+          <ErrorBoundary>
+            <CreateVenueForm
+              mode={editingVenue ? "edit" : "create"}
+              venueData={editingVenue}
+              onSuccess={() => {
+                fetchVenues();
+                setShowEditForm(false);
+                setEditingVenue(null);
+              }}
+              onCancel={() => {
+                setShowEditForm(false);
+                setEditingVenue(null);
+              }}
+            />
+          </ErrorBoundary>
         </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <div className="relative w-full sm:w-1/2">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="Search venues..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 border border-gray-300 px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 transition"
+          />
+        </div>
+        <button
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-md transition-transform hover:scale-105 cursor-pointer"
+          onClick={() => {
+            setShowEditForm(true);
+            setEditingVenue(null);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
+          <PlusCircle size={20} />
+          New Venue
+        </button>
+      </div>
+
+      {deleteError && (
+        <p className="text-red-600 font-medium mb-4">{deleteError}</p>
+      )}
+
+      {loading ? (
+        <p className="text-gray-500 text-center">Loading venues...</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredVenues.slice(0, visibleCount).map((venue) => (
+              <div
+                key={venue.id}
+                className="transition-transform hover:scale-105 animate-fade-in"
+              >
+                <VenueCard
+                  venue={venue}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              </div>
+            ))}
+          </div>
+
+          {filteredVenues.length === 0 && (
+            <p className="text-gray-500 text-center mt-6">No venues found.</p>
+          )}
+
+          {visibleCount < filteredVenues.length && (
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={loadMore}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-lg transition"
+              >
+                Load More
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
