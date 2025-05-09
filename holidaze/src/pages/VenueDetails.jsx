@@ -67,12 +67,20 @@ const VenueDetails = ({ user }) => {
       <h1 className="text-3xl font-bold mb-2">{venue.name}</h1>
 
       {/* Rating Stars */}
-      <div className="flex items-center mb-4">
+       <div
+        className="flex items-center mb-4"
+        role="img"
+        aria-label={
+          venue.rating
+            ? `Rating: ${venue.rating.toFixed(1)} out of 5`
+            : "No rating yet"
+        }
+      >
         {Array.from({ length: 5 }, (_, index) =>
           index < Math.round(venue.rating || 0) ? (
-            <FaStar key={index} className="text-yellow-400 mr-1" />
+            <FaStar key={index} className="text-yellow-400 mr-1" aria-hidden="true" />
           ) : (
-            <FaRegStar key={index} className="text-gray-400 mr-1" />
+            <FaRegStar key={index} className="text-gray-400 mr-1" aria-hidden="true" />
           )
         )}
         <span className="ml-2 text-sm text-gray-600">
