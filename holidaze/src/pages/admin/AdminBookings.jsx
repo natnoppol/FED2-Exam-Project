@@ -10,7 +10,9 @@ function AdminBookings() {
   const [error, setError] = useState(null);
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [search, setSearch] = useState("");
-
+  const [currentPage, setCurrentPage] = useState(1); // Current page state
+  const [itemsPerPage] = useState(9); // Number of items per page (you can adjust this)
+  
   const user = getUser();
   const token = getToken();
 
@@ -71,6 +73,11 @@ function AdminBookings() {
     setFilteredBookings(filtered);
   }, [search, bookings]);
 
+  // Pagination logic
+  const indexOfLastBooking = currentPage * itemsPerPage;
+  const indexOfFirstBooking = indexOfLastBooking - itemsPerPage;
+  const currentBookings = filteredBookings.slice(indexOfFirstBooking, indexOfLastBooking);
+
   const handleCancel = async (bookingId) => {
     const confirmCancel = window.confirm(
       "Are you sure you want to cancel this booking?"
@@ -99,6 +106,11 @@ function AdminBookings() {
       toast.error("Failed to cancel booking. Please try again later.");
     }
   };
+
+  // Handle page change
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
 
   if (loading) return <p>Loading bookings...</p>;
 
@@ -130,7 +142,7 @@ function AdminBookings() {
         <p>No bookings found.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="list">
-          {filteredBookings.map((booking) => (
+          {currentBookings.map((booking) => (
             <AdminBookingCard
               key={booking.id}
               booking={booking}
@@ -139,6 +151,25 @@ function AdminBookings() {
           ))}
         </div>
       )}
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center mt-6">
+        <button
+          className="px-4 py-2 bg-gray-500 text-white rounded-l-md hover:bg-blue-600 cursor-pointer"
+          onClick={() => paginate(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span className="px-4 py-2">{`${currentPage} / ${totalPages}`}</span>
+        <button
+          className="px-4 py-2 bg-gray-500 text-white rounded-r-md hover:bg-blue-600 cursor-pointer"
+          onClick={() => paginate(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
