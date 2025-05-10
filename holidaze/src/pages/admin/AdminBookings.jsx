@@ -110,7 +110,7 @@ function AdminBookings() {
   // Handle page change
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredBookings.length / itemsPerPage));
 
   if (loading) return <p>Loading bookings...</p>;
 
