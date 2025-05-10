@@ -37,7 +37,7 @@ function AdminBookings() {
         );
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch bookings: ${response.statusText}`);
+         throw new Error(`Failed to fetch bookings: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();

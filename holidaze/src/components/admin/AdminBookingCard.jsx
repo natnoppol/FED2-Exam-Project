@@ -6,7 +6,6 @@ import { fallbackImage } from "../../api";
 function AdminBookingCard({ booking, onCancel }) {
   const { dateFrom, dateTo, guests, venue } = booking;
 
-  // ถ้าไม่มีรูป, ใช้ fallback จาก public/images
   const image = venue?.media?.[0]?.url || fallbackImage;
 
   return (
