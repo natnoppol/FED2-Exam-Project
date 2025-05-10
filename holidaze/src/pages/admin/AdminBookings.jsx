@@ -25,7 +25,9 @@ function AdminBookings() {
       const loadingToast = toast.loading("Loading bookings...");
       try {
         const response = await fetch(
-          `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(user.name)}/bookings?_venue=true`,
+          `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(
+            user.name
+          )}/bookings?_venue=true`,
           {
             method: "GET",
             headers: {
@@ -37,7 +39,9 @@ function AdminBookings() {
         );
 
         if (!response.ok) {
-         throw new Error(`Failed to fetch bookings: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch bookings: ${response.status} ${response.statusText}`
+          );
         }
 
         const data = await response.json();
@@ -68,7 +72,9 @@ function AdminBookings() {
   }, [search, bookings]);
 
   const handleCancel = async (bookingId) => {
-    const confirmCancel = window.confirm("Are you sure you want to cancel this booking?");
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this booking?"
+    );
     if (!confirmCancel) return;
 
     try {
@@ -98,7 +104,10 @@ function AdminBookings() {
 
   if (error) {
     return (
-      <div role="alert" className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <div
+        role="alert"
+        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"
+      >
         <strong className="font-bold">Error:</strong> <span>{error}</span>
       </div>
     );
@@ -120,7 +129,7 @@ function AdminBookings() {
       {filteredBookings.length === 0 ? (
         <p>No bookings found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="list">
           {filteredBookings.map((booking) => (
             <AdminBookingCard
               key={booking.id}
