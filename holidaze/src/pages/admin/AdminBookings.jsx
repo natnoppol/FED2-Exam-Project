@@ -11,8 +11,8 @@ function AdminBookings() {
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1); // Current page state
-  const [itemsPerPage] = useState(9); // Number of items per page (you can adjust this)
-  
+  const itemsPerPage = 9; // Number of items per page (you can adjust this)
+
   const user = getUser();
   const token = getToken();
 
