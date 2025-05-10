@@ -20,6 +20,7 @@ function AdminBookings() {
       setLoading(false);
       return;
     }
+
     const fetchBookings = async () => {
       const loadingToast = toast.loading("Loading bookings...");
       try {
@@ -34,21 +35,20 @@ function AdminBookings() {
             },
           }
         );
+
         if (!response.ok) {
-            throw new Error(`Failed to fetch bookings: ${response.status} ${response.statusText}`);
+          throw new Error(`Failed to fetch bookings: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
         setBookings(data.data);
-        setFilteredBookings(data.data); // Initialize filtered bookings
-        if (data.data.length === 0) {
-          toast.info("No bookings found for this user.");
-        } else {
-          toast.success("Bookings fetched successfully!");
-        }
+        setFilteredBookings(data.data);
+        data.data.length === 0
+          ? toast.info("No bookings found for this user.")
+          : toast.success("Bookings fetched successfully!");
       } catch (error) {
-        setError(error.message);
         console.error("Error fetching bookings:", error);
+        setError("Failed to fetch bookings. Please try again later.");
         toast.error("Failed to fetch bookings. Please try again later.");
       } finally {
         toast.dismiss(loadingToast);
@@ -59,16 +59,18 @@ function AdminBookings() {
     fetchBookings();
   }, [user?.name, token]);
 
-  // Handle search
   useEffect(() => {
     const query = search.toLowerCase();
     const filtered = bookings.filter((booking) =>
-        (booking.venue?.name || '').toLowerCase().includes(query)
+      (booking.venue?.name || "").toLowerCase().includes(query)
     );
     setFilteredBookings(filtered);
   }, [search, bookings]);
 
   const handleCancel = async (bookingId) => {
+    const confirmCancel = window.confirm("Are you sure you want to cancel this booking?");
+    if (!confirmCancel) return;
+
     try {
       const response = await fetch(
         `${API_BASE_URL}/holidaze/bookings/${bookingId}`,
@@ -92,13 +94,26 @@ function AdminBookings() {
   };
 
   if (loading) return <p>Loading bookings...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+
+  if (error) {
+    return (
+      <div role="alert" className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <strong className="font-bold">Error:</strong> <span>{error}</span>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Admin Bookings</h2>
+
+      <label htmlFor="search" className="sr-only">
+        Search by venue name
+      </label>
       <input
+        id="search"
         type="text"
+        aria-label="Search bookings by venue name"
         placeholder="Search by venue name..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -110,16 +125,9 @@ function AdminBookings() {
       ) : (
         <ul className="space-y-4">
           {filteredBookings.map((booking) => (
-           
-           <AdminBookingCard
-             key={booking.id}
-             booking={booking}
-             onCancel={handleCancel}
-           />
-
+            <AdminBookingCard key={booking.id} booking={booking} onCancel={handleCancel} />
           ))}
         </ul>
-
       )}
     </div>
   );
