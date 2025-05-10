@@ -173,7 +173,7 @@ const AdminVenueManagement = () => {
             <div className="flex justify-center mt-8">
               <button
                 onClick={loadMore}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-lg transition"
+                className="bg-gray-200 text-gray-800 font-medium px-6 py-2 rounded-lg transition hover:text-white hover:bg-blue-600 cursor-pointer"
               >
                 Load More
               </button>

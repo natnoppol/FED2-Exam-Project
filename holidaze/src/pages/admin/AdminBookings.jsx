@@ -10,6 +10,8 @@ function AdminBookings() {
   const [error, setError] = useState(null);
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1); // Current page state
+  const itemsPerPage = 9; // Number of items per page (you can adjust this)
 
   const user = getUser();
   const token = getToken();
@@ -25,7 +27,9 @@ function AdminBookings() {
       const loadingToast = toast.loading("Loading bookings...");
       try {
         const response = await fetch(
-          `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(user.name)}/bookings?_venue=true`,
+          `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(
+            user.name
+          )}/bookings?_venue=true`,
           {
             method: "GET",
             headers: {
@@ -37,7 +41,9 @@ function AdminBookings() {
         );
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch bookings: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch bookings: ${response.status} ${response.statusText}`
+          );
         }
 
         const data = await response.json();
@@ -67,8 +73,15 @@ function AdminBookings() {
     setFilteredBookings(filtered);
   }, [search, bookings]);
 
+  // Pagination logic
+  const indexOfLastBooking = currentPage * itemsPerPage;
+  const indexOfFirstBooking = indexOfLastBooking - itemsPerPage;
+  const currentBookings = filteredBookings.slice(indexOfFirstBooking, indexOfLastBooking);
+
   const handleCancel = async (bookingId) => {
-    const confirmCancel = window.confirm("Are you sure you want to cancel this booking?");
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this booking?"
+    );
     if (!confirmCancel) return;
 
     try {
@@ -84,6 +97,7 @@ function AdminBookings() {
       );
 
       if (!response.ok) throw new Error("Failed to cancel booking");
+
       setBookings((prev) => prev.filter((b) => b.id !== bookingId));
       toast.success("Booking cancelled successfully!");
     } catch (error) {
@@ -93,42 +107,69 @@ function AdminBookings() {
     }
   };
 
+  // Handle page change
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const totalPages = Math.max(1, Math.ceil(filteredBookings.length / itemsPerPage));
+
   if (loading) return <p>Loading bookings...</p>;
 
   if (error) {
     return (
-      <div role="alert" className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <div
+        role="alert"
+        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"
+      >
         <strong className="font-bold">Error:</strong> <span>{error}</span>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="max-w-6xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Admin Bookings</h2>
 
-      <label htmlFor="search" className="sr-only">
-        Search by venue name
-      </label>
       <input
-        id="search"
         type="text"
         aria-label="Search bookings by venue name"
         placeholder="Search by venue name..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full p-2 mb-4 border rounded"
+        className="w-full p-2 mb-6 border rounded"
       />
 
       {filteredBookings.length === 0 ? (
         <p>No bookings found.</p>
       ) : (
-        <ul className="space-y-4">
-          {filteredBookings.map((booking) => (
-            <AdminBookingCard key={booking.id} booking={booking} onCancel={handleCancel} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="list">
+          {currentBookings.map((booking) => (
+            <AdminBookingCard
+              key={booking.id}
+              booking={booking}
+              onCancel={handleCancel}
+            />
           ))}
-        </ul>
+        </div>
       )}
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center mt-6">
+        <button
+          className="px-4 py-2 bg-gray-500 text-white rounded-l-md hover:bg-blue-600 cursor-pointer"
+          onClick={() => paginate(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span className="px-4 py-2">{`${currentPage} / ${totalPages}`}</span>
+        <button
+          className="px-4 py-2 bg-gray-500 text-white rounded-r-md hover:bg-blue-600 cursor-pointer"
+          onClick={() => paginate(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
