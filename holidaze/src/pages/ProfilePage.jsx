@@ -34,7 +34,7 @@ const ProfilePage = () => {
         setTimeout(() => setUpdateMessage(""), 3000);
       },
       (error) => {
-        setUpdateMessage("Error updating profile. Please try again.", error);
+         setUpdateMessage(`Error updating profile. Please try again. ${error?.message || String(error)}`);
         setTimeout(() => setUpdateMessage(""), 3000);
       }
     );
