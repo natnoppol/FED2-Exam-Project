@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { API_BASE_URL, API_KEY } from "../config";
 import { getToken } from "../utils/auth";
 
-export const useVenuesByManager = (username, currentPage = 1, itemsPerPage = 4) => {
+export const useVenuesByManager = (username, initialPage = 1, itemsPerPage = 4) => {
   const [venues, setVenues] = useState([]);
   const [loadingVenues, setLoadingVenues] = useState(true);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage);
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -33,10 +34,16 @@ export const useVenuesByManager = (username, currentPage = 1, itemsPerPage = 4) 
 
         const data = await response.json();
 
+      
+
         if (response.ok) {
-          // Ensure data contains valid venue list and total pages
+          // Ensure data contains valid venue list and total items
           const venuesList = Array.isArray(data?.data) ? data.data : [];
-          const totalPagesCount = Number.isInteger(data?.totalPages) ? data.totalPages : 1;
+          const totalItems = data?.totalItems || venuesList.length; // Assuming totalItems is available
+          console.log("Total Items:", totalItems);
+          
+          // Calculate total pages using totalItems and itemsPerPage
+          const totalPagesCount = Math.ceil(totalItems / itemsPerPage);
 
           setVenues(venuesList);
           setTotalPages(totalPagesCount);
@@ -55,5 +62,25 @@ export const useVenuesByManager = (username, currentPage = 1, itemsPerPage = 4) 
     fetchVenues();
   }, [username, currentPage, itemsPerPage]);
 
-  return { venues, loadingVenues, error, totalPages };
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  return {
+    venues,
+    loadingVenues,
+    error,
+    totalPages,
+    currentPage,
+    handlePrevPage,
+    handleNextPage,
+  };
 };
