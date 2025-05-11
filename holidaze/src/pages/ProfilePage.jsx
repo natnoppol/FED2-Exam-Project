@@ -6,6 +6,11 @@ import { useBookings } from "../hooks/useBookings";
 import { useVenuesByManager } from "../hooks/useVenuesByManager";
 import { fallbackImage } from "../api";
 
+import { FaEdit } from "react-icons/fa";
+import BannerInput from "../components/profile/editForm/BannerInput";
+import AvatarInput from "../components/profile/editForm/AvatarInput";
+import BioInput from "../components/profile/editForm/BioInput";
+
 const ProfilePage = () => {
   const [updateMessage, setUpdateMessage] = useState("");
   const [user, setUser] = useState(null);
@@ -17,14 +22,24 @@ const ProfilePage = () => {
     venueManager: false,
   });
   const { updateUserProfile } = useUpdateProfile();
+
   const handleUpdate = () => {
-    updateUserProfile(user.name, formData, (updated) => {
-      setUser(updated);
-      setEditing(false);
-      setUpdateMessage("Profile updated successfully!");
-      setTimeout(() => setUpdateMessage(""), 3000);
-    });
+    updateUserProfile(
+      user.name,
+      formData,
+      (updated) => {
+        setUser(updated);
+        setEditing(false);
+        setUpdateMessage("Profile updated successfully!");
+        setTimeout(() => setUpdateMessage(""), 3000);
+      },
+      (error) => {
+        setUpdateMessage("Error updating profile. Please try again.", error);
+        setTimeout(() => setUpdateMessage(""), 3000);
+      }
+    );
   };
+
   const [activeTab, setActiveTab] = useState("bookings");
 
   // Get bookings only after the user is fetched
@@ -46,22 +61,23 @@ const ProfilePage = () => {
 
   useEffect(() => {
     const profileData = getUser();
-    setUser(profileData);
-
     if (profileData) {
+      setUser(profileData);
       setFormData({
-        bio: profileData?.bio || "",
-        avatar: profileData?.avatar?.url || "",
-        banner: profileData?.banner?.url || "",
-        venueManager: profileData?.venueManager || false,
+        bio: profileData.bio || "",
+        avatar: profileData.avatar?.url || "",
+        banner: profileData.banner?.url || "",
+        venueManager: profileData.venueManager || false,
       });
     }
   }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    const val = type === "checkbox" ? checked : value;
-    setFormData((prev) => ({ ...prev, [name]: val }));
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   if (!user) {
@@ -150,8 +166,56 @@ const ProfilePage = () => {
           className="w-24 h-24 rounded-full object-cover mx-auto"
         />
         <h2 className="text-xl font-semibold">{user.name}</h2>
+
         {/* Display bio and venue manager status */}
-        {!editing ? (
+        {editing ? (
+          <div className="mt-4 space-y-4 bg-gray-50 p-4 rounded-lg shadow-inner">
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">
+              Edit Your Profile
+            </h3>
+
+            <BioInput formData={formData} setFormData={setFormData} />
+            <AvatarInput formData={formData} setFormData={setFormData} />
+            <BannerInput formData={formData} setFormData={setFormData} />
+
+            <div className="mb-4 flex items-center">
+              <input
+                type="checkbox"
+                name="venueManager"
+                id="venueManager"
+                checked={formData.venueManager}
+                onChange={handleChange}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="venueManager"
+                className="ml-2 block text-sm text-gray-700"
+              >
+                I am a venue manager
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                onClick={handleUpdate}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 cursor-pointer"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={() => setEditing(false)}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-150 cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+            {updateMessage && (
+              <p className="text-green-600 text-sm text-center mt-2">
+                {updateMessage}
+              </p>
+            )}
+          </div>
+        ) : (
           <>
             <p>
               <strong>Bio:</strong> {user.bio}
@@ -162,8 +226,9 @@ const ProfilePage = () => {
             <div className="flex justify-center gap-4 mt-2">
               <button
                 onClick={() => setEditing(true)}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm transition"
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm transition cursor-pointer"
               >
+                <FaEdit className="inline mr-2" />
                 Edit Profile
               </button>
               {user.venueManager && (
@@ -181,58 +246,6 @@ const ProfilePage = () => {
               </p>
             )}
           </>
-        ) : (
-          <div>
-            <div className="mb-4">
-              <label className="block">Bio:</label>
-              <textarea
-                name="bio"
-                value={formData.bio}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-md"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block">Avatar URL:</label>
-              <input
-                type="text"
-                name="avatar"
-                value={formData.avatar}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-md"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block">Banner URL:</label>
-              <input
-                type="text"
-                name="banner"
-                value={formData.banner}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-md"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block">Venue Manager:</label>
-              <input
-                type="checkbox"
-                name="venueManager"
-                checked={formData.venueManager}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Yes, I am a venue manager
-            </div>
-            <button onClick={handleUpdate} className="btn btn-primary mt-4">
-              Save Changes
-            </button>
-            <button
-              onClick={() => setEditing(false)}
-              className="btn btn-outline mt-2"
-            >
-              Cancel
-            </button>
-          </div>
         )}
       </div>
       <div className="flex flex-col sm:flex-row justify-center gap-2 mt-4">
@@ -309,11 +322,11 @@ const ProfilePage = () => {
                           </ul>
                         </div>
                         <Link
-  to={`/admin/venue/${venue.id}/bookings`}
-  className="btn btn-primary mt-3"
->
-  View Bookings
-</Link>
+                          to={`/admin/venue/${venue.id}/bookings`}
+                          className="btn btn-primary mt-3"
+                        >
+                          View Bookings
+                        </Link>
                       </li>
                     ))}
                   </ul>
