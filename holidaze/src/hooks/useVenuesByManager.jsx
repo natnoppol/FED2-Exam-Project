@@ -2,21 +2,28 @@ import { useState, useEffect } from "react";
 import { API_BASE_URL, API_KEY } from "../config";
 import { getToken } from "../utils/auth";
 
-export const useVenuesByManager = (username) => {
+export const useVenuesByManager = (username, initialPage = 1, itemsPerPage = 4) => {
   const [venues, setVenues] = useState([]);
   const [loadingVenues, setLoadingVenues] = useState(true);
   const [error, setError] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage);
 
   useEffect(() => {
     const fetchVenues = async () => {
-        if (!username) {
-            setLoadingVenues(false); // Stop loading
-            return;
-          }
+      if (!username) {
+        // Reset state if username is not provided
+        setVenues([]);
+        setTotalPages(1);
+        setLoadingVenues(false);
+        return;
+      }
+
+      setLoadingVenues(true);
 
       try {
         const response = await fetch(
-          `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(username)}/venues`,
+          `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(username)}/venues?page=${currentPage}&limit=${itemsPerPage}`,
           {
             headers: {
               Authorization: `Bearer ${getToken()}`,
@@ -28,13 +35,18 @@ export const useVenuesByManager = (username) => {
         const data = await response.json();
 
         if (response.ok) {
-          setVenues(data.data);
+          // Ensure data contains valid venue list
+          const venuesList = Array.isArray(data?.data) ? data.data : [];
+          const pageCount = data?.meta.pageCount || 1; // Using pageCount from API
+
+          setVenues(venuesList);
+          setTotalPages(pageCount); // Set total pages using pageCount
           setError(null);
         } else {
-          throw new Error(data.message || "Failed to fetch venues.");
+          throw new Error(data?.message || "Failed to fetch venues.");
         }
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching venues:", error);
         setError(error.message || "An error occurred while fetching venues.");
       } finally {
         setLoadingVenues(false);
@@ -42,7 +54,28 @@ export const useVenuesByManager = (username) => {
     };
 
     fetchVenues();
-  }, [username]);
+  }, [username, currentPage, itemsPerPage]);
 
-  return { venues, loadingVenues, error };
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  return {
+    venues,
+    loadingVenues,
+    error,
+    totalPages,
+    currentPage,
+    handlePrevPage,
+    handleNextPage,
+  };
 };
+
