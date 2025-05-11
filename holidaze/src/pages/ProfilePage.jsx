@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getUser } from "../utils/auth";
-import { useUpdateProfile } from "../hooks/useUpdateProfile"; // Assuming this is the correct path to your update function
+import { useUpdateProfile } from "../hooks/useUpdateProfile"; 
 import { Link } from "react-router-dom";
 import { useBookings } from "../hooks/useBookings";
 import { useVenuesByManager } from "../hooks/useVenuesByManager";
@@ -10,6 +10,9 @@ import { FaEdit } from "react-icons/fa";
 import BannerInput from "../components/profile/editForm/BannerInput";
 import AvatarInput from "../components/profile/editForm/AvatarInput";
 import BioInput from "../components/profile/editForm/BioInput";
+
+import MyBookings from "../components/profile/MyBooking";
+import MyVenues from "../components/profile/MyVenues";
 
 const ProfilePage = () => {
   const [updateMessage, setUpdateMessage] = useState("");
@@ -34,7 +37,11 @@ const ProfilePage = () => {
         setTimeout(() => setUpdateMessage(""), 3000);
       },
       (error) => {
-         setUpdateMessage(`Error updating profile. Please try again. ${error?.message || String(error)}`);
+        setUpdateMessage(
+          `Error updating profile. Please try again. ${
+            error?.message || String(error)
+          }`
+        );
         setTimeout(() => setUpdateMessage(""), 3000);
       }
     );
@@ -42,7 +49,6 @@ const ProfilePage = () => {
 
   const [activeTab, setActiveTab] = useState("bookings");
 
-  // Get bookings only after the user is fetched
   const {
     currentBookings,
     loadingBookings,
@@ -53,6 +59,7 @@ const ProfilePage = () => {
     cancellingId,
     handleCancelBooking,
   } = useBookings(user?.name);
+
   const {
     venues,
     loadingVenues,
@@ -84,77 +91,6 @@ const ProfilePage = () => {
     return <div className="text-center mt-10">Loading profile...</div>;
   }
 
-  let renderBookingsContent;
-
-  if (loadingBookings) {
-    renderBookingsContent = (
-      <div className="flex justify-center items-center">
-        <p>Loading bookings...</p>
-      </div>
-    );
-  } else if (currentBookings.length > 0) {
-    renderBookingsContent = (
-      <>
-        <ul className="space-y-4">
-          {currentBookings.map((booking) => (
-            <li
-              key={booking.id}
-              className="border p-3 rounded-md shadow-sm bg-gray-50"
-            >
-              <Link
-                to={`/venue/${booking.venue.id}`}
-                className="text-blue-600 font-medium hover:underline"
-              >
-                {booking.venue?.name}
-              </Link>
-              <p>
-                <strong>Guests:</strong> {booking.guests}
-              </p>
-              <p>
-                <strong>Dates:</strong>{" "}
-                {new Date(booking.dateFrom).toLocaleDateString("en-US")} →{" "}
-                {new Date(booking.dateTo).toLocaleDateString("en-US")}
-              </p>
-              <button
-                onClick={() => handleCancelBooking(booking.id)}
-                disabled={cancellingId === booking.id}
-                className={`mt-2 px-4 py-2 rounded text-white transition-all ${
-                  cancellingId === booking.id
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-red-600 hover:bg-red-700"
-                }`}
-              >
-                {cancellingId === booking.id
-                  ? "Cancelling..."
-                  : "Cancel Booking"}
-              </button>
-            </li>
-          ))}
-        </ul>
-        <div className="flex justify-between mt-4">
-          <button
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="px-4">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
-      </>
-    );
-  } else {
-    renderBookingsContent = <p>You have no bookings yet.</p>;
-  }
 
   return (
     <div className="max-w-xl mx-auto mt-10 p-4 bg-white shadow-md rounded-lg">
@@ -248,15 +184,15 @@ const ProfilePage = () => {
           </>
         )}
       </div>
-      <div className="flex flex-col sm:flex-row justify-center gap-2 mt-4">
-        {user.venueManager && (
-          <div className="">
+
+      {/* Venue Manager Tabs - My Bookings / My Venues */}
+      {user.venueManager && (
+        <div className="mt-6">
+          <div className="flex gap-2 justify-center mb-4">
             <button
               onClick={() => setActiveTab("bookings")}
               className={`px-4 py-2 rounded-lg ${
-                activeTab === "bookings"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200"
+                activeTab === "bookings" ? "bg-blue-600 text-white" : "bg-gray-200"
               }`}
             >
               My Bookings
@@ -264,80 +200,38 @@ const ProfilePage = () => {
             <button
               onClick={() => setActiveTab("venues")}
               className={`px-4 py-2 rounded-lg ${
-                activeTab === "venues"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200"
+                activeTab === "venues" ? "bg-blue-600 text-white" : "bg-gray-200"
               }`}
             >
               My Venues
             </button>
-            {activeTab === "bookings" ? (
-              <>
-                <h2 className="text-xl font-semibold mt-6 mb-2">My Bookings</h2>
-                {renderBookingsContent}
-              </>
-            ) : (
-              <>
-                <h2 className="text-xl font-semibold mt-6 mb-2">My Venues</h2>
-                {loadingVenues ? (
-                  <div className="flex justify-center items-center">
-                    <p>Loading venues...</p>
-                  </div>
-                ) : venuesError ? (
-                  <p className="text-red-500">{venuesError}</p> // Display error if any
-                ) : venues.length > 0 ? (
-                  <ul className="space-y-4">
-                    {venues.map((venue) => (
-                      <li
-                        key={venue.id}
-                        className="border p-3 rounded-md shadow-sm bg-gray-50"
-                      >
-                        <Link
-                          to={`/venue/${venue.id}`}
-                          className="text-blue-600 font-medium hover:underline"
-                        >
-                          {venue.name}
-                        </Link>
-                        <p>
-                          {venue.location?.city}, {venue.location?.country}
-                        </p>
-                        <p>Max Guests: {venue.maxGuests}</p>
-                        <p>{venue.description}</p>
-                        <img
-                          src={venue.media[0]?.url || fallbackImage}
-                          alt={
-                            venue.media[0]?.alt || venue.name || "Venue image"
-                          }
-                          className="w-full h-48 object-cover rounded-md mt-2"
-                        />
-                        <p>Price: ${venue.price}</p>
-                        <p>Rating: ⭐ {venue.rating ?? "N/A"}</p>
-                        <div className="mt-2 text-sm text-gray-700">
-                          <p>Amenities:</p>
-                          <ul className="list-disc list-inside">
-                            {venue.meta?.wifi && <li>WiFi</li>}
-                            {venue.meta?.breakfast && <li>Breakfast</li>}
-                            {venue.meta?.pets && <li>Pets Allowed</li>}
-                            {venue.meta?.parking && <li>Parking</li>}
-                          </ul>
-                        </div>
-                        <Link
-                          to={`/admin/venue/${venue.id}/bookings`}
-                          className="btn btn-primary mt-3"
-                        >
-                          View Bookings
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>You have not created any venues yet.</p>
-                )}
-              </>
-            )}
           </div>
-        )}
-      </div>
+
+          {activeTab === "bookings" ? (
+           <MyBookings
+              bookings={currentBookings}
+              loading={loadingBookings}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPrevPage={handlePrevPage}
+              onNextPage={handleNextPage}
+              cancellingId={cancellingId}
+              onCancelBooking={handleCancelBooking}
+            />
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold mt-6 mb-2">My Venues</h2>
+              {loadingVenues ? (
+                <div>Loading venues...</div>
+              ) : venuesError ? (
+                <div className="text-red-500">{venuesError}</div>
+              ) : (
+                <MyVenues venues={venues} />
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };
