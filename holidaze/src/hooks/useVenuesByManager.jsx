@@ -34,19 +34,13 @@ export const useVenuesByManager = (username, initialPage = 1, itemsPerPage = 4) 
 
         const data = await response.json();
 
-      
-
         if (response.ok) {
-          // Ensure data contains valid venue list and total items
+          // Ensure data contains valid venue list
           const venuesList = Array.isArray(data?.data) ? data.data : [];
-          const totalItems = data?.totalItems || venuesList.length; // Assuming totalItems is available
-          console.log("Total Items:", totalItems);
-          
-          // Calculate total pages using totalItems and itemsPerPage
-          const totalPagesCount = Math.ceil(totalItems / itemsPerPage);
+          const pageCount = data?.meta.pageCount || 1; // Using pageCount from API
 
           setVenues(venuesList);
-          setTotalPages(totalPagesCount);
+          setTotalPages(pageCount); // Set total pages using pageCount
           setError(null);
         } else {
           throw new Error(data?.message || "Failed to fetch venues.");
@@ -84,3 +78,4 @@ export const useVenuesByManager = (username, initialPage = 1, itemsPerPage = 4) 
     handleNextPage,
   };
 };
+

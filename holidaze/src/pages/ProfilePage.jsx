@@ -197,7 +197,7 @@ const ProfilePage = () => {
               className={`px-6 py-2 rounded-lg text-lg font-medium transition ${
                 activeTab === "bookings"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700"
+                  : "bg-gray-200 text-gray-700 cursor-pointer"
               }`}
             >
               My Bookings
@@ -207,7 +207,7 @@ const ProfilePage = () => {
               className={`px-6 py-2 rounded-lg text-lg font-medium transition ${
                 activeTab === "venues"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700"
+                  : "bg-gray-200 text-gray-700 cursor-pointer"
               }`}
             >
               My Venues
