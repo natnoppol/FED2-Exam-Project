@@ -18,8 +18,7 @@ const LoginPage = () => {
     try {
       const userData = await loginUser({ email, password });
 
-      console.log("User data:", userData);
-
+  
       // Check if the user is a venue manager and redirect accordingly
       if (userData.venueManager) {
         navigate("/profile");  // Redirect to venue manager dashboard
