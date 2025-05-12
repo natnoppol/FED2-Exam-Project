@@ -5,6 +5,7 @@ import { getToken } from "./utils/auth";
 
 export async function loginUser(credentials) {
   try {
+    // The '_holidaze=true' query parameter ensures the API response includes fields like 'venueManager'.
     const response = await fetch(`${API_BASE_URL}/auth/login?_holidaze=true`, {
       method: "POST",
       headers: {
@@ -26,12 +27,13 @@ export async function loginUser(credentials) {
 
     saveAuth(data.data);
 
-    return data.data; // Return the user data
+    return data.data;
   } catch (error) {
     console.error("Login error:", error);
     throw error;
   }
 }
+
 
 
 
