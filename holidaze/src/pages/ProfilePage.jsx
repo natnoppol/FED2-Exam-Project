@@ -83,13 +83,7 @@ const ProfilePage = () => {
     }
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+  
 
   if (!user) {
     return <div className="text-center mt-10">Loading profile...</div>;
@@ -117,22 +111,7 @@ const ProfilePage = () => {
             <AvatarInput formData={formData} setFormData={setFormData} />
             <BannerInput formData={formData} setFormData={setFormData} />
 
-            <div className="mb-4 flex items-center">
-              <input
-                type="checkbox"
-                name="venueManager"
-                id="venueManager"
-                checked={formData.venueManager}
-                onChange={handleChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="venueManager"
-                className="ml-2 block text-sm text-gray-700"
-              >
-                I am a venue manager
-              </label>
-            </div>
+            
 
             <div className="flex justify-end gap-3 pt-2">
               <button
