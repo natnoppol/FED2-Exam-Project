@@ -1,8 +1,9 @@
 import React from "react";
 import { FaImage } from "react-icons/fa";
 import { fallbackImage } from "../../api";
+import PropTypes from "prop-types";
 
-function ImageInputPreview({ label, register, watchValue, altLabel, altRegister, errorUrl, errorAlt }) {
+function ImageInputPreview({ label, register, watchValue, altLabel, altRegister, errorUrl, errorAlt, previewAlt }) {
   return (
     <>
       <div>
@@ -21,7 +22,7 @@ function ImageInputPreview({ label, register, watchValue, altLabel, altRegister,
           <p className="text-sm text-gray-500 mb-1">Preview:</p>
           <img
             src={watchValue}
-            alt="Preview"
+            alt={previewAlt}
             className="w-full max-h-48 object-cover rounded border"
             onError={(e) => {
               e.target.onerror = null;
@@ -39,5 +40,21 @@ function ImageInputPreview({ label, register, watchValue, altLabel, altRegister,
     </>
   );
 }
+
+ImageInputPreview.propTypes = {
+  label: PropTypes.string.isRequired,
+  register: PropTypes.object.isRequired,
+  watchValue: PropTypes.string,
+  altLabel: PropTypes.string.isRequired,
+  altRegister: PropTypes.object.isRequired,
+  errorUrl: PropTypes.string,
+  errorAlt: PropTypes.string,
+  previewAlt: PropTypes.string,
+};
+
+
+ImageInputPreview.defaultProps = {
+  previewAlt: "Image preview",
+};
 
 export default ImageInputPreview;
