@@ -29,7 +29,7 @@ function CustomerRegisterForm() {
   } = useForm({ resolver: yupResolver(schema) });
 
   const handleError = (err) => {
-    if (err.response && err.response.status === 409) {
+    if (err.response?.status === 409) {
       setError("Email is already registered.");
     } else if (err.message === "Network Error") {
       setError("There was an issue connecting to the server. Please try again later.");
