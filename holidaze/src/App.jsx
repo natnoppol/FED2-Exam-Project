@@ -18,47 +18,32 @@ import Footer from "./components/Footer/Footer";
 
 
 
-
 function App() {
   return (
     <Router>
-      <ResponsiveNav />
-      <Routes>
-        {/* Customer Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/venue/:venueId" element={<VenueDetails />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/register/customer" element={<CustomerRegisterForm />} />
-        <Route
-          path="/register/venue-manager"
-          element={<VenueManagerRegisterForm />}
-        />
-
-        <Route path="/profile" element={<ProfilePage />} />
-
-        {/* 🔐 Protected Admin Routes */}
-        {/* Admin Routes */}
+      <div className="min-h-screen flex flex-col">
+        <ResponsiveNav />
         
-        <Route
-          path="/admin/manage-venues"
-          element={
-            <ProtectedRoute>
-              <AdminVenueManagement />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/bookings"
-          element={
-            <ProtectedRoute>
-              <AdminBookings />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/admin/venue/:id/bookings" element={<ProtectedRoute><VenueBookingsPage /></ProtectedRoute>} />
-      </Routes>
-      <Footer />
+        <main className="flex-1 py-10 sm:py-16 lg:py-24 px-4">
+          <Routes>
+            {/* Customer Routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/venue/:venueId" element={<VenueDetails />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/register/customer" element={<CustomerRegisterForm />} />
+            <Route path="/register/venue-manager" element={<VenueManagerRegisterForm />} />
+            <Route path="/profile" element={<ProfilePage />} />
+
+            {/* 🔐 Protected Admin Routes */}
+            <Route path="/admin/manage-venues" element={<ProtectedRoute><AdminVenueManagement /></ProtectedRoute>} />
+            <Route path="/admin/bookings" element={<ProtectedRoute><AdminBookings /></ProtectedRoute>} />
+            <Route path="/admin/venue/:id/bookings" element={<ProtectedRoute><VenueBookingsPage /></ProtectedRoute>} />
+          </Routes>
+        </main>
+
+        <Footer />
+      </div>
     </Router>
   );
 }

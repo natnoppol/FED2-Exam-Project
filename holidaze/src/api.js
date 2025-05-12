@@ -5,7 +5,8 @@ import { getToken } from "./utils/auth";
 
 export async function loginUser(credentials) {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    // The '_holidaze=true' query parameter ensures the API response includes fields like 'venueManager'.
+    const response = await fetch(`${API_BASE_URL}/auth/login?_holidaze=true`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -19,18 +20,24 @@ export async function loginUser(credentials) {
     if (!response.ok) {
       throw new Error(`${data.errors?.[0]?.message || 'Login failed'} (Status: ${response.status})`);
     }
+
     if (LOGGING_ENABLED) {
       console.log("Login response:", data);
     }
 
     saveAuth(data.data);
 
-    return data.data; // Return the user data
+    return data.data;
   } catch (error) {
     console.error("Login error:", error);
     throw error;
   }
 }
+
+
+
+
+
 
 // Function to get venues (requires the user's name and token)
 export async function getMyVenues(profileName, token) {
