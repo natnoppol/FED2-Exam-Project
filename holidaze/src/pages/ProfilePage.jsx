@@ -13,6 +13,7 @@ import BioInput from "../components/profile/editForm/BioInput";
 import MyBookings from "../components/profile/MyBooking";
 import MyVenues from "../components/profile/MyVenues";
 import { useVenuesByManager } from "../hooks/useVenuesByManager";
+import ProfileTabs from "../components/profile/ProfileTabs";
 
 const ProfilePage = () => {
   const [updateMessage, setUpdateMessage] = useState("");
@@ -83,8 +84,6 @@ const ProfilePage = () => {
     }
   }, []);
 
-  
-
   if (!user) {
     return <div className="text-center mt-10">Loading profile...</div>;
   }
@@ -110,8 +109,6 @@ const ProfilePage = () => {
             <BioInput formData={formData} setFormData={setFormData} />
             <AvatarInput formData={formData} setFormData={setFormData} />
             <BannerInput formData={formData} setFormData={setFormData} />
-
-            
 
             <div className="flex justify-end gap-3 pt-2">
               <button
@@ -167,65 +164,46 @@ const ProfilePage = () => {
         )}
       </div>
 
-      {/* Venue Manager Tabs - My Bookings / My Venues */}
-      {user.venueManager && (
-        <div className="mt-6">
-          <div className="flex gap-4 justify-center mb-4">
-            <button
-              onClick={() => setActiveTab("bookings")}
-              className={`px-6 py-2 rounded-lg text-lg font-medium transition ${
-                activeTab === "bookings"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700 cursor-pointer"
-              }`}
-            >
-              My Bookings
-            </button>
-            <button
-              onClick={() => setActiveTab("venues")}
-              className={`px-6 py-2 rounded-lg text-lg font-medium transition ${
-                activeTab === "venues"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700 cursor-pointer"
-              }`}
-            >
-              My Venues
-            </button>
-          </div>
+      {/** Venue Manager Tabs - My Bookings / My Venues */}
+      <div className="mt-6">
+        <ProfileTabs
+          isVenueManager={user.venueManager}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
 
-          {activeTab === "bookings" ? (
-            <MyBookings
-              bookings={currentBookings}
-              loading={loadingBookings}
-              currentPage={bookingCurrentPage}
-              totalPages={bookingTotalPages}
-              onPrevPage={handleBookingPrevPage}
-              onNextPage={handleBookingNextPage}
-              cancellingId={cancellingId}
-              onCancelBooking={handleCancelBooking}
-            />
-          ) : (
-            <>
-              <h2 className="text-2xl font-semibold mt-6 mb-4">My Venues</h2>
-              {loadingVenues ? (
-                <div>Loading venues...</div>
-              ) : venuesError ? (
-                <div className="text-red-500">{venuesError}</div>
-              ) : (
-                <MyVenues
-                  venues={venues}
-                  loading={loadingVenues}
-                  error={venuesError}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPrevPage={handlePrevPage}
-                  onNextPage={handleNextPage}
-                />
-              )}
-            </>
-          )}
-        </div>
-      )}
+        {activeTab === "bookings" ? (
+          <MyBookings
+            bookings={currentBookings}
+            loading={loadingBookings}
+            currentPage={bookingCurrentPage}
+            totalPages={bookingTotalPages}
+            onPrevPage={handleBookingPrevPage}
+            onNextPage={handleBookingNextPage}
+            cancellingId={cancellingId}
+            onCancelBooking={handleCancelBooking}
+          />
+        ) : user.venueManager ? (
+          <>
+            <h2 className="text-2xl font-semibold mt-6 mb-4">My Venues</h2>
+            {loadingVenues ? (
+              <div>Loading venues...</div>
+            ) : venuesError ? (
+              <div className="text-red-500">{venuesError}</div>
+            ) : (
+              <MyVenues
+                venues={venues}
+                loading={loadingVenues}
+                error={venuesError}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPrevPage={handlePrevPage}
+                onNextPage={handleNextPage}
+              />
+            )}
+          </>
+        ) : null}
+      </div>
     </div>
   );
 };
