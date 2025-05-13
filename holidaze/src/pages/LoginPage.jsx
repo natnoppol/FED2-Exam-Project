@@ -2,7 +2,7 @@ import {  useContext, useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { loginUser } from "../api";
 import { FiLogIn, FiMail, FiLock } from "react-icons/fi";
-
+import { toast } from "react-toastify";
 import { UserContext } from "../contexts/UserContext";
 
 const LoginPage = () => {
@@ -23,7 +23,8 @@ const LoginPage = () => {
        setUser(userData);
       // Check if the user is a venue manager and redirect accordingly
       if (userData.venueManager) {
-        navigate("/profile");  // Redirect to venue manager dashboard
+        toast.success("Login successful! ");
+        navigate("/");  
       } else {
         navigate(from, { replace: true });  // Redirect to the original page or home if customer
       }

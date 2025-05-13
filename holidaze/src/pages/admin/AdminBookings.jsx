@@ -3,6 +3,7 @@ import { getToken, getUser } from "../../utils/auth";
 import { API_BASE_URL, API_KEY } from "../../config";
 import { toast } from "react-toastify";
 import AdminBookingCard from "../../components/admin/AdminBookingCard";
+import { Spinner } from "../../components/Spinner";
 
 function AdminBookings() {
   const [bookings, setBookings] = useState([]);
@@ -24,7 +25,6 @@ function AdminBookings() {
     }
 
     const fetchBookings = async () => {
-      const loadingToast = toast.loading("Loading bookings...");
       try {
         const response = await fetch(
           `${API_BASE_URL}/holidaze/profiles/${encodeURIComponent(
@@ -49,15 +49,11 @@ function AdminBookings() {
         const data = await response.json();
         setBookings(data.data);
         setFilteredBookings(data.data);
-        data.data.length === 0
-          ? toast.info("No bookings found for this user.")
-          : toast.success("Bookings fetched successfully!");
       } catch (error) {
         console.error("Error fetching bookings:", error);
         setError("Failed to fetch bookings. Please try again later.");
         toast.error("Failed to fetch bookings. Please try again later.");
       } finally {
-        toast.dismiss(loadingToast);
         setLoading(false);
       }
     };
@@ -112,7 +108,7 @@ function AdminBookings() {
 
   const totalPages = Math.max(1, Math.ceil(filteredBookings.length / itemsPerPage));
 
-  if (loading) return <p>Loading bookings...</p>;
+  if (loading) return <Spinner />;
 
   if (error) {
     return (
