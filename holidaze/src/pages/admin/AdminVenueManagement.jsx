@@ -78,6 +78,7 @@ const AdminVenueManagement = () => {
           setEditingVenue(null);
           setShowEditForm(false);
         }
+        
         setLoading(true);
         await fetchVenues();
       }

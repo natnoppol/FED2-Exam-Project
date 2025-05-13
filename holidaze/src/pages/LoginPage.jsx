@@ -1,7 +1,9 @@
-import { useState } from "react";
+import {  useContext, useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { loginUser } from "../api";
 import { FiLogIn, FiMail, FiLock } from "react-icons/fi";
+
+import { UserContext } from "../contexts/UserContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -10,6 +12,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
+  const { setUser } = useContext(UserContext);
 
    const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,8 +20,7 @@ const LoginPage = () => {
 
     try {
       const userData = await loginUser({ email, password });
-
-  
+       setUser(userData);
       // Check if the user is a venue manager and redirect accordingly
       if (userData.venueManager) {
         navigate("/profile");  // Redirect to venue manager dashboard

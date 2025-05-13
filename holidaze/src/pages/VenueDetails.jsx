@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getVenueById } from "../api";
 import BookingForm from "../components/BookingForm";
@@ -6,10 +6,12 @@ import { toast } from "react-toastify";
 import { fallbackImage } from "../api";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import { FaWifi, FaParking, FaCoffee, FaDog } from "react-icons/fa";
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import styles
+import "react-responsive-carousel/lib/styles/carousel.min.css"; 
 import { Carousel } from "react-responsive-carousel";
+import { UserContext } from "../contexts/UserContext";
 
-const VenueDetails = ({ user }) => {
+const VenueDetails = () => {
+  const { user } = useContext(UserContext);
   const { venueId } = useParams();
   const [venue, setVenue] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,9 +19,10 @@ const VenueDetails = ({ user }) => {
   const [isManager, setIsManager] = useState(false);
   const navigate = useNavigate();
 
+  console.log("user",user)
+
   const handleBookingSuccess = () => {
     toast.success("Booking successful!");
-    navigate("/profile");
   };
 
   const handleEdit = (venueId) => {
@@ -27,7 +30,7 @@ const VenueDetails = ({ user }) => {
       toast.error("You do not have permission to edit this venue.");
       return;
     }
-    navigate(`/admin/manage-venues/${venueId}`);
+    navigate(`/venues/edit/${venueId}`);
   };
 
   const handleDelete = (venueId) => {
@@ -45,9 +48,15 @@ const VenueDetails = ({ user }) => {
     }
 
     const fetchVenueDetails = async () => {
+
       try {
         const data = await getVenueById(venueId);
         setVenue(data);
+        if (user?.venueManager && data.owner?.name === user.name) {
+        setIsManager(true);
+      } else {
+        setIsManager(false);
+      }
       } catch (error) {
         setError("Failed to fetch venue details");
         console.error(error);
@@ -57,7 +66,7 @@ const VenueDetails = ({ user }) => {
     };
 
     fetchVenueDetails();
-  }, [venueId, user?.venueManager]);
+  }, [venueId, user]);
 
   if (loading) return <div className="text-center py-10">Loading venue details...</div>;
   if (error) return <p>{error}</p>;
@@ -151,21 +160,21 @@ const VenueDetails = ({ user }) => {
         </ul>
       </div>
 
+      
       {/* Manager Actions or Booking Form */}
-      {/* Manager Actions or Booking Form */}
-      {isManager && venue.owner?.email === user?.email ? (
+      {isManager ?(
         // Venue belongs to this manager
         <div className="flex gap-4 mb-6">
           <button
             onClick={() => handleEdit(venue.id)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
           >
             Edit Venue
           </button>
 
           <button
             onClick={() => handleDelete(venue.id)}
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
           >
             Delete Venue
           </button>

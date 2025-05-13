@@ -188,25 +188,29 @@ export const fetchPaginatedVenues = async (page = 1, limit = 9) => {
 
 export const getVenueById = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/holidaze/venues/${id}`, {
-      method: "GET",
-      headers: {
-        "X-Noroff-API-Key": API_KEY, // If needed
-        "Content-Type": "application/json", // Assuming the API returns JSON
-      },
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/holidaze/venues/${id}?_owner=true&_bookings=true`,
+      {
+        method: "GET",
+        headers: {
+          "X-Noroff-API-Key": API_KEY, 
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to fetch venue with ID: ${id}`);
     }
 
     const json = await response.json();
-    return json.data; // The data returned should be the details of the venue
+    return json.data;
   } catch (error) {
     console.error("Error fetching venue by ID:", error);
-    throw error; // You may choose to handle the error in a different way
+    throw error;
   }
 };
+
 
 export const updateProfile = async (profileName, formData) => {
   try {
