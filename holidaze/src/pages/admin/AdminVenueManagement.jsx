@@ -1,183 +1,189 @@
-import { API_BASE_URL, API_KEY } from "../../config";
-import { useEffect, useState } from "react";
-import { getMyVenues } from "../../api";
-import { getToken, getUser } from "../../utils/auth";
-import VenueCard from "../../components/admin/VenueCard";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import CreateVenueForm from "../../components/admin/CreateVenueForm";
-import ErrorBoundary from "../../components/ErrorBoundary";
+import VenueCard from "../../components/admin/VenueCard";
+import { useVenuesByManager } from "../../hooks/useVenuesByManager";
+import { getUser } from "../../utils/auth";
+import { getVenueById, deleteVenue as apiDeleteVenue } from "../../api";
 import { toast } from "react-toastify";
-import { DELETE_ERROR_MESSAGE, DELETE_SUCCESS_MESSAGE } from "../../constants";
-import { PlusCircle, Hotel, Search } from "lucide-react";
+import { Plus, ArrowLeft, ArrowRight } from "lucide-react";
+
+const PaginationControls = ({ currentPage, totalPages, handlePrevPage, handleNextPage }) => (
+  <div className="flex justify-center mt-8 space-x-2">
+    <button
+      onClick={handlePrevPage}
+      disabled={currentPage === 1}
+      className="flex items-center gap-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-blue-600 hover:text-white cursor-pointer disabled:opacity-50"
+    >
+      <ArrowLeft size={16} /> Previous
+    </button>
+    <span className="px-4 py-2 self-center">
+      Page {currentPage} of {totalPages}
+    </span>
+    <button
+      onClick={handleNextPage}
+      disabled={currentPage === totalPages}
+      className="flex items-center gap-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-blue-600 hover:text-white cursor-pointer disabled:opacity-50"
+    >
+      Next <ArrowRight size={16} />
+    </button>
+  </div>
+);
 
 const AdminVenueManagement = () => {
-  const [deleteError, setDeleteError] = useState("");
-  const [venues, setVenues] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showEditForm, setShowEditForm] = useState(false);
-  const [editingVenue, setEditingVenue] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [visibleCount, setVisibleCount] = useState(6);
+  const { venueIdParam } = useParams();
+  const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const token = getToken();
-  const user = getUser();
+  useEffect(() => {
+    setCurrentUser(getUser());
+  }, []);
 
-  const filteredVenues = venues.filter((venue) =>
-    venue.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const {
+    venues: managerVenues,
+    loadingVenues,
+    error: venuesError,
+    currentPage,
+    totalPages,
+    handlePrevPage,
+    handleNextPage,
+    fetchVenuesByManager,
+  } = useVenuesByManager(currentUser?.name);
 
-  const loadMore = () => setVisibleCount((prev) => prev + 6);
+  const [showForm, setShowForm] = useState(false);
+  const [venueToEdit, setVenueToEdit] = useState(null);
+  const [isLoadingVenueForEdit, setIsLoadingVenueForEdit] = useState(false);
 
-  const handleEdit = (venue) => {
-    setEditingVenue(venue);
-    setShowEditForm(true);
+  useEffect(() => {
+    if (venueIdParam) {
+      const loadVenueForEdit = async () => {
+        setIsLoadingVenueForEdit(true);
+        setShowForm(true);
+        try {
+          const data = await getVenueById(venueIdParam);
+          setVenueToEdit(data);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (error) {
+          toast.error("Failed to load venue data for editing.", error);
+          navigate("/admin/manage-venues", { replace: true });
+        } finally {
+          setIsLoadingVenueForEdit(false);
+        }
+      };
+      loadVenueForEdit();
+    }
+  }, [venueIdParam, navigate]);
+
+  const handleEditClick = (venue) => {
+    setVenueToEdit(venue);
+    setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const fetchVenues = async () => {
-    try {
-      if (!user?.name) {
-        console.error("User missing or invalid.");
-        setLoading(false);
-        return;
-      }
-      const data = await getMyVenues(user.name, token);
-      setVenues(data);
-    } catch (error) {
-      console.error("Failed to fetch venues:", error);
-    } finally {
-      setLoading(false);
+  const handleAddNewClick = () => {
+    setVenueToEdit(null);
+    setShowForm(true);
+    if (venueIdParam) navigate("/admin/manage-venues", { replace: true });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleFormSuccess = () => {
+    setShowForm(false);
+    setVenueToEdit(null);
+    toast.success(venueToEdit ? "Venue updated successfully!" : "Venue created successfully!");
+    if (fetchVenuesByManager) fetchVenuesByManager(1);
+    navigate("/admin/manage-venues", { replace: true });
+  };
+
+  const handleFormCancel = () => {
+    setShowForm(false);
+    setVenueToEdit(null);
+    if (venueIdParam) {
+      navigate("/admin/manage-venues", { replace: true });
     }
   };
 
-  useEffect(() => {
-    fetchVenues();
-  }, [user?.name, token]);
-
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this venue?");
-    if (!confirmDelete) return;
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/holidaze/venues/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "X-Noroff-API-Key": API_KEY,
-        },
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error(DELETE_ERROR_MESSAGE, errorData);
-        setDeleteError(DELETE_ERROR_MESSAGE);
-        toast.error(DELETE_ERROR_MESSAGE);
-      } else {
-        setDeleteError("");
-        toast.success(DELETE_SUCCESS_MESSAGE);
-        if (editingVenue?.id === id) {
-          setEditingVenue(null);
-          setShowEditForm(false);
-        }
-        setLoading(true);
-        await fetchVenues();
+  const handleDeleteVenue = async (id) => {
+    if (
+      window.confirm("Are you sure you want to delete this venue? This action cannot be undone.")
+    ) {
+      try {
+        await apiDeleteVenue(id);
+        toast.success("Venue deleted successfully!");
+        if (fetchVenuesByManager) fetchVenuesByManager(currentPage);
+      } catch (error) {
+        toast.error(error?.message || "Failed to delete venue.");
       }
-    } catch (error) {
-      console.error("Delete error:", error);
-      setDeleteError(DELETE_ERROR_MESSAGE);
-      toast.error(DELETE_ERROR_MESSAGE);
     }
+    // Tip: consider replacing this with a custom modal confirmation for better UX
   };
+
+  if (loadingVenues && !showForm && !venueIdParam) {
+    return <div className="text-center py-10">Loading your venues...</div>;
+  }
+
+  if (venuesError && !showForm) {
+    return (
+      <div className="text-center py-10 text-red-500">
+        Error loading venues: {venuesError}
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
-      <header className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-          <Hotel className="text-blue-600" size={32} />
-          Venue Manager
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">
+          {showForm ? (venueToEdit ? "Edit Venue" : "Create New Venue") : "Manage Your Venues"}
         </h1>
-        <p className="text-gray-600">Create, edit, and manage your venues easily.</p>
-      </header>
-
-      {showEditForm && (
-        <div className="mb-8 animate-fade-in">
-          <ErrorBoundary>
-            <CreateVenueForm
-              mode={editingVenue ? "edit" : "create"}
-              venueData={editingVenue}
-              onSuccess={() => {
-                fetchVenues();
-                setShowEditForm(false);
-                setEditingVenue(null);
-              }}
-              onCancel={() => {
-                setShowEditForm(false);
-                setEditingVenue(null);
-              }}
-            />
-          </ErrorBoundary>
-        </div>
-      )}
-
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-        <div className="relative w-full sm:w-1/2">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-          <input
-            type="text"
-            placeholder="Search venues..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 border border-gray-300 px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 transition"
-          />
-        </div>
-        <button
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-md transition-transform hover:scale-105 cursor-pointer"
-          onClick={() => {
-            setShowEditForm(true);
-            setEditingVenue(null);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-        >
-          <PlusCircle size={20} />
-          New Venue
-        </button>
+        {!showForm && (
+          <button
+            onClick={handleAddNewClick}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Add New Venue
+          </button>
+        )}
       </div>
 
-      {deleteError && (
-        <p className="text-red-600 font-medium mb-4">{deleteError}</p>
-      )}
-
-      {loading ? (
-        <p className="text-gray-500 text-center">Loading venues...</p>
+      {showForm ? (
+        isLoadingVenueForEdit ? (
+          <div className="text-center py-10">Loading venue data for editing...</div>
+        ) : (
+          <CreateVenueForm
+            mode={venueToEdit ? "edit" : "create"}
+            venueData={venueToEdit || {}}
+            onSuccess={handleFormSuccess}
+            onCancel={handleFormCancel}
+          />
+        )
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredVenues.slice(0, visibleCount).map((venue) => (
-              <div
-                key={venue.id}
-                className="transition-transform hover:scale-105 animate-fade-in"
-              >
+          {managerVenues?.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {managerVenues.map((venue) => (
                 <VenueCard
+                  key={venue.id}
                   venue={venue}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
+                  onEdit={() => handleEditClick(venue)}
+                  onDelete={() => handleDeleteVenue(venue.id)}
                 />
-              </div>
-            ))}
-          </div>
-
-          {filteredVenues.length === 0 && (
-            <p className="text-gray-500 text-center mt-6">No venues found.</p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-600 mt-10">
+              You haven't created any venues yet. Click "Add New Venue" to get started!
+            </p>
           )}
 
-          {visibleCount < filteredVenues.length && (
-            <div className="flex justify-center mt-8">
-              <button
-                onClick={loadMore}
-                className="bg-gray-200 text-gray-800 font-medium px-6 py-2 rounded-lg transition hover:text-white hover:bg-blue-600 cursor-pointer"
-              >
-                Load More
-              </button>
-            </div>
+          {managerVenues?.length > 0 && totalPages > 1 && (
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              handlePrevPage={handlePrevPage}
+              handleNextPage={handleNextPage}
+            />
           )}
         </>
       )}

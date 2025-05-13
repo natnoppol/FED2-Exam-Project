@@ -1,16 +1,15 @@
-import { API_BASE_URL, API_KEY } from "../../config";
+
 import { useState } from "react";
-import { getToken } from "../../utils/auth";
 import { toast } from "react-toastify";
 import {
   CREATE_SUCCESS_MESSAGE,
-  CREATE_ERROR_MESSAGE,
   UPDATE_SUCCESS_MESSAGE,
-  UPDATE_ERROR_MESSAGE,
 } from "../../constants";
 import MediaInput from "../form/MediaInput";
 import { useNavigate } from "react-router-dom";
 import StarRating from "./StarRating";
+import { saveVenue } from "../../api";
+
 
 const CreateVenueForm = ({
   mode = "create",
@@ -96,71 +95,49 @@ const CreateVenueForm = ({
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMessage("");
-    setLoading(true);
-    try {
-      const url =
-        mode === "edit" && venueId
-          ? `${API_BASE_URL}/holidaze/venues/${venueId}`
-          : `${API_BASE_URL}/holidaze/venues`;
+  e.preventDefault();
+  setErrorMessage("");
+  setLoading(true);
 
-      const method = mode === "edit" ? "PUT" : "POST";
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-          "X-Noroff-API-Key": API_KEY,
-        },
-        body: JSON.stringify(preparedData),
-      });
+  try {
+    const venue = await saveVenue(mode, preparedData, venueId);
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(
-          errorData?.message ||
-            (mode === "edit" ? UPDATE_ERROR_MESSAGE : CREATE_ERROR_MESSAGE)
-        );
-      }
+    toast.success(
+      mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE
+    );
 
-      const venue = await res.json();
-      toast.success(
-        mode === "edit" ? UPDATE_SUCCESS_MESSAGE : CREATE_SUCCESS_MESSAGE
-      );
+    setFormData({
+      name: "",
+      description: "",
+      price: "",
+      maxGuests: "",
+      rating: 0,
+      media: [],
+      location: {
+        address: "",
+        city: "",
+        country: "",
+        zip: "",
+      },
+      meta: {
+        wifi: false,
+        parking: false,
+        breakfast: false,
+        pets: false,
+      },
+    });
 
-      setFormData({
-        name: "",
-        description: "",
-        price: "",
-        maxGuests: "",
-        rating: 0,
-        media: [],
-        location: {
-          address: "",
-          city: "",
-          country: "",
-          zip: "",
-        },
-        meta: {
-          wifi: false,
-          parking: false,
-          breakfast: false,
-          pets: false,
-        },
-      });
-
-      onSuccess(venue);
-      navigate("/admin/manage-venues");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      setErrorMessage(err.message);
-      console.error(err);
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    onSuccess(venue);
+    navigate("/admin/manage-venues");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (err) {
+    setErrorMessage(err.message);
+    console.error(err);
+    toast.error(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const MetaCheckbox = ({ label, name }) => (
     <label className="flex items-center gap-2">
@@ -206,6 +183,7 @@ const CreateVenueForm = ({
           placeholder="Price per night"
           className="border p-3 rounded-lg shadow-sm w-full"
           min="0"
+          max="10000"
         />
         <input
           name="maxGuests"
@@ -216,6 +194,7 @@ const CreateVenueForm = ({
           placeholder="Max guests"
           className="border p-3 rounded-lg shadow-sm w-full"
           min="0"
+          max="100"
         />
         <MediaInput
           value={formData.media}
