@@ -139,7 +139,7 @@ const AdminVenueManagement = () => {
         {!showForm && (
           <button
             onClick={handleAddNewClick}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md flex items-center gap-2 cursor-pointer"
           >
             <Plus size={20} />
             Add New Venue

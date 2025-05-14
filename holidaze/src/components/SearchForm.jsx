@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 const SearchForm = ({ onSearch }) => {
   const [location, setLocation] = useState("");
@@ -19,7 +20,10 @@ const SearchForm = ({ onSearch }) => {
     setCheckIn("");
     setCheckOut("");
     setGuests(1);
-    onSearch({});
+    setErrorMessage(""); // Clear any form-specific error messages
+    // Call onSearch with empty/default parameters to reset the filter on HomePage
+    onSearch({ country: "", checkIn: "", checkOut: "", guests: 1 });
+    toast.info("Form reset successfully!");
   };
 
   const handleSubmit = async (e) => {
@@ -38,6 +42,8 @@ const SearchForm = ({ onSearch }) => {
       }
       // Check if country is empty
       await onSearch({ country: trimmedCountry, checkIn, checkOut, guests });
+      toast.success("Search successful!");
+
     } finally {
       setIsSubmitting(false);
     }
