@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { fetchVenues, fallbackImage, fetchPaginatedVenues } from "../api";
+import { fallbackImage } from "../api"; // Keep fallbackImage
 import SearchForm from "../components/SearchForm";
 import { Spinner } from "../components/Spinner";
 import { HiLocationMarker } from "react-icons/hi"; 
+import { useVenues } from "../contexts/venueContext";
 
 const VenueCard = ({ venue }) => {
   const { city = "Unknown City", country = "Unknown Country" } = venue.location || {};
@@ -39,61 +40,50 @@ const VenueCard = ({ venue }) => {
   );
 };
 
+// Helper function for filtering (can be moved outside if preferred)
+const filterVenues = (venues, { country, guests }) => {
+  if (!venues) return [];
+
+  const lowerCountry = country ? country.toLowerCase().trim() : "";
+  const minGuests = guests || 1; // Default to 1 guest if not specified
+
+  return venues.filter(venue => {
+    // Filter by location (country, city, or continent) if country search term is provided
+    const locationMatch = lowerCountry === "" ||
+      venue.location?.country?.toLowerCase().includes(lowerCountry) ||
+      venue.location?.city?.toLowerCase().includes(lowerCountry) ||
+      venue.location?.continent?.toLowerCase().includes(lowerCountry);
+
+    // Filter by guests
+    const guestsMatch = venue.maxGuests >= minGuests;
+
+    // Note: Date filtering (checkIn, checkOut) is not possible client-side
+    // with only the venue details. This would require fetching booking data.
+    // We will ignore date parameters for client-side filtering here.
+
+    return locationMatch && guestsMatch;
+  });
+};
+
 const HomePage = () => {
-  const [venues, setVenues] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  // Use the context to get all venues and their loading/error states
+  const { allVenues, loading, error } = useVenues();
 
-  const [searchParams, setSearchParams] = useState(null);
+  // State to hold the venues currently being displayed (filtered)
+  const [displayedVenues, setDisplayedVenues] = useState([]);
 
-
+  // Effect to initialize displayedVenues when allVenues from context is loaded
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-  
-      try {
-        let response;
-        if (searchParams) {
-          response = await fetchVenues(searchParams, currentPage, 9);
-        } else {
-          response = await fetchPaginatedVenues(currentPage, 9);
-        }
-  
-        setVenues(response.venues);
-        setTotalPages(response.totalPages);
-      } catch (error) {
-        setError("Failed to load venues. Please try again later.");
-        console.error("Error fetching venues:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    fetchData();
-  }, [currentPage, searchParams]);
-  
+    if (allVenues && !loading && !error) {
+      setDisplayedVenues(allVenues); // Initially display all venues once loaded
+    }
+  }, [allVenues, loading, error]);
 
   const handleSearch = async (searchParams) => {
-    setLoading(true);
-    setError(null);
-    setCurrentPage(1); // Reset to the first page when searching
-    setSearchParams(searchParams); // Store search parameters for filtering
-  
-    try {
-      const { venues: filtered, totalPages } = await fetchVenues(searchParams, 1, 9);
-      setVenues(filtered);
-      setTotalPages(totalPages);
-    } catch (error) {
-      setError("Failed to filter venues. Please try again later.");
-      console.error("Error filtering venues:", error);
-    } finally {
-      setLoading(false);
-    }
+    // Filter the venues from the context based on search parameters
+    const filtered = filterVenues(allVenues, searchParams);
+    setDisplayedVenues(filtered);
   };
-  
 
   if (loading) return <Spinner />;
 
@@ -103,39 +93,19 @@ const HomePage = () => {
 
       {error && <p className="text-red-600">{error}</p>}
 
-      <h1 className="text-2xl font-bold mb-6">Available Venues</h1>
+      <h1 className="text-2xl font-bold mb-6">
+        {displayedVenues.length > 0 ? "Available Venues" : "No Venues Found"}
+      </h1>
       <div className="venue-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {venues.length === 0 ? (
+        {displayedVenues.length === 0 && !loading && !error ? (
           <p className="text-center text-gray-600 mt-6">
             No venues found for your search criteria.
           </p>
         ) : (
-          venues.map((venue, idx) => (
+          displayedVenues.map((venue, idx) => (
             <VenueCard key={venue.id + idx} venue={venue} />
           ))
         )}
-      </div>
-
-      <div className="flex justify-center mt-6 space-x-4">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
-        >
-          Previous
-        </button>
-        <span className="self-center">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
-        >
-          Next
-        </button>
       </div>
     </div>
   );
