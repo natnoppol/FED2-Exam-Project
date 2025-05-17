@@ -5,6 +5,7 @@ import { getToken } from "../utils/auth"; // Assuming you have a utility functio
 import DatePicker from "react-datepicker";
 import { parseISO } from "date-fns";
 import { generateDisabledDates } from "../utils/bookingUtils";
+import { useNavigate } from "react-router-dom";
 
 const BookingForm = ({ venue, bookings = [], onBook }) => {
   const [dateFrom, setDateFrom] = useState(null);
@@ -13,81 +14,91 @@ const BookingForm = ({ venue, bookings = [], onBook }) => {
   const disabledDates = generateDisabledDates(bookings);
   const [loading, setLoading] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!dateFrom || !dateTo) {
-      toast.error("Please select both start and end dates.");
-      return;
-    }
+  const token = getToken();
+  if (!token) {
+    toast.warning("Please log in before booking.");
+     setTimeout(() => navigate("/login"), 2000);
+  return;
+  }
 
-    if (dateTo <= dateFrom) {
-      toast.error("End date must be after the start date.");
-      return;
-    }
+  if (!dateFrom || !dateTo) {
+    toast.error("Please select both start and end dates.");
+    return;
+  }
 
-    if (guests > venue.maxGuests) {
-      toast.error(`Max allowed guests: ${venue.maxGuests}`);
-      return;
-    }
+  if (dateTo <= dateFrom) {
+    toast.error("End date must be after the start date.");
+    return;
+  }
 
-    const hasOverlap = bookings.some((booking) => {
-      const bookingStart = parseISO(booking.dateFrom);
-      const bookingEnd = parseISO(booking.dateTo);
-      return dateFrom < bookingEnd && dateTo > bookingStart;
+  if (guests > venue.maxGuests) {
+    toast.error(`Max allowed guests: ${venue.maxGuests}`);
+    return;
+  }
+
+  const hasOverlap = bookings.some((booking) => {
+    const bookingStart = parseISO(booking.dateFrom);
+    const bookingEnd = parseISO(booking.dateTo);
+    return dateFrom < bookingEnd && dateTo > bookingStart;
+  });
+
+  if (hasOverlap) {
+    toast.error("Selected dates overlap with an existing booking.");
+    return;
+  }
+
+  const payload = {
+    dateFrom: dateFrom.toISOString(),
+    dateTo: dateTo.toISOString(),
+    guests: parseInt(guests, 10),
+    venueId: venue.id,
+  };
+
+  setLoading(true);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/holidaze/bookings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "X-Noroff-API-Key": API_KEY,
+      },
+      body: JSON.stringify(payload),
     });
 
-    // Check if the selected dates overlap with any existing bookings
-    if (hasOverlap) {
-      toast.error("Selected dates overlap with an existing booking.");
+    const json = await response.json();
+
+    if (!response.ok) {
+      const errorMsg = json.errors?.[0]?.message || json.message || "Booking failed";
+
+      if (response.status === 409) {
+        toast.error(
+          `Selected dates overlap with an existing booking. ${errorMsg}`
+        );
+      } else {
+        toast.error(errorMsg);
+      }
       return;
     }
 
-    const payload = {
-      dateFrom: dateFrom.toISOString(),
-      dateTo: dateTo.toISOString(),
-      guests: parseInt(guests, 10),
-      venueId: venue.id,
-    };
+    setBookingComplete(true);
+    onBook?.(json);
+    setDateFrom(null);
+    setDateTo(null);
+    setGuests(1);
+  } catch (error) {
+    toast.error(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
-    setLoading(true);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/holidaze/bookings`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-          "X-Noroff-API-Key": API_KEY,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const json = await response.json();
-
-      if (!response.ok) {
-        const errorMsg = json.errors?.[0]?.message || json.message || "Booking failed";
-
-        if (response.status === 409) {
-          toast.error(
-            `Selected dates overlap with an existing booking. ${errorMsg}`
-          );
-        }
-        return;
-      }
-
-      setBookingComplete(true);
-      onBook?.(json); // optional callback to refresh or redirect
-      setDateFrom(null);
-      setDateTo(null);
-      setGuests(1);
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getNights = () => {
     if (!dateFrom || !dateTo) return 0;
@@ -174,7 +185,7 @@ const BookingForm = ({ venue, bookings = [], onBook }) => {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition ${
+          className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition cursor-pointer ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
