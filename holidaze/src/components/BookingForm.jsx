@@ -185,9 +185,7 @@ const BookingForm = ({ venue, bookings = [], onBook }) => {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition cursor-pointer ${
-            loading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Booking..." : "Book Now"}
         </button>
