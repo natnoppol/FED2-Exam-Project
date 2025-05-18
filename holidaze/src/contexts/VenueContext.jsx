@@ -6,7 +6,8 @@ import React, {
   useCallback, 
 } from "react";
 
-import { fetchPaginatedVenues, fetchAllPages } from "../api"; // Add fetchAllPages
+import { fetchPaginatedVenues, fetchAllPages } from "../api"; 
+import { ITEMS_PER_PAGE } from "../constants"; 
 
 const VenueContext = createContext();
 
@@ -23,7 +24,7 @@ const loadPage = useCallback(async (page = 1) => {
   setLoading(true);
   try {
     const { venues: data, currentPage: cp, totalPages: tp } =
-      await fetchPaginatedVenues(page, 9);
+      await fetchPaginatedVenues(page, ITEMS_PER_PAGE);
     setVenues(data);
     setCurrentPage(cp);
     setTotalPages(tp);

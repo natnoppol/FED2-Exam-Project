@@ -5,6 +5,7 @@ import { Spinner } from "../components/Spinner";
 import { HiLocationMarker } from "react-icons/hi";
 import { useVenues } from "../contexts/venueContext";
 import { filterVenues } from "../utils/filterVenues"; 
+import { ITEMS_PER_PAGE } from "../constants";
 
 const VenueCard = ({ venue }) => {
   const { city = "Unknown City", country = "Unknown Country" } = venue.location || {};
@@ -51,7 +52,6 @@ const HomePage = () => {
   const [isFiltered, setIsFiltered] = useState(false);
   const [searchPage, setSearchPage] = useState(1);
 
-  const itemsPerPage = 9;
 
 useEffect(() => {
   if (!isFiltered) {
@@ -74,10 +74,10 @@ useEffect(() => {
     setSearchPage(1);
   };
 
-  const paginatedFiltered = filteredVenues.slice(
-    (searchPage - 1) * itemsPerPage,
-    searchPage * itemsPerPage
-  );
+ const paginatedFiltered = filteredVenues.slice(
+  (searchPage - 1) * ITEMS_PER_PAGE,
+  searchPage * ITEMS_PER_PAGE
+);
 
   const venuesToDisplay = isFiltered ? paginatedFiltered : venues;
 
@@ -137,16 +137,16 @@ useEffect(() => {
           </button>
           <span className="text-lg font-semibold">
             Page {searchPage} of{" "}
-            {Math.ceil(filteredVenues.length / itemsPerPage)}
+            {Math.ceil(filteredVenues.length / ITEMS_PER_PAGE)}
           </span>
           <button
             onClick={() =>
               setSearchPage((p) =>
-                p < Math.ceil(filteredVenues.length / itemsPerPage) ? p + 1 : p
+                p < Math.ceil(filteredVenues.length / ITEMS_PER_PAGE) ? p + 1 : p
               )
             }
             disabled={
-              searchPage >= Math.ceil(filteredVenues.length / itemsPerPage)
+              searchPage >= Math.ceil(filteredVenues.length / ITEMS_PER_PAGE)
             }
             className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
           >

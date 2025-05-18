@@ -6,3 +6,5 @@ export const CREATE_ERROR_MESSAGE = "Failed to create venue. Please try again.";
 
 export const UPDATE_SUCCESS_MESSAGE = "Venue updated successfully.";
 export const UPDATE_ERROR_MESSAGE = "Failed to update venue. Please try again.";
+
+export const ITEMS_PER_PAGE = 9;
