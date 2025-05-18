@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { fallbackImage } from "../api"; // Keep fallbackImage
+import React, { useEffect, useState } from "react";
+import { fallbackImage } from "../api";
 import SearchForm from "../components/SearchForm";
 import { Spinner } from "../components/Spinner";
-import { HiLocationMarker } from "react-icons/hi"; 
+import { HiLocationMarker } from "react-icons/hi";
 import { useVenues } from "../contexts/venueContext";
 
 const VenueCard = ({ venue }) => {
@@ -17,18 +17,13 @@ const VenueCard = ({ venue }) => {
       />
       <div className="p-4">
         <h2 className="text-xl font-semibold mb-1">{venue.name}</h2>
-
-        {/* Location with icon */}
         <p className="text-gray-700 text-sm font-medium mb-2 flex items-center gap-2">
           <HiLocationMarker className="text-red-500 text-lg" />
           {city}, {country}
         </p>
-
-        {/* Price per night */}
         <p className="text-lg font-bold text-green-600 mb-2">
           Price: ${venue.price} / night
         </p>
-
         <a
           href={`/venue/${venue.id}`}
           className="btn btn-primary mt-2 inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -40,52 +35,70 @@ const VenueCard = ({ venue }) => {
   );
 };
 
-// Helper function for filtering (can be moved outside if preferred)
+// Helper: filter venues by search parameters
 const filterVenues = (venues, { country, guests }) => {
-  if (!venues) return [];
-
   const lowerCountry = country ? country.toLowerCase().trim() : "";
-  const minGuests = guests || 1; // Default to 1 guest if not specified
+  const minGuests = guests || 1;
 
-  return venues.filter(venue => {
-    // Filter by location (country, city, or continent) if country search term is provided
-    const locationMatch = lowerCountry === "" ||
+  return venues.filter((venue) => {
+    const locationMatch =
+      lowerCountry === "" ||
       venue.location?.country?.toLowerCase().includes(lowerCountry) ||
       venue.location?.city?.toLowerCase().includes(lowerCountry) ||
       venue.location?.continent?.toLowerCase().includes(lowerCountry);
 
-    // Filter by guests
     const guestsMatch = venue.maxGuests >= minGuests;
-
-    // Note: Date filtering (checkIn, checkOut) is not possible client-side
-    // with only the venue details. This would require fetching booking data.
-    // We will ignore date parameters for client-side filtering here.
 
     return locationMatch && guestsMatch;
   });
 };
 
 const HomePage = () => {
-  // Use the context to get all venues and their loading/error states
-  const { allVenues, loading, error } = useVenues();
+  const {
+    venues,
+    allVenues,
+    loading,
+    error,
+    currentPage,
+    totalPages,
+    loadPage,
+  } = useVenues();
 
-  // State to hold the venues currently being displayed (filtered)
-  const [displayedVenues, setDisplayedVenues] = useState([]);
+  const [filteredVenues, setFilteredVenues] = useState([]);
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [searchPage, setSearchPage] = useState(1);
 
-  // Effect to initialize displayedVenues when allVenues from context is loaded
+  const itemsPerPage = 9;
+
   useEffect(() => {
-    if (allVenues && !loading && !error) {
-      setDisplayedVenues(allVenues); // Initially display all venues once loaded
+    if (!isFiltered) {
+      loadPage(1); // load first page only when not filtering
     }
-  }, [allVenues, loading, error]);
+  }, [isFiltered]);
 
-  const handleSearch = async (searchParams) => {
-    // Filter the venues from the context based on search parameters
+  const handleSearch = (searchParams) => {
+    if (!searchParams.country && !searchParams.guests) {
+      setIsFiltered(false);
+      setFilteredVenues([]);
+      setSearchPage(1);
+      return;
+    }
+
     const filtered = filterVenues(allVenues, searchParams);
-    setDisplayedVenues(filtered);
+    setFilteredVenues(filtered);
+    setIsFiltered(true);
+    setSearchPage(1); // reset to page 1
   };
 
-  if (loading) return <Spinner />;
+  // Apply pagination to filtered venues
+  const paginatedFiltered = filteredVenues.slice(
+    (searchPage - 1) * itemsPerPage,
+    searchPage * itemsPerPage
+  );
+
+  const venuesToDisplay = isFiltered ? paginatedFiltered : venues;
+
+  if (loading && !isFiltered) return <Spinner />;
 
   return (
     <div>
@@ -94,19 +107,72 @@ const HomePage = () => {
       {error && <p className="text-red-600">{error}</p>}
 
       <h1 className="text-2xl font-bold mb-6">
-        {displayedVenues.length > 0 ? "Available Venues" : "No Venues Found"}
+        {venuesToDisplay.length > 0 ? "Available Venues" : "No Venues Found"}
       </h1>
+
       <div className="venue-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {displayedVenues.length === 0 && !loading && !error ? (
+        {venuesToDisplay.length === 0 && !loading ? (
           <p className="text-center text-gray-600 mt-6">
             No venues found for your search criteria.
           </p>
         ) : (
-          displayedVenues.map((venue, idx) => (
-            <VenueCard key={venue.id + idx} venue={venue} />
+          venuesToDisplay.map((venue) => (
+            <VenueCard key={venue.id} venue={venue} />
           ))
         )}
       </div>
+
+      {/* Pagination controls */}
+      {!isFiltered ? (
+        <div className="flex justify-center gap-4 mt-8">
+          <button
+            onClick={() => loadPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="text-lg font-semibold">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => loadPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      ) : (
+        <div className="flex justify-center gap-4 mt-8">
+          <button
+            onClick={() => setSearchPage((p) => Math.max(p - 1, 1))}
+            disabled={searchPage === 1}
+            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
+          >
+            Previous
+          </button>
+          <span className="text-lg font-semibold">
+            Page {searchPage} of{" "}
+            {Math.ceil(filteredVenues.length / itemsPerPage)}
+          </span>
+          <button
+            onClick={() =>
+              setSearchPage((p) =>
+                p < Math.ceil(filteredVenues.length / itemsPerPage)
+                  ? p + 1
+                  : p
+              )
+            }
+            disabled={
+              searchPage >= Math.ceil(filteredVenues.length / itemsPerPage)
+            }
+            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
