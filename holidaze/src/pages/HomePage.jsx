@@ -4,6 +4,7 @@ import SearchForm from "../components/SearchForm";
 import { Spinner } from "../components/Spinner";
 import { HiLocationMarker } from "react-icons/hi";
 import { useVenues } from "../contexts/venueContext";
+import { filterVenues } from "../utils/filterVenues"; 
 
 const VenueCard = ({ venue }) => {
   const { city = "Unknown City", country = "Unknown Country" } = venue.location || {};
@@ -35,24 +36,6 @@ const VenueCard = ({ venue }) => {
   );
 };
 
-// Helper: filter venues by search parameters
-const filterVenues = (venues, { country, guests }) => {
-  const lowerCountry = country ? country.toLowerCase().trim() : "";
-  const minGuests = guests || 1;
-
-  return venues.filter((venue) => {
-    const locationMatch =
-      lowerCountry === "" ||
-      venue.location?.country?.toLowerCase().includes(lowerCountry) ||
-      venue.location?.city?.toLowerCase().includes(lowerCountry) ||
-      venue.location?.continent?.toLowerCase().includes(lowerCountry);
-
-    const guestsMatch = venue.maxGuests >= minGuests;
-
-    return locationMatch && guestsMatch;
-  });
-};
-
 const HomePage = () => {
   const {
     venues,
@@ -72,7 +55,7 @@ const HomePage = () => {
 
   useEffect(() => {
     if (!isFiltered) {
-      loadPage(1); // load first page only when not filtering
+      loadPage(1);
     }
   }, [isFiltered]);
 
@@ -87,10 +70,9 @@ const HomePage = () => {
     const filtered = filterVenues(allVenues, searchParams);
     setFilteredVenues(filtered);
     setIsFiltered(true);
-    setSearchPage(1); // reset to page 1
+    setSearchPage(1);
   };
 
-  // Apply pagination to filtered venues
   const paginatedFiltered = filteredVenues.slice(
     (searchPage - 1) * itemsPerPage,
     searchPage * itemsPerPage
@@ -122,13 +104,13 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* Pagination controls */}
+      {/* Pagination */}
       {!isFiltered ? (
         <div className="flex justify-center gap-4 mt-8">
           <button
             onClick={() => loadPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
           >
             Previous
           </button>
@@ -138,7 +120,7 @@ const HomePage = () => {
           <button
             onClick={() => loadPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
           >
             Next
           </button>
@@ -148,7 +130,7 @@ const HomePage = () => {
           <button
             onClick={() => setSearchPage((p) => Math.max(p - 1, 1))}
             disabled={searchPage === 1}
-            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
           >
             Previous
           </button>
@@ -159,15 +141,13 @@ const HomePage = () => {
           <button
             onClick={() =>
               setSearchPage((p) =>
-                p < Math.ceil(filteredVenues.length / itemsPerPage)
-                  ? p + 1
-                  : p
+                p < Math.ceil(filteredVenues.length / itemsPerPage) ? p + 1 : p
               )
             }
             disabled={
               searchPage >= Math.ceil(filteredVenues.length / itemsPerPage)
             }
-            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
           >
             Next
           </button>
