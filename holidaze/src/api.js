@@ -164,7 +164,8 @@ export const fetchAllPages = async (maxPages = Infinity) => {
 
     do {
       const response = await fetch(
-        `${API_BASE_URL}/holidaze/venues?page=${currentPage}`,
+        `
+        ${API_BASE_URL}/holidaze/venues?page=${currentPage}`,
         {
           method: "GET",
           headers: {
