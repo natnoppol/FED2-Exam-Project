@@ -6,6 +6,7 @@ import { HiLocationMarker } from "react-icons/hi";
 import { useVenues } from "../contexts/venueContext";
 import { filterVenues } from "../utils/filterVenues"; 
 import { ITEMS_PER_PAGE } from "../constants";
+import Pagination from "../components/Pagination";
 
 const VenueCard = ({ venue }) => {
   const { city = "Unknown City", country = "Unknown Country" } = venue.location || {};
@@ -51,6 +52,9 @@ const HomePage = () => {
   const [filteredVenues, setFilteredVenues] = useState([]);
   const [isFiltered, setIsFiltered] = useState(false);
   const [searchPage, setSearchPage] = useState(1);
+
+  // Calculate total pages for filtered venues
+  const filteredTotalPages = Math.ceil(filteredVenues.length / ITEMS_PER_PAGE);
 
 
 useEffect(() => {
@@ -107,52 +111,21 @@ useEffect(() => {
 
       {/* Pagination */}
       {!isFiltered ? (
-        <div className="flex justify-center gap-4 mt-8">
-          <button
-            onClick={() => loadPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
-          >
-            Previous
-          </button>
-          <span className="text-lg font-semibold">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => loadPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
-          >
-            Next
-          </button>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => {
+            if (page >= 1 && page <= totalPages) loadPage(page);
+          }}
+        />
       ) : (
-        <div className="flex justify-center gap-4 mt-8">
-          <button
-            onClick={() => setSearchPage((p) => Math.max(p - 1, 1))}
-            disabled={searchPage === 1}
-            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
-          >
-            Previous
-          </button>
-          <span className="text-lg font-semibold">
-            Page {searchPage} of{" "}
-            {Math.ceil(filteredVenues.length / ITEMS_PER_PAGE)}
-          </span>
-          <button
-            onClick={() =>
-              setSearchPage((p) =>
-                p < Math.ceil(filteredVenues.length / ITEMS_PER_PAGE) ? p + 1 : p
-              )
-            }
-            disabled={
-              searchPage >= Math.ceil(filteredVenues.length / ITEMS_PER_PAGE)
-            }
-            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white cursor-pointer"
-          >
-            Next
-          </button>
-        </div>
+        <Pagination
+          currentPage={searchPage}
+          totalPages={filteredTotalPages}
+          onPageChange={(page) => {
+            if (page >= 1 && page <= filteredTotalPages) setSearchPage(page);
+          }}
+        />
       )}
     </div>
   );
