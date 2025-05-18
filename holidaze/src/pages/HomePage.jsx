@@ -94,7 +94,7 @@ useEffect(() => {
       </h1>
 
       <div className="venue-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {venuesToDisplay.length === 0 && !loading ? (
+         {venuesToDisplay.length === 0 && !loading && !error ? (
           <p className="text-center text-gray-600 mt-6">
             No venues found for your search criteria.
           </p>
