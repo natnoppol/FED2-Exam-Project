@@ -1,4 +1,11 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback, 
+} from "react";
+
 import { fetchPaginatedVenues, fetchAllPages } from "../api"; // Add fetchAllPages
 
 const VenueContext = createContext();
@@ -12,22 +19,23 @@ export function VenueProvider({ children }) {
   const [totalPages, setTotalPages] = useState(1);
 
   // Load paginated venues
-  const loadPage = async (page = 1) => {
-    setLoading(true);
-    try {
-      const { venues: data, currentPage: cp, totalPages: tp } =
-        await fetchPaginatedVenues(page, 9);
-      setVenues(data);
-      setCurrentPage(cp);
-      setTotalPages(tp);
-      setError(null);
-    } catch (err) {
-      setError(err.message);
-      setVenues([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+const loadPage = useCallback(async (page = 1) => {
+  setLoading(true);
+  try {
+    const { venues: data, currentPage: cp, totalPages: tp } =
+      await fetchPaginatedVenues(page, 9);
+    setVenues(data);
+    setCurrentPage(cp);
+    setTotalPages(tp);
+    setError(null);
+  } catch (err) {
+    setError(err.message);
+    setVenues([]);
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
 
   // Load all venues once (for filtering)
   const loadAllVenues = async () => {
