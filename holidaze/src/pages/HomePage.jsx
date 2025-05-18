@@ -53,11 +53,12 @@ const HomePage = () => {
 
   const itemsPerPage = 9;
 
-  useEffect(() => {
-    if (!isFiltered) {
-      loadPage(1);
-    }
-  }, [isFiltered]);
+useEffect(() => {
+  if (!isFiltered) {
+    loadPage(1);
+  }
+}, [isFiltered, loadPage]);
+
 
   const handleSearch = (searchParams) => {
     if (!searchParams.country && !searchParams.guests) {
