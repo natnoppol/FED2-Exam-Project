@@ -92,11 +92,26 @@ const ProfilePage = () => {
     <div className="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
       {/* Profile section */}
       <div className="space-y-2 text-center">
-        <img
-          src={user.avatar?.url || fallbackImage}
-          alt={user.avatar?.alt || user.name}
-          className="w-24 h-24 rounded-full object-cover mx-auto"
-        />
+        {/* Banner + Avatar overlapping */}
+        <div className="relative mb-4">
+          {user.banner?.url && (
+            <img
+              src={user.banner.url}
+              alt={user.banner.alt || `${user.name}'s banner`}
+              className="w-full h-48 object-cover rounded-md shadow-sm"
+            />
+          )}
+
+          <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
+            <img
+              src={user.avatar?.url || fallbackImage}
+              alt={user.avatar?.alt || user.name}
+              className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md"
+            />
+          </div>
+        </div>
+        {/* Space for avatar */}
+        <div className="h-12"></div>
         <h2 className="text-2xl font-semibold">{user.name}</h2>
 
         {/* Display bio and venue manager status */}
