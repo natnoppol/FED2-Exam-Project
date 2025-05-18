@@ -110,23 +110,15 @@ useEffect(() => {
       </div>
 
       {/* Pagination */}
-      {!isFiltered ? (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => {
-            if (page >= 1 && page <= totalPages) loadPage(page);
-          }}
-        />
-      ) : (
-        <Pagination
-          currentPage={searchPage}
-          totalPages={filteredTotalPages}
-          onPageChange={(page) => {
-            if (page >= 1 && page <= filteredTotalPages) setSearchPage(page);
-          }}
-        />
-      )}
+      <Pagination
+        currentPage={isFiltered ? searchPage : currentPage}
+        totalPages={isFiltered ? filteredTotalPages : totalPages}
+        onPageChange={(page) => {
+          if (page >= 1 && page <= (isFiltered ? filteredTotalPages : totalPages)) {
+            isFiltered ? setSearchPage(page) : loadPage(page);
+          }
+        }}
+      />
     </div>
   );
 };

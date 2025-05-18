@@ -47,8 +47,12 @@ export function VenueProvider({ children }) {
       setAllVenues(all);
       setError(null); // Clear any previous error
     } catch (err) {
+      console.error("Error loading page:", err); 
       setError(`Failed to load all venues: ${err.message}`); // Set error state
       setAllVenues([]); // Clear allVenues on failure
+    }
+    finally {
+      setLoading(false);
     }
   };
 
