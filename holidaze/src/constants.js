@@ -8,3 +8,5 @@ export const UPDATE_SUCCESS_MESSAGE = "Venue updated successfully.";
 export const UPDATE_ERROR_MESSAGE = "Failed to update venue. Please try again.";
 
 export const ITEMS_PER_PAGE = 9;
+
+export const BOOKINGS_PER_PAGE = 5;
