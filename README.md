@@ -17,12 +17,12 @@
 
 ```
 bash
-git clone natnoppol/ecom-react-natnoppol
+gh repo clone natnoppol/FED2-Exam-Project
 
 ```
-
-
-### `npm start`
+### `.env` VITE_API_KEY='3375ffec-226d-4a0c-9550-ce4e61bf2122' make sure you do add your API KEY
+### `cd holidaze`
+### `npm run dev`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
