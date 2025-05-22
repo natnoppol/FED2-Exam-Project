@@ -20,7 +20,11 @@ bash
 gh repo clone natnoppol/FED2-Exam-Project
 
 ```
-### `.env` VITE_API_KEY='3375ffec-226d-4a0c-9550-ce4e61bf2122' make sure you do add your API KEY
+### `.env`  make sure you do add your API KEY
+### `.env`
+### `VITE_API_BASE_URL=YOUR_API_BASE_URL`
+### `VITE_LOGGING_ENABLED=YOUR_LOGGING_ENABLED`
+###  `VITE_API_KEY=YOUR_API_KEY`
 ### `cd holidaze`
 ### `npm run dev`
 
@@ -29,4 +33,10 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
+
+
+# .env
+VITE_API_BASE_URL=YOUR_API_BASE_URL
+VITE_LOGGING_ENABLED=YOUR_LOGGING_ENABLED
+VITE_API_KEY=YOUR_API_KEY
 
