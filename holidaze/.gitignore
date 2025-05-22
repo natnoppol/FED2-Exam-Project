@@ -1,5 +1,6 @@
 # .gitignore
 .env
+/holidaze/.env
 .env.*
 
 # Logs
