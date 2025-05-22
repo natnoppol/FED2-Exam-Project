@@ -3,7 +3,9 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
 import { UserProvider } from "./contexts/UserContext";
-import { VenueProvider } from "./contexts/venueContext"; 
+// check 
+import { VenueProvider } from "./contexts/VenueContext"; // Import VenueProvider
+
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
