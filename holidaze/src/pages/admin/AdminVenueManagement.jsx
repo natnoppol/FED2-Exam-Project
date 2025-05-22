@@ -7,6 +7,7 @@ import { getUser } from "../../utils/auth";
 import { getVenueById, deleteVenue as apiDeleteVenue } from "../../api";
 import { toast } from "react-toastify";
 import { Plus, ArrowLeft, ArrowRight } from "lucide-react";
+import { Spinner } from "../../components/Spinner";
 
 const PaginationControls = ({ currentPage, totalPages, handlePrevPage, handleNextPage }) => (
   <div className="flex justify-center mt-8 space-x-2">
@@ -119,7 +120,7 @@ const AdminVenueManagement = () => {
   };
 
   if (loadingVenues && !showForm && !venueIdParam) {
-    return <div className="text-center py-10">Loading your venues...</div>;
+    return <Spinner/>
   }
 
   if (venuesError && !showForm) {
