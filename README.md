@@ -22,9 +22,9 @@ gh repo clone natnoppol/FED2-Exam-Project
 ```
 ### `.env`  make sure you do add your API KEY
 ### `.env`
-VITE_API_BASE_URL=YOUR_API_BASE_URL
-VITE_LOGGING_ENABLED=YOUR_LOGGING_ENABLED
-VITE_API_KEY=YOUR_API_KEY
+### `VITE_API_BASE_URL=YOUR_API_BASE_URL`
+### `VITE_LOGGING_ENABLED=YOUR_LOGGING_ENABLED`
+###  `VITE_API_KEY=YOUR_API_KEY`
 ### `cd holidaze`
 ### `npm run dev`
 
