@@ -3,7 +3,8 @@ import { fallbackImage } from "../api";
 import SearchForm from "../components/SearchForm";
 import { Spinner } from "../components/Spinner";
 import { HiLocationMarker } from "react-icons/hi";
-import { useVenues } from "../contexts/venueContext";
+//check
+import { useVenues } from "../contexts/VenueContext";
 import { filterVenues } from "../utils/filterVenues"; 
 import { ITEMS_PER_PAGE } from "../constants";
 import Pagination from "../components/Pagination";
