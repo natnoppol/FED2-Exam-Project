@@ -120,7 +120,7 @@ const AdminVenueManagement = () => {
   };
 
   if (loadingVenues && !showForm && !venueIdParam) {
-    return <Spinner/>
+    return <Spinner message="Loading venue details..." />;
   }
 
   if (venuesError && !showForm) {
