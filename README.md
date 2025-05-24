@@ -8,8 +8,13 @@
 
 ## Table of Contents
 
-- [planing board](https://github.com/users/natnoppol/projects/10/views/1)
-- [Demo]()
+- [Kanban board](https://github.com/users/natnoppol/projects/10/views/1)
+- [Gannt chart](https://github.com/users/natnoppol/projects/10/views/2)
+- [Figma style guide](https://www.figma.com/design/EarMz0a8yDFw4Xfpzxi3GG/Game-App?node-id=2313-3753&t=kHiBLkJMfoTZS53j-1)
+- [Link to your Figma design](https://www.figma.com/design/EarMz0a8yDFw4Xfpzxi3GG/Game-App?node-id=2318-7614&t=kHiBLkJMfoTZS53j-1)
+- [ Link to your GitHub repository](https://github.com/natnoppol/FED2-Exam-Project)
+- [ Link to your GitHub repository](https://github.com/natnoppol/FED2-Exam-Project)
+- [Link to your deployed web application](https://fed-2-exam-project.vercel.app/)
 
 🟢 
 
